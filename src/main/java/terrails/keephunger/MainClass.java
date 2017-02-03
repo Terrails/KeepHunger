@@ -17,7 +17,7 @@ import terrails.keephunger.proxies.CommonProxy;
         guiFactory = Constants.GUIFACTORY
 )
 public class MainClass {
-    @SidedProxy(clientSide="terrails.keephunger.proxies.ClientProxy", serverSide="terrails.keephunger.proxies.ServerProxy")
+    @SidedProxy(clientSide=Constants.CLIENT_PROXY, serverSide=Constants.SERVER_PROXY)
     public static CommonProxy proxy;
 
     @Mod.EventHandler
