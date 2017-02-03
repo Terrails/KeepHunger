@@ -1,0 +1,16 @@
+[
+  {
+    "modid": "keep_hunger",
+    "name": "Keep Hunger",
+    "description": "It saves your hunger when you respawn",
+    "version": "1.1",
+    "mcversion": "1.9-1.11.2",
+    "url": "https://mods.curse.com/mc-mods/minecraft/258168-keep-hunger",
+    "updateUrl": "",
+    "authorList": ["Terrails"],
+    "credits": "Authored by Terrails, based on idea from Tinker's Construct",
+    "logoFile": "/keepHunger.png",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
