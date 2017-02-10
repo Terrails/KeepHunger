@@ -16,6 +16,9 @@ public class ConfigHandler{
     public static boolean noEating;
     public static boolean peacefulHunger;
     public static int noEatingTime;
+    public static int minRespawn;
+    public static boolean respawnMin;
+    public static boolean saturation;
 
     public static void init(File file)
     {
@@ -39,7 +42,9 @@ public class ConfigHandler{
         keepXP = configFile.getBoolean("XP Saving", category, true, "Enable Experience Saving");
         noEating = configFile.getBoolean("Eating Cooldown", category, true, "Enable Eating Cooldown");
         noEatingTime = configFile.getInt("Eating Cooldown (Seconds)", category, 300, 0, Int.MaxValue(), "Eating Cooldown (Seconds)");
-        peacefulHunger = configFile.getBoolean("Hunger in Peaceful", category, true, "Enable Hunger in Peaceful Mode");
+        respawnMin = configFile.getBoolean("Respawn Minimal Food", category, true, "Respawn Minimal Food");
+        minRespawn = configFile.getInt("Respawn Minimal Food Value", category, 8, 0, 20, "Respawn Minimal Food Value");
+        saturation = configFile.getBoolean("Saturation Saving", category, true, "Enable Saturation Saving");
 
         if (configFile.hasChanged()) {
             configFile.save();

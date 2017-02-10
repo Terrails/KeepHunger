@@ -9,7 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class PotionDefault extends Potion
 {
-    private static final ResourceLocation POTIONS_LOCATION = new ResourceLocation("keephunger:textures/potions/potioneffect.png");
+    private static final ResourceLocation POTIONS_LOCATION = new ResourceLocation("keep_hunger:textures/potions/potioneffect.png");
 
     protected PotionDefault(boolean isBadEffectIn, int liquidColorIn, int x, int y)
     {
@@ -32,7 +32,10 @@ public class PotionDefault extends Potion
     @SideOnly(Side.CLIENT)
     public boolean hasStatusIcon()
     {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(POTIONS_LOCATION);
+    //    Minecraft.getMinecraft().getTextureManager().bindTexture(POTIONS_LOCATION);
+        Minecraft.getMinecraft().renderEngine.bindTexture(POTIONS_LOCATION);
+        this.setIconIndex(0,0);
         return super.hasStatusIcon();
+     //   return false;
     }
 }

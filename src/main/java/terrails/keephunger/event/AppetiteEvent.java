@@ -3,10 +3,14 @@ package terrails.keephunger.event;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
+import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import terrails.keephunger.config.ConfigHandler;
 import terrails.keephunger.potion.ModPotions;
+
+import java.lang.reflect.Field;
 
 public class AppetiteEvent {
     //Appetite Effect
@@ -39,4 +43,5 @@ public class AppetiteEvent {
             event.setCanceled(true);
         }
     }
+
 }

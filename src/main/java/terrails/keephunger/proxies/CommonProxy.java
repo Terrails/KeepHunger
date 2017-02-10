@@ -11,8 +11,12 @@ import terrails.keephunger.event.EventHandler;
 
 public class CommonProxy {
 
+ //   public static SoundEvent mgtc;
+
     public void preInit(FMLPreInitializationEvent e) {
         FMLCommonHandler.instance().bus().register(new ConfigHandler());
+  //      final ResourceLocation location = new ResourceLocation(Constants.MODID, "mgtc");
+//        mgtc = GameRegistry.register(new SoundEvent(location).setRegistryName(location));
     }
 
     public void init(FMLInitializationEvent e) {

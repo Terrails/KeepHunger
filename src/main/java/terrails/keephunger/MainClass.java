@@ -1,13 +1,18 @@
 package terrails.keephunger;
 
+import net.minecraft.util.FoodStats;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import terrails.keephunger.config.ConfigHandler;
 import terrails.keephunger.potion.ModPotions;
 import terrails.keephunger.proxies.CommonProxy;
+
+import java.lang.reflect.Field;
 
 @Mod(
         modid = Constants.MODID,
@@ -17,26 +22,25 @@ import terrails.keephunger.proxies.CommonProxy;
         guiFactory = Constants.GUIFACTORY
 )
 public class MainClass {
-    @SidedProxy(clientSide=Constants.CLIENT_PROXY, serverSide=Constants.SERVER_PROXY)
+    @SidedProxy(clientSide = Constants.CLIENT_PROXY, serverSide = Constants.SERVER_PROXY)
     public static CommonProxy proxy;
 
     @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
+    public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
         ModPotions.init();
         ConfigHandler.init(event.getSuggestedConfigurationFile());
     }
 
     @Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
+    public void init(FMLInitializationEvent event) {
         proxy.init(event);
     }
 
     @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event)
-    {
+    public void postInit(FMLPostInitializationEvent event) {
         proxy.postInit(event);
     }
+
+
 }
