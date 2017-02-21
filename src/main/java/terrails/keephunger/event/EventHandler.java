@@ -1,27 +1,36 @@
 package terrails.keephunger.event;
 
-
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumAction;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.FoodStats;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import terrails.keephunger.config.ConfigHandler;
 import terrails.keephunger.potion.ModPotions;
+import toughasnails.core.ToughAsNails;
+import toughasnails.thirst.ThirstHandler;
 
 import java.lang.reflect.Field;
 
 public class EventHandler
 {
+        @SubscribeEvent
+        public void keepHunger(PlayerEvent.Clone player)
+        {
+            if((player.isWasDeath() && ConfigHandler.respawnMinHungerBoolean) &&
+            player.getOriginal().getFoodStats().getFoodLevel() <= ConfigHandler.minHungerValue) {
+                player.getEntityPlayer().getFoodStats().setFoodLevel(ConfigHandler.minHungerValue);
+
+            } else if ((player.isWasDeath()) &&
+                    (ConfigHandler.keepHunger)) {
+                player.getEntityPlayer().getFoodStats().setFoodLevel(player.getOriginal().getFoodStats().getFoodLevel());
+            }
+
+            if(player.isWasDeath() && ConfigHandler.saturation) {
+                setFoodSaturationLevel(player.getEntityPlayer().getFoodStats(), player.getOriginal().getFoodStats().getSaturationLevel());
+            }
+        }
 
         public void setFoodSaturationLevel(FoodStats food, float sat)
         {
@@ -33,24 +42,6 @@ public class EventHandler
             catch (IllegalAccessException e)
             {
                 throw new RuntimeException(e);
-            }
-        }
-
-        @SubscribeEvent
-        public void keepHunger(PlayerEvent.Clone player)
-        {
-            if((player.isWasDeath() && ConfigHandler.respawnMin) &&
-            player.getOriginal().getFoodStats().getFoodLevel() <= ConfigHandler.minRespawn) {
-                player.getEntityPlayer().getFoodStats().setFoodLevel(ConfigHandler.minRespawn);
-
-            } else if ((player.isWasDeath()) &&
-                    (ConfigHandler.keepHunger)) {
-                player.getEntityPlayer().getFoodStats().setFoodLevel(player.getOriginal().getFoodStats().getFoodLevel());
-            }
-
-            if(player.isWasDeath() && ConfigHandler.saturation) {
-                // player.getEntityPlayer().getFoodStats().setFoodSaturationLevel(player.getOriginal().getFoodStats().getSaturationLevel());
-                setFoodSaturationLevel(player.getEntityPlayer().getFoodStats(), player.getOriginal().getFoodStats().getSaturationLevel());
             }
         }
 
@@ -70,4 +61,5 @@ public class EventHandler
                 player.player.addPotionEffect(new PotionEffect(ModPotions.appetite, ConfigHandler.noEatingTime * 20));
             }
         }
-    }
+}
+

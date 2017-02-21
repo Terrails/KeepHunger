@@ -2,3 +2,8 @@
 
 #Potion
 potion.appetite=No Appetite
+
+#Config
+config.category.generalSettings.title=General Settings
+config.category.minimalSettings.title=Minimal Value Settings
+config.category.tanSettings.title=ToughAsNails Settings
