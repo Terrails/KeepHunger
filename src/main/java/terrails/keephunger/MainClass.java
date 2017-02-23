@@ -1,22 +1,14 @@
 package terrails.keephunger;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.FoodStats;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import terrails.keephunger.config.ConfigHandler;
 import terrails.keephunger.potion.ModPotions;
 import terrails.keephunger.proxies.CommonProxy;
-import toughasnails.core.ToughAsNails;
-
-import java.lang.reflect.Field;
 
 @Mod(
         modid = Constants.MODID,
