@@ -62,16 +62,4 @@ public class TANEvent{
         IThirst thirstData = ThirstHelper.getThirstData(entityPlayer);
         thirstData.setThirst(player.getThirst());
     }
-
-    @SubscribeEvent
-    public void onJoin(EntityJoinWorldEvent event) {
-
-        if (event.getEntity() instanceof EntityPlayerMP) {
-            EntityPlayer entityPlayer = (EntityPlayer) event.getEntity();
-            final IThirst player = getThirstStats(entityPlayer);
-
-            IThirst thirstData = ThirstHelper.getThirstData(entityPlayer);
-            thirstData.setThirst(player.getThirst());
-        }
-    }
 }
