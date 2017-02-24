@@ -21,6 +21,7 @@ import toughasnails.api.thirst.ThirstHelper;
 import toughasnails.thirst.ThirstHandler;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.concurrent.TimeUnit;
 
 public class TANEvent{
@@ -36,9 +37,8 @@ public class TANEvent{
     @SubscribeEvent
     public void onClonePlayer(PlayerEvent.Clone player) {
         final IThirst originalPlayer = player.getOriginal().getCapability(TANCapabilities.THIRST, null);
-        final IThirst entityPlayer = player.getEntityPlayer().getCapability(TANCapabilities.THIRST, null);
-        entityPlayer.setThirst(originalPlayer.getThirst());
-
+        final IThirst clonedPlayer = player.getEntityPlayer().getCapability(TANCapabilities.THIRST, null);
+        clonedPlayer.setThirst(originalPlayer.getThirst());
 
         //Using multiple isModLoaded name's for 1.9-1.11 compatibility
         //Currently not using because od debugging
@@ -63,6 +63,6 @@ public class TANEvent{
         //   final IThirst entityPlayer = event.player.getCapability(TANCapabilities.THIRST, null);
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        MainClass.instance.sendTo(new ThirstMessage(1), player);
+        MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
     }
 }

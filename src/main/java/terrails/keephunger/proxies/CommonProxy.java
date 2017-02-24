@@ -20,15 +20,12 @@ public class CommonProxy {
     public void init(FMLInitializationEvent e) {
         EventHandler handler = new EventHandler();
         MinecraftForge.EVENT_BUS.register(handler);
-        FMLCommonHandler.instance().bus().register(handler);
 
         AppetiteEvent appetite = new AppetiteEvent();
         MinecraftForge.EVENT_BUS.register(appetite);
-        FMLCommonHandler.instance().bus().register(appetite);
 
         TANEvent tanEvent = new TANEvent();
         MinecraftForge.EVENT_BUS.register(tanEvent);
-        FMLCommonHandler.instance().bus().register(tanEvent);
 
     }
 
