@@ -26,40 +26,33 @@ public class TANEvent{
             return entity.getCapability(TANCapabilities.THIRST, null);
         return null;
     }
-/*
-    @Nullable
-    public static IThirst getThirst(final EntityLivingBase entity) {
-        return entity.getCapability(TANCapabilities.THIRST, null);
-    }
-*/
     @SubscribeEvent
     public void onClonePlayer(PlayerEvent.Clone player) {
         final IThirst original = getThirstStats(player.getOriginal());
         final IThirst entityPlayer = getThirstStats(player.getEntityPlayer());
+    //    IThirst thirstData = ThirstHelper.getThirstData(player.getEntityPlayer());
 
-        //Using multiple isModLoaded id's for 1.9-1.11 compatibility
+        //Using multiple isModLoaded name's for 1.9-1.11 compatibility
 
         if (original.getThirst() <= ConfigHandler.thirstAmount && ConfigHandler.thirstBoolean && Loader.isModLoaded("toughasnails") && player.isWasDeath()) {
             entityPlayer.setThirst(ConfigHandler.thirstAmount);
+            IThirst thirstData = ThirstHelper.getThirstData(player.getEntityPlayer());
+            thirstData.setThirst(ConfigHandler.thirstAmount);
 
         } else if (original.getThirst() <= ConfigHandler.thirstAmount && ConfigHandler.thirstBoolean && Loader.isModLoaded("ToughAsNails") && player.isWasDeath()) {
             entityPlayer.setThirst(ConfigHandler.thirstAmount);
+            IThirst thirstData = ThirstHelper.getThirstData(player.getEntityPlayer());
+            thirstData.setThirst(ConfigHandler.thirstAmount);
 
         } else if (ConfigHandler.thirst && Loader.isModLoaded("toughasnails") && player.isWasDeath()) {
             entityPlayer.setThirst(original.getThirst());
+            IThirst thirstData = ThirstHelper.getThirstData(player.getEntityPlayer());
+            thirstData.setThirst(original.getThirst());
 
         } else if (ConfigHandler.thirst && Loader.isModLoaded("ToughAsNails") && player.isWasDeath()) {
             entityPlayer.setThirst(original.getThirst());
+            IThirst thirstData = ThirstHelper.getThirstData(player.getEntityPlayer());
+            thirstData.setThirst(original.getThirst());
         }
-    }
-
-    @SubscribeEvent
-    public void onRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event)
-    {
-        EntityPlayer entityPlayer = event.player;
-        final IThirst player = getThirstStats(entityPlayer);
-
-        IThirst thirstData = ThirstHelper.getThirstData(entityPlayer);
-        thirstData.setThirst(player.getThirst());
     }
 }
