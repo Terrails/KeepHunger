@@ -1,4 +1,4 @@
-package terrails.keephunger.potion;
+package terrails.statskeeper.potion;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
@@ -6,10 +6,11 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import terrails.statskeeper.Constants;
 
 public class PotionDefault extends Potion
 {
-    private static final ResourceLocation POTIONS_LOCATION = new ResourceLocation("keep_hunger:textures/potions/potioneffect.png");
+    private static final ResourceLocation POTIONS_LOCATION = new ResourceLocation(Constants.MODID + ":textures/potions/potioneffect.png");
 
     protected PotionDefault(boolean isBadEffectIn, int liquidColorIn, int x, int y)
     {

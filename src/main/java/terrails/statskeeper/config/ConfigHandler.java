@@ -1,13 +1,11 @@
-package terrails.keephunger.config;
+package terrails.statskeeper.config;
 
-import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.Sys;
 import scala.Int;
-import terrails.keephunger.Constants;
+import terrails.statskeeper.Constants;
 
 import java.io.File;
 

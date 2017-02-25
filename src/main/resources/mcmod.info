@@ -1,15 +1,15 @@
 [
   {
-    "modid": "keep_hunger",
-    "name": "Keep Hunger",
-    "description": "It saves your hunger when you respawn",
+    "modid": "stats_keeper",
+    "name": "Stats Keeper",
+    "description": "Save all the stats!",
     "version": "${version}",
     "mcversion": "${mcversion}",
-    "url": "https://mods.curse.com/mc-mods/minecraft/258168-keep-hunger",
+    "url": "https://minecraft.curseforge.com/projects/stats-keeper",
     "updateUrl": "",
     "authorList": ["Terrails"],
     "credits": "Authored by Terrails, based on idea from Tinker's Construct",
-    "logoFile": "/keepHunger.png",
+    "logoFile": "/Stats_Keeper.png",
     "screenshots": [],
     "dependencies": []
   }

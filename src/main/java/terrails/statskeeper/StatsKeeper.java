@@ -1,6 +1,5 @@
-package terrails.keephunger;
+package terrails.statskeeper;
 
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -9,11 +8,11 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import terrails.keephunger.config.ConfigHandler;
-import terrails.keephunger.event.TANEvent;
-import terrails.keephunger.packet.ThirstMessage;
-import terrails.keephunger.potion.ModPotions;
-import terrails.keephunger.proxies.CommonProxy;
+import terrails.statskeeper.config.ConfigHandler;
+import terrails.statskeeper.event.TANEvent;
+import terrails.statskeeper.packet.ThirstMessage;
+import terrails.statskeeper.potion.ModPotions;
+import terrails.statskeeper.proxies.CommonProxy;
 
 @Mod(
         modid = Constants.MODID,
@@ -22,7 +21,7 @@ import terrails.keephunger.proxies.CommonProxy;
         acceptedMinecraftVersions = Constants.MCVERSION,
         guiFactory = Constants.GUIFACTORY
 )
-public class MainClass {
+public class StatsKeeper {
     @SidedProxy(clientSide = Constants.CLIENT_PROXY, serverSide = Constants.SERVER_PROXY)
     public static CommonProxy proxy;
     public static SimpleNetworkWrapper instance;

@@ -1,4 +1,4 @@
-package terrails.keephunger.event;
+package terrails.statskeeper.event;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -6,10 +6,10 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import terrails.keephunger.Constants;
-import terrails.keephunger.MainClass;
-import terrails.keephunger.config.ConfigHandler;
-import terrails.keephunger.packet.ThirstMessage;
+import terrails.statskeeper.Constants;
+import terrails.statskeeper.StatsKeeper;
+import terrails.statskeeper.config.ConfigHandler;
+import terrails.statskeeper.packet.ThirstMessage;
 import toughasnails.api.TANCapabilities;
 import toughasnails.api.stat.capability.IThirst;
 import toughasnails.api.thirst.ThirstHelper;
@@ -50,7 +50,7 @@ public class TANEvent{
 
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
     }
 
     @Optional.Method(modid = "ToughAsNails")
@@ -58,7 +58,7 @@ public class TANEvent{
     public void onJoin(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
     }
 
     @Optional.Method(modid = "ToughAsNails")
@@ -67,7 +67,7 @@ public class TANEvent{
         if (event.getEntity() instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
             IThirst thirstData = ThirstHelper.getThirstData(player);
-            MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
         }
     }
 
@@ -97,7 +97,7 @@ public class TANEvent{
 
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
     }
 
     @Optional.Method(modid = "toughasnails")
@@ -105,7 +105,7 @@ public class TANEvent{
     public void onJoinOldTAN(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
     }
     @Optional.Method(modid = "toughasnails")
     @SubscribeEvent
@@ -113,7 +113,7 @@ public class TANEvent{
         if (event.getEntity() instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
             IThirst thirstData = ThirstHelper.getThirstData(player);
-            MainClass.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
         }
     }
 

@@ -1,4 +1,4 @@
-package terrails.keephunger.config;
+package terrails.statskeeper.config;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;

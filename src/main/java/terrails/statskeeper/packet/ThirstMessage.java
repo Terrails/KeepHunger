@@ -1,4 +1,4 @@
-package terrails.keephunger.packet;
+package terrails.statskeeper.packet;
 
 
 import io.netty.buffer.ByteBuf;
@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import toughasnails.api.TANCapabilities;
 import toughasnails.api.stat.capability.IThirst;
-import toughasnails.network.message.MessageUpdateStat;
 
 public class ThirstMessage implements IMessage {
 

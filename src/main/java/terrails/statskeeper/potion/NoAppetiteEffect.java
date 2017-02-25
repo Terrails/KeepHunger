@@ -1,4 +1,4 @@
-package terrails.keephunger.potion;
+package terrails.statskeeper.potion;
 
 public class NoAppetiteEffect   extends PotionDefault
 {

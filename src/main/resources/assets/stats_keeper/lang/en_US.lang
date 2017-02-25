@@ -7,3 +7,6 @@ potion.appetite=No Appetite
 config.category.generalSettings.title=General Settings
 config.category.minimalSettings.title=Minimal Value Settings
 config.category.tanSettings.title=ToughAsNails Settings
+
+#Config Tooltip
+config.category.arrowSettings.tooltip=Change Config Values InGame

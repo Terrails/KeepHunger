@@ -1,16 +1,12 @@
-package terrails.keephunger.event;
+package terrails.statskeeper.event;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
-import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import terrails.keephunger.config.ConfigHandler;
-import terrails.keephunger.potion.ModPotions;
-
-import java.lang.reflect.Field;
+import terrails.statskeeper.config.ConfigHandler;
+import terrails.statskeeper.potion.ModPotions;
 
 public class AppetiteEvent {
     //Appetite Effect

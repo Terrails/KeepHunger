@@ -14,8 +14,8 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 version = modversion
-group= "terrails.keephunger" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "KeepHunger"
+group= "terrails.statskeeper" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "Stats Keeper"
 
 minecraft {
     version = mcversion + "-" + forgeversion

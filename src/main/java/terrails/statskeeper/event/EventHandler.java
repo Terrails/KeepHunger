@@ -1,15 +1,12 @@
-package terrails.keephunger.event;
+package terrails.statskeeper.event;
 
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import terrails.keephunger.config.ConfigHandler;
-import terrails.keephunger.potion.ModPotions;
-import toughasnails.core.ToughAsNails;
-import toughasnails.thirst.ThirstHandler;
+import terrails.statskeeper.config.ConfigHandler;
+import terrails.statskeeper.potion.ModPotions;
 
 import java.lang.reflect.Field;
 

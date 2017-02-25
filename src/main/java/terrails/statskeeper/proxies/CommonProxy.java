@@ -1,14 +1,14 @@
-package terrails.keephunger.proxies;
+package terrails.statskeeper.proxies;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import terrails.keephunger.config.ConfigHandler;
-import terrails.keephunger.event.AppetiteEvent;
-import terrails.keephunger.event.EventHandler;
-import terrails.keephunger.event.TANEvent;
+import terrails.statskeeper.config.ConfigHandler;
+import terrails.statskeeper.event.AppetiteEvent;
+import terrails.statskeeper.event.EventHandler;
+import terrails.statskeeper.event.TANEvent;
 
 public class CommonProxy {
 
