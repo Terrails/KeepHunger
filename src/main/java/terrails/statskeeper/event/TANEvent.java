@@ -46,28 +46,33 @@ public class TANEvent{
 
     @Optional.Method(modid = "ToughAsNails")
     @SubscribeEvent
-    public void playerRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event){
-
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
-        IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+    public void playerRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
+        if (ConfigHandler.thirstBoolean || ConfigHandler.thirst) {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
+            IThirst thirstData = ThirstHelper.getThirstData(event.player);
+            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        }
     }
 
     @Optional.Method(modid = "ToughAsNails")
     @SubscribeEvent
     public void onJoin(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
-        IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        if (ConfigHandler.thirstBoolean || ConfigHandler.thirst) {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
+            IThirst thirstData = ThirstHelper.getThirstData(event.player);
+            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        }
     }
 
     @Optional.Method(modid = "ToughAsNails")
     @SubscribeEvent
     public void onWorldChange(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.player instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
-            IThirst thirstData = ThirstHelper.getThirstData(player);
-            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        if (ConfigHandler.thirstBoolean || ConfigHandler.thirst) {
+            if (event.player instanceof EntityPlayerMP) {
+                EntityPlayerMP player = (EntityPlayerMP) event.player;
+                IThirst thirstData = ThirstHelper.getThirstData(player);
+                StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+            }
         }
     }
 
@@ -93,27 +98,32 @@ public class TANEvent{
 
     @Optional.Method(modid = "toughasnails")
     @SubscribeEvent
-    public void playerRespawnOldTAN(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event){
-
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
-        IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+    public void playerRespawnOldTAN(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
+        if (ConfigHandler.thirstBoolean || ConfigHandler.thirst) {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
+            IThirst thirstData = ThirstHelper.getThirstData(event.player);
+            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        }
     }
 
     @Optional.Method(modid = "toughasnails")
     @SubscribeEvent
     public void onJoinOldTAN(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
-        IThirst thirstData = ThirstHelper.getThirstData(event.player);
-        StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        if (ConfigHandler.thirstBoolean || ConfigHandler.thirst) {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
+            IThirst thirstData = ThirstHelper.getThirstData(event.player);
+            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        }
     }
     @Optional.Method(modid = "toughasnails")
     @SubscribeEvent
     public void onWorldChangeOldTAN(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.player instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
-            IThirst thirstData = ThirstHelper.getThirstData(player);
-            StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+        if (ConfigHandler.thirstBoolean || ConfigHandler.thirst) {
+            if (event.player instanceof EntityPlayerMP) {
+                EntityPlayerMP entityPlayer = (EntityPlayerMP) event.player;
+                IThirst thirstData = ThirstHelper.getThirstData(entityPlayer);
+                StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), entityPlayer);
+            }
         }
     }
 
