@@ -9,7 +9,7 @@
     "updateUrl": "",
     "authorList": ["Terrails"],
     "credits": "Authored by Terrails, based on idea from Tinker's Construct",
-    "logoFile": "/Stats_Keeper.png",
+    "logoFile": "/statskeeper.png",
     "screenshots": [],
     "dependencies": []
   }

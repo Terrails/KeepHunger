@@ -63,9 +63,9 @@ public class TANEvent{
 
     @Optional.Method(modid = "ToughAsNails")
     @SubscribeEvent
-    public void onWorldChange(EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
+    public void onWorldChange(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.player instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
             IThirst thirstData = ThirstHelper.getThirstData(player);
             StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
         }
@@ -109,9 +109,9 @@ public class TANEvent{
     }
     @Optional.Method(modid = "toughasnails")
     @SubscribeEvent
-    public void onWorldChangeOldTAN(EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.getEntity();
+    public void onWorldChangeOldTAN(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.player instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) event.player;
             IThirst thirstData = ThirstHelper.getThirstData(player);
             StatsKeeper.instance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
         }
