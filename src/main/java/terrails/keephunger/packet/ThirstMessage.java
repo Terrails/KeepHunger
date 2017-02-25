@@ -38,10 +38,10 @@ public class ThirstMessage implements IMessage {
         @Override
         public IMessage onMessage(ThirstMessage message, MessageContext ctx) {
             IThreadListener mainThread = Minecraft.getMinecraft();
-            EntityPlayer player = Minecraft.getMinecraft().player;
             mainThread.addScheduledTask(new Runnable() {
                 @Override
                 public void run() {
+                    EntityPlayer player = Minecraft.getMinecraft().player;
                     final IThirst entityPlayer = player.getCapability(TANCapabilities.THIRST, null);
                     entityPlayer.setThirst(message.thirst);
                 }

@@ -76,13 +76,14 @@ public class ConfigHandler
 
         //ToughAsNails
         if(Loader.isModLoaded("toughasnails")){
-            System.out.println("Keep Hunger TAN config loaded!");
+            Constants.LOGGER.info("TAN config loaded!");
+
             thirst = configFile.getBoolean("Thirst Saving", TAN_SETTINGS, true, "Enable Tough As Nails Thirst Saving");
             thirstBoolean = configFile.getBoolean("Respawn Minimal Thirst", TAN_SETTINGS, true, "Respawn Minimal Thirst");
             thirstAmount = configFile.getInt("Respawn Minimal Thirst Value", TAN_SETTINGS, 8, 0, 20, "Respawn Minimal Thirst Value");
         }
         else if(Loader.isModLoaded("ToughAsNails")){
-            System.out.println("Keep Hunger TAN config loaded!");
+            Constants.LOGGER.info("TAN config loaded!");
 
             thirst = configFile.getBoolean("Thirst Saving", TAN_SETTINGS, true, "Enable Tough As Nails Thirst Saving");
             thirstBoolean = configFile.getBoolean("Respawn Minimal Thirst", TAN_SETTINGS, true, "Respawn Minimal Thirst");
@@ -92,24 +93,4 @@ public class ConfigHandler
             configFile.save();
         }
     }
-/*
-    public static void syncConfig()
-    {
-        String category = "General";
-        configFile.addCustomCategoryComment(category, "General Settings");
-        keepHunger = configFile.getBoolean("Hunger Saving", category, true, "Enable Hunger Saving");
-        keepXP = configFile.getBoolean("XP Saving", category, true, "Enable Experience Saving");
-        noEating = configFile.getBoolean("Eating Cooldown", category, true, "Enable Eating Cooldown");
-        noEatingTime = configFile.getInt("Eating Cooldown (Seconds)", category, 300, 0, Int.MaxValue(), "Eating Cooldown (Seconds)");
-        respawnMin = configFile.getBoolean("Respawn Minimal Food", category, true, "Respawn Minimal Food");
-        minRespawn = configFile.getInt("Respawn Minimal Food Value", category, 8, 0, 20, "Respawn Minimal Food Value");
-        saturation = configFile.getBoolean("Saturation Saving", category, true, "Enable Saturation Saving");
-        thirst = configFile.getBoolean("Thirst Saving", category, true, "Enable Tough As Nails Saturation Saving");
-        amountThirst = configFile.getBoolean("Respawn Minimal Thirst", category, true, "Respawn Minimal Thirst");
-        thirstAmount = configFile.getInt("Respawn Minimal Thirst Value", category, 8, 0, 20, "Respawn Minimal Thirst Value");
-
-        if (configFile.hasChanged()) {
-            configFile.save();
-        }
-    } */
 }

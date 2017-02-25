@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import terrails.keephunger.config.ConfigHandler;
+import terrails.keephunger.event.TANEvent;
 import terrails.keephunger.packet.ThirstMessage;
 import terrails.keephunger.potion.ModPotions;
 import terrails.keephunger.proxies.CommonProxy;
@@ -30,20 +31,10 @@ public class MainClass {
     public void preInit(FMLPreInitializationEvent event) {
         proxy.preInit(event);
         ModPotions.init();
+        TANEvent.init();
+        ConfigHandler.init(event.getSuggestedConfigurationFile());
         instance = NetworkRegistry.INSTANCE.newSimpleChannel(Constants.MODID);
         instance.registerMessage(ThirstMessage.MessageHandler.class, ThirstMessage.class, 0, Side.CLIENT);
-
-        ConfigHandler.init(event.getSuggestedConfigurationFile());
-        if(Loader.isModLoaded("toughasnails")){
-            System.out.println("Keep Hunger TAN addon activated!");
-        }
-        else if(Loader.isModLoaded("ToughAsNails")){
-            System.out.println("Keep Hunger TAN addon activated!");
-
-        }
-        else{
-            System.out.println("Keep Hunger TAN addon not activated!");
-        }
     }
 
     @Mod.EventHandler

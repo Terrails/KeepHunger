@@ -1,5 +1,7 @@
 package terrails.keephunger;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Constants {
 
@@ -10,4 +12,5 @@ public class Constants {
     public static final String GUIFACTORY = "terrails.keephunger.config.ConfigFactoryGUI";
     public static final String CLIENT_PROXY = "terrails.keephunger.proxies.ClientProxy";
     public static final String SERVER_PROXY = "terrails.keephunger.proxies.ServerProxy";
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
 }
