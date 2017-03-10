@@ -1,4 +1,4 @@
-# KeepHunger
+# Stats Keeper
 
 It add's Tinker's Construct feature back. And even more configurable features!!!
 
