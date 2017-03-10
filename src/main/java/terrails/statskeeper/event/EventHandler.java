@@ -25,11 +25,11 @@ public class EventHandler
             }
 
             if(player.isWasDeath() && ConfigHandler.saturation) {
-                setFoodSaturationLevel(player.getEntityPlayer().getFoodStats(), player.getOriginal().getFoodStats().getSaturationLevel());
+                setServerSaturationLevel(player.getEntityPlayer().getFoodStats(), player.getOriginal().getFoodStats().getSaturationLevel());
             }
         }
 
-        public void setFoodSaturationLevel(FoodStats food, float sat)
+        public void setServerSaturationLevel(FoodStats food, float sat)
         {
             try
             {
