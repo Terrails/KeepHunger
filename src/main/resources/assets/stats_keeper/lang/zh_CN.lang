@@ -1,0 +1,12 @@
+< zh_CN.lang - Simple Chinese localization file for Stats Keeper >
+
+#Potion
+potion.appetite=没有胃口
+
+#Config
+config.category.generalSettings.title=常规设置
+config.category.minimalSettings.title=最小营养价值设置
+config.category.tanSettings.title=意志坚定设置
+
+#Config Tooltip
+config.category.arrowSettings.tooltip=在游戏中改变营养价值的配置
