@@ -1,0 +1,13 @@
+< en_US.lang - English localization file for Stats Keeper >
+
+#Potion
+potion.appetite=No Appetite
+
+#Config
+config.category.generalSettings.title=General Settings
+config.category.minimalSettings.title=Value/Timing Settings
+config.category.healthSettings.title=Health Settings
+config.category.tanSettings.title=ToughAsNails Settings
+
+#Config Tooltip
+config.category.arrowSettings.tooltip=Change Config Values InGame
