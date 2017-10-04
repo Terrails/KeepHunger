@@ -1,31 +1,29 @@
 package terrails.statskeeper.event;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import terrails.statskeeper.Constants;
 import terrails.statskeeper.StatsKeeper;
+import terrails.statskeeper.api.capabilities.tan.ITAN;
 import terrails.statskeeper.config.ConfigHandler;
+import terrails.statskeeper.data.capabilities.tan.CapabilityTAN;
 import terrails.statskeeper.packet.ThirstMessage;
 import toughasnails.api.TANCapabilities;
 import toughasnails.api.stat.capability.ITemperature;
 import toughasnails.api.stat.capability.IThirst;
 import toughasnails.api.thirst.ThirstHelper;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 
-public class TANEvent{
-
-    public static void init() {
-        if (Loader.isModLoaded("ToughAsNails") || Loader.isModLoaded("toughasnails")) {
-            Constants.LOGGER.info("TAN addon activated!");
-        }
-    }
+@Mod.EventBusSubscriber
+public class TANEvent {
 
     @SuppressWarnings("ConstantConditions")
     @SubscribeEvent
-    public void onClonePlayer(PlayerEvent.Clone player) {
+    public static void onClonePlayer(PlayerEvent.Clone player) {
         if (Loader.isModLoaded("toughasnails") || Loader.isModLoaded("ToughAsNails")) {
             final IThirst originalPlayer = player.getOriginal().getCapability(TANCapabilities.THIRST, null);
             final IThirst clonedPlayer = player.getEntityPlayer().getCapability(TANCapabilities.THIRST, null);
@@ -36,7 +34,6 @@ public class TANEvent{
             if (ConfigHandler.keepThirst && player.isWasDeath()) {
                 int thirstValue = ConfigHandler.minThirstAmount >= originalPlayer.getThirst() ? ConfigHandler.minThirstAmount : originalPlayer.getThirst();
                 clonedPlayer.setThirst(thirstValue);
-
             }
             if (ConfigHandler.keepHydration && player.isWasDeath()) {
                 float hydrationValue = ConfigHandler.minHydrationAmount >= originalPlayer.getThirst() ? ConfigHandler.minHydrationAmount : originalPlayer.getHydration();
@@ -49,38 +46,55 @@ public class TANEvent{
     }
 
     @SubscribeEvent
-    public void playerRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
+    public static void playerRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
         if (Loader.isModLoaded("ToughAsNails") || Loader.isModLoaded("toughasnails")) {
             if (ConfigHandler.keepThirst) {
                 EntityPlayerMP player = (EntityPlayerMP) event.player;
                 IThirst thirstData = ThirstHelper.getThirstData(event.player);
-                StatsKeeper.wrapperInstance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+                StatsKeeper.networkWrapper.sendTo(new ThirstMessage(thirstData.getThirst()), player);
             }
         }
     }
 
     @SubscribeEvent
-    public void onJoin(PlayerLoggedInEvent event) {
+    public static void onJoin(PlayerLoggedInEvent event) {
         if (Loader.isModLoaded("ToughAsNails") || Loader.isModLoaded("toughasnails")) {
             if (ConfigHandler.keepThirst) {
                 EntityPlayerMP player = (EntityPlayerMP) event.player;
-                IThirst thirstData = ThirstHelper.getThirstData(event.player);
-                StatsKeeper.wrapperInstance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+                ITAN itan = player.getCapability(CapabilityTAN.TAN_CAPABILITY, null);
+                IThirst thirstData = ThirstHelper.getThirstData(player);
+                if (itan != null && itan.getThirst() != 0)
+                    StatsKeeper.networkWrapper.sendTo(new ThirstMessage((int) itan.getThirst()), player);
+                else if (itan != null)
+                    StatsKeeper.networkWrapper.sendTo(new ThirstMessage(20), player);
             }
         }
     }
 
     @SubscribeEvent
-    public void onWorldChange(PlayerChangedDimensionEvent event) {
+    public static void onWorldChange(PlayerChangedDimensionEvent event) {
         if (Loader.isModLoaded("ToughAsNails") || Loader.isModLoaded("toughasnails")) {
             if (ConfigHandler.keepThirst) {
                 if (event.player instanceof EntityPlayerMP) {
                     EntityPlayerMP player = (EntityPlayerMP) event.player;
-                    IThirst thirstData = ThirstHelper.getThirstData(player);
-                    StatsKeeper.wrapperInstance.sendTo(new ThirstMessage(thirstData.getThirst()), player);
+                    IThirst thirstData = ThirstHelper.getThirstData(event.player);
+                    StatsKeeper.networkWrapper.sendTo(new ThirstMessage(thirstData.getThirst()), player);
                 }
             }
         }
     }
 
+    @SubscribeEvent
+    public static void onLogout(PlayerLoggedOutEvent event) {
+        if (Loader.isModLoaded("ToughAsNails") || Loader.isModLoaded("toughasnails")) {
+            if (ConfigHandler.keepThirst) {
+                EntityPlayerMP player = (EntityPlayerMP) event.player;
+                ITAN itan = player.getCapability(CapabilityTAN.TAN_CAPABILITY, null);
+                IThirst thirstData = ThirstHelper.getThirstData(player);
+                if (itan != null) {
+                    itan.setThirst(thirstData.getThirst());
+                }
+            }
+        }
+    }
 }

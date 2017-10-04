@@ -1,6 +1,5 @@
 package terrails.statskeeper.packet;
 
-
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;

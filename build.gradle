@@ -14,9 +14,8 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 version = mod_version
-group= "terrails.statskeeper"
+group = "terrails.statskeeper"
 archivesBaseName = "Stats Keeper"
-
 
 minecraft {
     version = mc_version + "-" + forge_version
@@ -32,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compile 'terrails.terracore:TerraCore-1.12:2.0.0'
+    compile 'terrails.terracore:TerraCore-1.12:2.1.0'
 }
 
 processResources {
@@ -43,11 +42,11 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-        
+
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'

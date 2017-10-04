@@ -3,11 +3,13 @@ package terrails.statskeeper.config;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.Constants;
 
 import java.io.File;
 
+@Mod.EventBusSubscriber
 public class ConfigHandler
 {
     public static Configuration configFile;
@@ -53,7 +55,7 @@ public class ConfigHandler
     }
 
     @SubscribeEvent
-    public void configChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+    public static void configChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(Constants.MOD_ID)) {
             syncConfig();
         }
@@ -118,7 +120,7 @@ public class ConfigHandler
     public static void syncToughAsNailsConfig(){
         //ToughAsNails
         if(Loader.isModLoaded("toughasnails") || Loader.isModLoaded("ToughAsNails")){
-            Constants.LOGGER.info("TAN config loaded!");
+            Constants.LOGGER.info("TAN addon activated!");
 
             //Temperature
             keepTemperature = configFile.get(TAN_SETTINGS, "Keep Temperature", true).getBoolean();
