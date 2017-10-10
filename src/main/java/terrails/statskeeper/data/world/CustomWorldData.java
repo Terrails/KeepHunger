@@ -40,7 +40,14 @@ public class CustomWorldData extends WorldSavedData {
     }
 
     private double oldMaxHealthValue;
+    private double oldMinHealthValue;
 
+    public void setOldMinHealth(double health) {
+        oldMinHealthValue = health;
+    }
+    public double getOldMinHealth() {
+        return oldMinHealthValue;
+    }
     public void setOldMaxHealth(double health) {
         oldMaxHealthValue = health;
         markDirty();
@@ -48,7 +55,6 @@ public class CustomWorldData extends WorldSavedData {
     public double getOldMaxHealth() {
         return oldMaxHealthValue;
     }
-
     public double getMaxHealth() {
         return ConfigHandler.maxHealth;
     }

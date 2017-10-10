@@ -4,6 +4,7 @@ import com.google.common.base.CharMatcher;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
@@ -24,6 +25,7 @@ import terrails.statskeeper.api.capabilities.health.IHealth;
 import terrails.statskeeper.config.ConfigHandler;
 import terrails.statskeeper.data.capabilities.health.CapabilityHealth;
 import terrails.statskeeper.data.world.CustomWorldData;
+import terrails.statskeeper.potion.ModPotions;
 import terrails.terracore.helper.PlayerHelper;
 import terrails.terracore.helper.PlayerStats;
 import terrails.terracore.helper.StringHelper;
@@ -44,22 +46,17 @@ public class HealthEvent {
      */
     private static boolean ENABLE_DEBUGGING = false;
 
-
     public static Item getItem(String item) {
-    //    String one = item.contains(";") ? item.substring(0, item.indexOf(";")) : item.contains(",") ? item.substring(0, item.indexOf(",")) : item;
         String one = item.contains(";") ? StringHelper.getSubstringBefore(item, ";") : item.contains(",") ? StringHelper.getSubstringBefore(item, ",") : item;
         return Item.getByNameOrId(one);
     }
     public static int getItemMeta(String item) {
-     //   String one = item.contains(";") ? item.substring(item.indexOf(";")) : "0";
         String one = item.contains(";") ? StringHelper.getSubstringAfter(item ,";") : "0";
-    //    String two = one.contains(",") ? one.substring(0, one.indexOf(",")) : one;
         String two = one.contains(",") ? StringHelper.getSubstringBefore(item, ",") : one;
         int meta = Integer.parseInt(CharMatcher.digit().retainFrom(two));
         return meta;
     }
     public static int getItemAddedHealth(String item) {
-  //      return item.contains(", ") ? Integer.parseInt(CharMatcher.digit().retainFrom(item.substring(item.indexOf(",")))) : 2;
         return item.contains(", ") ? Integer.parseInt(CharMatcher.digit().retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
     }
 
@@ -74,11 +71,19 @@ public class HealthEvent {
 
             if (!health.getHasAddedHealth()) {
                 if (ENABLE_DEBUGGING) Constants.getLogger("PlayerLoggedInEvent").info("Starting Health Before Setting: " + player.getMaxHealth());
-                worldData.setOldMaxHealth(worldData.getMaxHealth());
+                if (!ConfigHandler.startWithMinHealth) {
+                    worldData.setOldMaxHealth(worldData.getMaxHealth());
 
-                health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                health.setHasAddedHealth(true);
+                    health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
+                    PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                    health.setHasAddedHealth(true);
+                } else {
+                    worldData.setOldMinHealth(worldData.getMinHealth());
+
+                    health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
+                    PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                    health.setHasAddedHealth(true);
+                }
 
                 Constants.playerMessage(player, "Your health was changed to: " + (int) worldData.getMaxHealth());
 
@@ -231,9 +236,11 @@ public class HealthEvent {
                 int meta = getItemMeta(item);
 
                 if (theItem != null && event.getItemStack().getItem() == theItem && event.getItemStack().getItemDamage() == meta && !world.isRemote) {
-                    event.setCanceled(true);
-                    health.setLastItemName(item);
-                    event.getEntityPlayer().setActiveHand(EnumHand.MAIN_HAND);
+                    if (event.getItemStack().getItemUseAction() != EnumAction.EAT || !event.getEntityPlayer().isPotionActive(ModPotions.getPotion("appetite"))) {
+                        event.setCanceled(true);
+                        health.setLastItemName(item);
+                        event.getEntityPlayer().setActiveHand(EnumHand.MAIN_HAND);
+                    }
                 } else health.setLastItemName("none");
             }
         }
@@ -256,12 +263,22 @@ public class HealthEvent {
                     if (ConfigHandler.healthSystem) {
                         worldData.markDirty();
 
-                        if (worldData.getOldMaxHealth() != worldData.getMaxHealth() || !health.getHasAddedHealth()) {
-                            health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                            worldData.setOldMaxHealth(worldData.getMaxHealth());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            health.setHasAddedHealth(true);
-                            if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health has been changed to: " + health.getAddedHealth());
+                        if (!ConfigHandler.startWithMinHealth) {
+                            if (worldData.getOldMaxHealth() != worldData.getMaxHealth() || !health.getHasAddedHealth()) {
+                                health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
+                                worldData.setOldMaxHealth(worldData.getMaxHealth());
+                                PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                                health.setHasAddedHealth(true);
+                                if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health has been changed to: " + health.getAddedHealth());
+                            }
+                        } else {
+                            if (worldData.getOldMinHealth() != worldData.getMinHealth() || !health.getHasAddedHealth()) {
+                                health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
+                                worldData.setOldMinHealth(worldData.getMinHealth());
+                                PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                                health.setHasAddedHealth(true);
+                                if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health has been changed to: " + health.getAddedHealth());
+                            }
                         }
                     } else {
                         PlayerStats.removeMaxHealthModifier(player, STATS_KEEPER_HEALTH_UUID);
