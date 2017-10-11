@@ -1,21 +1,19 @@
 package terrails.statskeeper.potion;
 
-import net.minecraft.item.ItemStack;
-import terrails.statskeeper.Constants;
-import terrails.terracore.item.PotionBase;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import terrails.terracore.base.PotionBase;
+
 public class NoAppetiteEffect extends PotionBase {
 
-    public NoAppetiteEffect(String name) {
-        super(name, true, 0, 0, 0, Constants.MOD_ID);
+    public NoAppetiteEffect(int id) {
+        super("stats_keeper", true, 0, 1, 1);
     }
 
-    @Override
-    public List<ItemStack> getCurativeItems() {
-        List<ItemStack> list = new ArrayList<ItemStack>();
+    public List getCurativeItems()
+    {
+        List list = new ArrayList();
         return list;
     }
 }

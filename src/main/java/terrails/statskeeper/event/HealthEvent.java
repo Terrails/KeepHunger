@@ -1,8 +1,11 @@
 package terrails.statskeeper.event;
 
+import java.util.Random;
+import java.util.UUID;
+
 import com.google.common.base.CharMatcher;
+
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -14,25 +17,19 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import terrails.statskeeper.Constants;
 import terrails.statskeeper.api.capabilities.health.IHealth;
+import terrails.statskeeper.api.helper.PlayerStats;
 import terrails.statskeeper.config.ConfigHandler;
 import terrails.statskeeper.data.capabilities.health.CapabilityHealth;
 import terrails.statskeeper.data.world.CustomWorldData;
 import terrails.statskeeper.potion.ModPotions;
-import terrails.terracore.helper.PlayerHelper;
-import terrails.terracore.helper.PlayerStats;
-import terrails.terracore.helper.StringHelper;
-
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import terrails.statskeeper.api.helper.StringHelper;
 
 @Mod.EventBusSubscriber
 public class HealthEvent {
@@ -53,11 +50,11 @@ public class HealthEvent {
     public static int getItemMeta(String item) {
         String one = item.contains(";") ? StringHelper.getSubstringAfter(item ,";") : "0";
         String two = one.contains(",") ? StringHelper.getSubstringBefore(item, ",") : one;
-        int meta = Integer.parseInt(CharMatcher.digit().retainFrom(two));
+        int meta = Integer.parseInt(CharMatcher.DIGIT.retainFrom(two));
         return meta;
     }
     public static int getItemAddedHealth(String item) {
-        return item.contains(", ") ? Integer.parseInt(CharMatcher.digit().retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
+        return item.contains(", ") ? Integer.parseInt(CharMatcher.DIGIT.retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
     }
 
     @SubscribeEvent
@@ -127,7 +124,7 @@ public class HealthEvent {
             World world = player.getEntityWorld();
             IHealth health = player.getCapability(CapabilityHealth.HEALTH_CAPABILITY, null);
             CustomWorldData worldData = CustomWorldData.get(player.getEntityWorld());
-            if (ConfigHandler.healthSystem && health != null && worldData != null) {
+            if (ConfigHandler.healthSystem && health != null && worldData != null && event.getItem() != null) {
                 worldData.markDirty();
                 Item theItem = getItem(health.getLastItemName());
                 int meta = getItemMeta(health.getLastItemName());
@@ -145,7 +142,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().shrink(1);
+                            event.getItem().stackSize -= 1;
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         } else {
@@ -153,7 +150,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().shrink(1);
+                            event.getItem().stackSize -= 1;
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         }
@@ -179,7 +176,7 @@ public class HealthEvent {
             World world = player.getEntityWorld();
             IHealth health = player.getCapability(CapabilityHealth.HEALTH_CAPABILITY, null);
             CustomWorldData worldData = CustomWorldData.get(player.getEntityWorld());
-            if (ConfigHandler.healthSystem && health != null && worldData != null && !health.getLastItemName().equals("none")) {
+            if (ConfigHandler.healthSystem && health != null && worldData != null && !health.getLastItemName().equals("none") && event.getItem() != null) {
                 worldData.markDirty();
                 Item theItem = getItem(health.getLastItemName());
                 int meta = getItemMeta(health.getLastItemName());
@@ -196,7 +193,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().shrink(1);
+                            event.getItem().stackSize -= 1;
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         } else {
@@ -204,7 +201,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().shrink(1);
+                            event.getItem().stackSize -= 1;
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         }
@@ -229,14 +226,14 @@ public class HealthEvent {
         World world = player.getEntityWorld();
         IHealth health = player.getCapability(CapabilityHealth.HEALTH_CAPABILITY, null);
         CustomWorldData worldData = CustomWorldData.get(player.getEntityWorld());
-        if (ConfigHandler.healthSystem && health != null && worldData != null && !(player.getMaxHealth() >= worldData.getMaxHealth())) {
+        if (ConfigHandler.healthSystem && health != null && worldData != null && !(player.getMaxHealth() >= worldData.getMaxHealth() && event.getItemStack() != null)) {
             for (String item : ConfigHandler.itemNameArray) {
 
                 Item theItem = getItem(item);
                 int meta = getItemMeta(item);
 
                 if (theItem != null && event.getItemStack().getItem() == theItem && event.getItemStack().getItemDamage() == meta && !world.isRemote) {
-                    if (event.getItemStack().getItemUseAction() != EnumAction.EAT || !event.getEntityPlayer().isPotionActive(ModPotions.getPotion("appetite"))) {
+                    if (event.getItemStack().getItemUseAction() != EnumAction.EAT || !event.getEntityPlayer().isPotionActive(ModPotions.appetite)) {
                         event.setCanceled(true);
                         health.setLastItemName(item);
                         event.getEntityPlayer().setActiveHand(EnumHand.MAIN_HAND);
