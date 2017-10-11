@@ -142,7 +142,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().stackSize -= 1;
+                            event.getItem().shrink(1);
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         } else {
@@ -150,7 +150,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().stackSize -= 1;
+                            event.getItem().shrink(1);
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         }
@@ -193,7 +193,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().stackSize -= 1;
+                            event.getItem().shrink(1);
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         } else {
@@ -201,7 +201,7 @@ public class HealthEvent {
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            event.getItem().stackSize -= 1;
+                            event.getItem().shrink(1);
                             if (ENABLE_DEBUGGING)
                                 Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
                         }
