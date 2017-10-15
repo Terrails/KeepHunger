@@ -85,7 +85,7 @@ public class HealthEvent {
                     health.setHasAddedHealth(true);
                 }
 
-                Constants.playerMessage(player, "Your health was changed to: " + (int) worldData.getMaxHealth());
+                //Constants.playerMessage(player, "Your health was changed to: " + (int) worldData.getMaxHealth());
 
                 if (ENABLE_DEBUGGING) Constants.getLogger("PlayerLoggedInEvent").info("Starting Health After Setting: " + player.getMaxHealth());
             }
@@ -105,15 +105,18 @@ public class HealthEvent {
                 if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() == 0 && worldData.getRemoveHealth() == 0) {
                     newHealth.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue());
                     PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
-                } else
-                if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() != 0 && worldData.getRemoveHealth() != 0) {
+                } 
+                
+                if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() != 0) {
                     if (ENABLE_DEBUGGING) Constants.getLogger("PlayerEvent.Clone").info("Added Health Before Death: " + oldHealth.getAddedHealth());
 
                     double removedHealth = oldHealth.getAddedHealth() - worldData.getRemoveHealth();
                     double addedHealth = removedHealth <= worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue() ? worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue() : removedHealth;
                     newHealth.setAddedHealth(addedHealth);
                     PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
-                    Constants.playerMessage(newPlayer, "Oops, someone was evil and stole " + (int) worldData.getRemoveHealth() + " health from you!");
+                    if (worldData.getRemoveHealth() > 0) {
+                        Constants.playerMessage(newPlayer, "Oops, someone was evil and stole " + (int) worldData.getRemoveHealth() + " health from you!");
+                    }
                     if (ENABLE_DEBUGGING) Constants.getLogger("PlayerEvent.Clone").info("Added Health After Death: " + newHealth.getAddedHealth());
                 }
             }

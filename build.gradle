@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compile 'terrails.terracore:TerraCore-1.12:2.1.0'
+    compile fileTree(dir: 'libs', include: 'terracore-2.1.0-deobf (stable_32).jar')
 }
 
 processResources {
