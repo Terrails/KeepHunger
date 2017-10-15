@@ -32,6 +32,10 @@ repositories {
     mavenLocal()
 }
 
+dependencies {
+    compile fileTree(dir: 'libs', include: 'TerraCore-1.0.2.jar')
+}
+
 processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
