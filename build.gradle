@@ -29,7 +29,6 @@ minecraft {
 repositories {
     mavenLocal()
 }
-
 dependencies {
     compile 'terrails.terracore:TerraCore-1.12:2.1.0'
 }
