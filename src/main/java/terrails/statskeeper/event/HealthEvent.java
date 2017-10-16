@@ -167,7 +167,7 @@ public class HealthEvent {
                     PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
                 } 
                 
-                if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() != 0 && worldData.getRemoveHealth() != 0) {
+                if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() != 0) {
                     debugMessage("PlayerEvent.Clone", "Added Health Before Death: " + oldHealth.getAddedHealth());
 
                     double removedHealth = oldHealth.getAddedHealth() - worldData.getRemoveHealth();
@@ -177,7 +177,7 @@ public class HealthEvent {
 
                     int removedAmount = (int) (oldHealth.getAddedHealth() - newHealth.getAddedHealth());
 
-                    if (ConfigHandler.healthMessage) {
+                    if (ConfigHandler.healthMessage && worldData.getRemoveHealth() != 0) {
                         if (removedAmount != 0) {
                             TextComponentTranslation text = new TextComponentTranslation("death.removed_amount.1", removedAmount);
                             if (!text.getFormattedText().isEmpty()) Constants.playerMessage(newPlayer, text.getFormattedText());
