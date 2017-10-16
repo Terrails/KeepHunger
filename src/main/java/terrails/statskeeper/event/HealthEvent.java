@@ -88,8 +88,8 @@ public class HealthEvent {
                     health.setHasAddedHealth(true);
                 }
 
-                //Constants.playerMessage(player, "Your health was changed to: " + (int) worldData.getMaxHealth());
-
+                TextComponentTranslation text = new TextComponentTranslation("change.health", (int) (!ConfigHandler.startWithMinHealth ? worldData.getMaxHealth() : worldData.getMinHealth()));
+                if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
                 debugMessage("PlayerLoggedInEvent", "Starting Health After Setting: " + player.getMaxHealth());
             }
         }
