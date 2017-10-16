@@ -25,7 +25,7 @@ public class ConfigHandler
     //Boolean
     public static boolean healthSystem;
     public static boolean startWithMinHealth;
-    public static boolean healthDeathMessage;
+    public static boolean healthMessage;
 
     public static boolean keepHunger;
     public static boolean keepXP;
@@ -118,7 +118,7 @@ public class ConfigHandler
         minHealth = configFile.get(HEALTH_SETTINGS, "Min Health", 0, "", 0, Integer.MAX_VALUE).getInt();
         maxHealth = configFile.get(HEALTH_SETTINGS, "Max Health", 20, "", 0, Integer.MAX_VALUE).getInt();
         removedHealthOnDeath = configFile.get(HEALTH_SETTINGS, "Reduced Health on Death", 0, "",0, Integer.MAX_VALUE).getInt();
-        healthDeathMessage = configFile.get(HEALTH_SETTINGS, "Death Message", true).getBoolean();
+        healthMessage = configFile.get(HEALTH_SETTINGS, "Health Message", true).getBoolean();
     }
 
     public static void syncToughAsNailsConfig(){

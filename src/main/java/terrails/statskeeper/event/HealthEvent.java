@@ -88,7 +88,7 @@ public class HealthEvent {
                                 PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                                 health.setHasAddedHealth(true);
                                 TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMaxHealth());
-                                if (!text.getFormattedText().isEmpty()) Constants.playerMessage(player, text.getFormattedText());
+                                if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
                                 debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                             }
                         } else {
@@ -98,9 +98,18 @@ public class HealthEvent {
                                 PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                                 health.setHasAddedHealth(true);
                                 TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMinHealth());
-                                if (!text.getFormattedText().isEmpty()) Constants.playerMessage(player, text.getFormattedText());
+                                if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
                                 debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                             }
+                        }
+                        if (worldData.getOldMinHealth() != worldData.getMinHealth() && worldData.getOldMinHealth() < worldData.getMinHealth()) {
+                            health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
+                            worldData.setOldMinHealth(worldData.getMinHealth());
+                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            health.setHasAddedHealth(true);
+                            TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMinHealth());
+                            if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
+                            debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                         }
                     } else {
                         PlayerStats.removeMaxHealthModifier(player, STATS_KEEPER_HEALTH_UUID);
@@ -136,7 +145,7 @@ public class HealthEvent {
                 }
 
                 TextComponentTranslation text = new TextComponentTranslation("change.health", (int) (!ConfigHandler.startWithMinHealth ? worldData.getMaxHealth() : worldData.getMinHealth()));
-                if (!text.getFormattedText().isEmpty()) Constants.playerMessage(player, text.getFormattedText());
+                if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
 
                 debugMessage("PlayerLoggedInEvent", "Starting Health After Setting: " + player.getMaxHealth());
             }
@@ -168,7 +177,7 @@ public class HealthEvent {
 
                     int removedAmount = (int) (oldHealth.getAddedHealth() - newHealth.getAddedHealth());
 
-                    if (ConfigHandler.healthDeathMessage) {
+                    if (ConfigHandler.healthMessage) {
                         if (removedAmount != 0) {
                             TextComponentTranslation text = new TextComponentTranslation("death.removed_amount.1", removedAmount);
                             if (!text.getFormattedText().isEmpty()) Constants.playerMessage(newPlayer, text.getFormattedText());
