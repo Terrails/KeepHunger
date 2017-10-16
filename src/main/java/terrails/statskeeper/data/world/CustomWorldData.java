@@ -17,11 +17,13 @@ public class CustomWorldData extends WorldSavedData {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         setOldMaxHealth(nbt.getDouble("oldMaxHealth"));
+        setOldMinHealth(nbt.getDouble("oldMinHealth"));
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound.setDouble("oldMaxHealth", getOldMaxHealth());
+        compound.setDouble("oldMinHealth", getOldMinHealth());
         compound.setDouble("maxHealth", getMaxHealth());
         compound.setDouble("minHealth", getMinHealth());
         compound.setDouble("removeHealth", getRemoveHealth());
@@ -44,6 +46,7 @@ public class CustomWorldData extends WorldSavedData {
 
     public void setOldMinHealth(double health) {
         oldMinHealthValue = health;
+        markDirty();
     }
     public double getOldMinHealth() {
         return oldMinHealthValue;

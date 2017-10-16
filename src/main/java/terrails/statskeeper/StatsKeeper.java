@@ -14,6 +14,7 @@ import terrails.statskeeper.data.capabilities.tan.CapabilityTAN;
 import terrails.statskeeper.packet.ThirstMessage;
 import terrails.statskeeper.potion.ModPotions;
 import terrails.statskeeper.proxies.IProxy;
+import toughasnails.api.stat.capability.IThirst;
 
 @Mod(modid = Constants.MOD_ID,
         name = Constants.MOD_NAME,

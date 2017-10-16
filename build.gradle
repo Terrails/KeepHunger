@@ -10,10 +10,8 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 version = mod_version
 group = "terrails.statskeeper"
@@ -30,6 +28,10 @@ minecraft {
 
 repositories {
     mavenLocal()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: 'TerraCore-1.0.2.jar')
 }
 
 processResources {
