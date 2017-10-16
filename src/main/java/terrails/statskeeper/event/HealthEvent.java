@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -41,19 +42,24 @@ public class HealthEvent {
      * {@link HealthEvent#firstJoin} {@link HealthEvent#onTick} {@link HealthEvent#onClone}
      * {@link HealthEvent#addHealthOnRightClick} {@link HealthEvent#addHealthOnUsedItem} {@link HealthEvent#addHealthOnItem}
      */
-    private static boolean ENABLE_DEBUGGING = false;
-
-    public static Item getItem(String item) {
+    private static final boolean ENABLE_DEBUGGING = false;
+    private static void debugMessage(String event, String string) {
+         {
+            Constants.getLogger(event).info(string);
+        }
+    }
+    
+    private static Item getItem(String item) {
         String one = item.contains(";") ? StringHelper.getSubstringBefore(item, ";") : item.contains(",") ? StringHelper.getSubstringBefore(item, ",") : item;
         return Item.getByNameOrId(one);
     }
-    public static int getItemMeta(String item) {
+    private static int getItemMeta(String item) {
         String one = item.contains(";") ? StringHelper.getSubstringAfter(item ,";") : "0";
         String two = one.contains(",") ? StringHelper.getSubstringBefore(item, ",") : one;
         int meta = Integer.parseInt(CharMatcher.DIGIT.retainFrom(two));
         return meta;
     }
-    public static int getItemAddedHealth(String item) {
+    private static int getItemAddedHealth(String item) {
         return item.contains(", ") ? Integer.parseInt(CharMatcher.DIGIT.retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
     }
 
@@ -67,7 +73,7 @@ public class HealthEvent {
             worldData.markDirty();
 
             if (!health.getHasAddedHealth()) {
-                if (ENABLE_DEBUGGING) Constants.getLogger("PlayerLoggedInEvent").info("Starting Health Before Setting: " + player.getMaxHealth());
+                debugMessage("PlayerLoggedInEvent", "Starting Health Before Setting: " + player.getMaxHealth());
                 if (!ConfigHandler.startWithMinHealth) {
                     worldData.setOldMaxHealth(worldData.getMaxHealth());
 
@@ -84,7 +90,7 @@ public class HealthEvent {
 
                 //Constants.playerMessage(player, "Your health was changed to: " + (int) worldData.getMaxHealth());
 
-                if (ENABLE_DEBUGGING) Constants.getLogger("PlayerLoggedInEvent").info("Starting Health After Setting: " + player.getMaxHealth());
+                debugMessage("PlayerLoggedInEvent", "Starting Health After Setting: " + player.getMaxHealth());
             }
         }
     }
@@ -102,19 +108,26 @@ public class HealthEvent {
                 if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() == 0 && worldData.getRemoveHealth() == 0) {
                     newHealth.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue());
                     PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
-                } 
-                
+                }
+
                 if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() != 0) {
-                    if (ENABLE_DEBUGGING) Constants.getLogger("PlayerEvent.Clone").info("Added Health Before Death: " + oldHealth.getAddedHealth());
+                    debugMessage("PlayerEvent.Clone", "Added Health Before Death: " + oldHealth.getAddedHealth());
 
                     double removedHealth = oldHealth.getAddedHealth() - worldData.getRemoveHealth();
                     double addedHealth = removedHealth <= worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue() ? worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue() : removedHealth;
                     newHealth.setAddedHealth(addedHealth);
                     PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
-                    if (worldData.getRemoveHealth() > 0) {
-                        Constants.playerMessage(newPlayer, "Oops, someone was evil and stole " + (int) worldData.getRemoveHealth() + " health from you!");
+                    int removedAmount = (int) (oldHealth.getAddedHealth() - newHealth.getAddedHealth());
+                    if (ConfigHandler.healthMessage && worldData.getRemoveHealth() != 0) {
+                        if (removedAmount != 0) {
+                            TextComponentTranslation text = new TextComponentTranslation("death.removed_amount.1", removedAmount);
+                            if (!text.getFormattedText().isEmpty()) Constants.playerMessage(newPlayer, text.getFormattedText());
+                        } else {
+                            TextComponentTranslation text = new TextComponentTranslation("death.removed_amount.2");
+                            if (!text.getFormattedText().isEmpty()) Constants.playerMessage(newPlayer, text.getFormattedText());
+                        }
                     }
-                    if (ENABLE_DEBUGGING) Constants.getLogger("PlayerEvent.Clone").info("Added Health After Death: " + newHealth.getAddedHealth());
+                    debugMessage("PlayerEvent.Clone", "Added Health After Death: " + newHealth.getAddedHealth());
                 }
             }
         }
@@ -134,28 +147,27 @@ public class HealthEvent {
                 int healthAmount = getItemAddedHealth(health.getLastItemName());
 
                 if (theItem != null && event.getDuration() == 0) {
-                    if (ENABLE_DEBUGGING)
-                        Constants.getLogger("LivingEntityUseItemEvent.Start").info("ItemStack: " + theItem + ", Metadata: " + meta);
-                    if (ENABLE_DEBUGGING)
-                        Constants.getLogger("LivingEntityUseItemEvent.Start").info("Health Regained: " + healthAmount);
+                    
+                    debugMessage("LivingEntityUseItemEvent.Start", "ItemStack: " + theItem + ", Metadata: " + meta);
+                    debugMessage("LivingEntityUseItemEvent.Start", "Health Regained: " + healthAmount);
 
                     if (!world.isRemote && world instanceof WorldServer) {
                         if (worldData.getMaxHealth() <= player.getMaxHealth() + healthAmount) {
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().stackSize -= 1;
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         } else {
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().stackSize -= 1;
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         }
                     } else if (!(worldData.getMaxHealth() >= player.getMaxHealth())) {
                         Random random = new Random();
@@ -185,28 +197,27 @@ public class HealthEvent {
                 int meta = getItemMeta(health.getLastItemName());
                 int healthAmount = getItemAddedHealth(health.getLastItemName());
                 if (theItem != null) {
-                    if (ENABLE_DEBUGGING)
-                        Constants.getLogger("LivingEntityUseItemEvent.Start").info("ItemStack: " + theItem + ", Metadata: " + meta);
-                    if (ENABLE_DEBUGGING)
-                        Constants.getLogger("LivingEntityUseItemEvent.Start").info("Health Regained: " + healthAmount);
+                    
+                    debugMessage("LivingEntityUseItemEvent.Start", "ItemStack: " + theItem + ", Metadata: " + meta);
+                    debugMessage("LivingEntityUseItemEvent.Start", "Health Regained: " + healthAmount);
 
                     if (!world.isRemote && world instanceof WorldServer) {
                         if (worldData.getMaxHealth() <= player.getMaxHealth() + healthAmount) {
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().stackSize -= 1;
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         } else {
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health Before Item: " + health.getAddedHealth());
+                            
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().stackSize -= 1;
-                            if (ENABLE_DEBUGGING)
-                                Constants.getLogger("LivingEntityUseItemEvent.Start").info("Added Health After Item: " + health.getAddedHealth());
+
+                            debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         }
                     } else if (!(worldData.getMaxHealth() >= player.getMaxHealth())) {
                         Random random = new Random();
@@ -269,7 +280,9 @@ public class HealthEvent {
                                 worldData.setOldMaxHealth(worldData.getMaxHealth());
                                 PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                                 health.setHasAddedHealth(true);
-                                if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health has been changed to: " + health.getAddedHealth());
+                                TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMaxHealth());
+                                if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
+                                debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                             }
                         } else {
                             if (worldData.getOldMinHealth() != worldData.getMinHealth() || !health.getHasAddedHealth()) {
@@ -277,13 +290,24 @@ public class HealthEvent {
                                 worldData.setOldMinHealth(worldData.getMinHealth());
                                 PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                                 health.setHasAddedHealth(true);
-                                if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health has been changed to: " + health.getAddedHealth());
+                                TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMaxHealth());
+                                if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
+                                debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                             }
+                        }
+                        if (worldData.getOldMinHealth() != worldData.getMinHealth() && worldData.getOldMinHealth() < worldData.getMinHealth()) {
+                            health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
+                            worldData.setOldMinHealth(worldData.getMinHealth());
+                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            health.setHasAddedHealth(true);
+                            TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMinHealth());
+                            if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
+                            debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                         }
                     } else {
                         PlayerStats.removeMaxHealthModifier(player, STATS_KEEPER_HEALTH_UUID);
                         health.setHasAddedHealth(false);
-                        if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health System is disabled");
+                        debugMessage("ServerTickEvent", "Health System is disabled");
                     }
                 }
             }
@@ -309,12 +333,12 @@ public class HealthEvent {
                             worldData.setOldMaxHealth(worldData.getMaxHealth());
                             PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             health.setHasAddedHealth(true);
-                            if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health has been changed to: " + health.getAddedHealth());
+                            debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
                         }
                     } else {
                         PlayerStats.removeMaxHealthModifier(player, STATS_KEEPER_HEALTH_UUID);
                         health.setHasAddedHealth(false);
-                        if (ENABLE_DEBUGGING) Constants.getLogger("ServerTickEvent").info("Health System is disabled");
+                        debugMessage("ServerTickEvent", "Health System is disabled");
                     }
                 }
             }
