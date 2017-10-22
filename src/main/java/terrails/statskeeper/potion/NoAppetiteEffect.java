@@ -1,14 +1,17 @@
 package terrails.statskeeper.potion;
 
+import terrails.statskeeper.Constants;
+import terrails.terracore.item.PotionBase;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import terrails.terracore.base.PotionBase;
 
 public class NoAppetiteEffect extends PotionBase {
 
-    public NoAppetiteEffect(int id) {
-        super("stats_keeper", true, 0, 1, 1);
+    public NoAppetiteEffect(String name) {
+        super(name, true, 0, 0, 0);
+        setDefaultTextureLocation(Constants.MOD_ID);
     }
 
     public List getCurativeItems()

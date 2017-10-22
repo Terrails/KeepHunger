@@ -15,12 +15,13 @@ import terrails.statskeeper.packet.ThirstMessage;
 import terrails.statskeeper.potion.ModPotions;
 import terrails.statskeeper.proxies.IProxy;
 
-@Mod(modid = Constants.MOD_ID,
+@Mod(dependencies =
+        "required-after:terracore@[" + Constants.TERRACORE_VERSION + ",);",
+        modid = Constants.MOD_ID,
         name = Constants.MOD_NAME,
         version = Constants.MOD_VERSION,
         acceptedMinecraftVersions = Constants.MC_VERSION,
-        guiFactory = Constants.GUI_FACTORY,
-        dependencies = "required-after:terracore@[" + Constants.TERRACORE_VERSION + ",);")
+        guiFactory = Constants.GUI_FACTORY)
 public class StatsKeeper {
     @SidedProxy(clientSide = Constants.CLIENT_PROXY, serverSide = Constants.SERVER_PROXY)
     public static IProxy proxy;

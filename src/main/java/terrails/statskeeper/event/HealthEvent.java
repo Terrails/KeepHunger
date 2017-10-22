@@ -25,12 +25,12 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import terrails.statskeeper.Constants;
 import terrails.statskeeper.api.capabilities.health.IHealth;
-import terrails.statskeeper.api.helper.PlayerStats;
 import terrails.statskeeper.config.ConfigHandler;
 import terrails.statskeeper.data.capabilities.health.CapabilityHealth;
 import terrails.statskeeper.data.world.CustomWorldData;
 import terrails.statskeeper.potion.ModPotions;
-import terrails.statskeeper.api.helper.StringHelper;
+import terrails.terracore.helper.PlayerStats;
+import terrails.terracore.helper.StringHelper;
 
 @Mod.EventBusSubscriber
 public class HealthEvent {

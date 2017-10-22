@@ -17,18 +17,12 @@ public class ModPotions {
 
     public static void init()
     {
-        appetite = registerPotion("appetite", new NoAppetiteEffect(26).setPotionName("potion.appetite"));
+        appetite = registerPotion("appetite", new NoAppetiteEffect("appetite"));
     }
 
     public static Potion registerPotion(String name, Potion potion)
     {
-        GameRegistry.register(potion, new ResourceLocation("stats_keeper", name));
+        GameRegistry.register(potion);
         return potion;
-    }
-
-    public static PotionType registerPotionType(String name, PotionType potionType)
-    {
-        GameRegistry.register(potionType, new ResourceLocation("stats_keeper", name));
-        return potionType;
     }
 }
