@@ -10,7 +10,8 @@ import java.util.List;
 public class NoAppetiteEffect extends PotionBase {
 
     public NoAppetiteEffect(String name) {
-        super(name, true, 0, 0, 0, Constants.MOD_ID);
+        super(name, true, 0, 0, 0);
+        setDefaultTextureLocation(Constants.MOD_ID);
     }
 
     @Override

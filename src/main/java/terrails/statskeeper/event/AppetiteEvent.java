@@ -18,20 +18,20 @@ public class AppetiteEvent {
     @SubscribeEvent
     public static void applyEffect(PlayerEvent.PlayerRespawnEvent event) {
         if (ConfigHandler.noEating && !event.player.isCreative()) {
-            event.player.addPotionEffect(new PotionEffect(ModPotions.getPotion("appetite"), ConfigHandler.noEatingTime * 20));
+            event.player.addPotionEffect(new PotionEffect(ModPotions.APPETITE, ConfigHandler.noEatingTime * 20));
         }
     }
 
     @SubscribeEvent
     public static void itemInteract(PlayerInteractEvent.RightClickItem event) {
-        if (ConfigHandler.noEating && event.getItemStack().getItemUseAction() == EnumAction.EAT && event.getEntityPlayer().isPotionActive(ModPotions.getPotion("appetite"))) {
+        if (ConfigHandler.noEating && event.getItemStack().getItemUseAction() == EnumAction.EAT && event.getEntityPlayer().isPotionActive(ModPotions.APPETITE)) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public static void blockInteract(PlayerInteractEvent.RightClickBlock event) {
-        if (ConfigHandler.noEating && event.getWorld().getBlockState(event.getPos()).getBlock() == Blocks.CAKE && event.getEntityPlayer().isPotionActive(ModPotions.getPotion("appetite"))) {
+        if (ConfigHandler.noEating && event.getWorld().getBlockState(event.getPos()).getBlock() == Blocks.CAKE && event.getEntityPlayer().isPotionActive(ModPotions.APPETITE)) {
             event.setCanceled(true);
         }
     }

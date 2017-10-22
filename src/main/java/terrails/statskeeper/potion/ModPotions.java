@@ -1,6 +1,7 @@
 package terrails.statskeeper.potion;
 
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -15,9 +16,10 @@ public class ModPotions extends PotionRegistry {
 
     private static Map<String, Potion> potionMap = new HashMap<>();
 
+    public static Potion APPETITE;
+
     public static void init() {
-        setPotionMap(potionMap, Constants.MOD_NAME);
-        addPotion("appetite", new NoAppetiteEffect("appetite"));
+        APPETITE = addPotion(new NoAppetiteEffect("appetite"));
     }
 
     @SubscribeEvent

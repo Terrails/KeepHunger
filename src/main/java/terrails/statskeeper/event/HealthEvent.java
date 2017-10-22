@@ -296,7 +296,7 @@ public class HealthEvent {
                 int meta = getItemMeta(item);
 
                 if (theItem != null && event.getItemStack().getItem() == theItem && event.getItemStack().getItemDamage() == meta && !world.isRemote) {
-                    if (event.getItemStack().getItemUseAction() != EnumAction.EAT || !event.getEntityPlayer().isPotionActive(ModPotions.getPotion("appetite"))) {
+                    if (event.getItemStack().getItemUseAction() != EnumAction.EAT || !event.getEntityPlayer().isPotionActive(ModPotions.APPETITE)) {
                         event.setCanceled(true);
                         health.setLastItemName(item);
                         event.getEntityPlayer().setActiveHand(EnumHand.MAIN_HAND);

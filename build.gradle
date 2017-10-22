@@ -30,7 +30,7 @@ repositories {
     mavenLocal()
 }
 dependencies {
-    compile 'terrails.terracore:TerraCore-1.12:2.1.0'
+    compile 'terrails.terracore:TerraCore-1.12:2.1.1'
 }
 
 processResources {
