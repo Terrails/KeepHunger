@@ -1,3 +1,4 @@
+/**───────────────────────────────────────────────────────────────────────────────────**/
 buildscript {
     repositories {
         jcenter()
@@ -7,19 +8,20 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+/**───────────────────────────────────────────────────────────────────────────────────**/
 apply plugin: 'net.minecraftforge.gradle.forge'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = targetCompatibility = '1.8'
+compileJava { sourceCompatibility = targetCompatibility = '1.8' }
 
-version = mod_version
+
+version = MC_VERSION + "-" + MOD_VERSION
 group = "terrails.statskeeper"
-archivesBaseName = "Stats Keeper"
+archivesBaseName = "StatsKeeper"
 
 minecraft {
-    version = mc_version + "-" + forge_version
-    mappings = mcp_mappings
+    version = MC_VERSION + "-" + FORGE_VERSION
+    mappings = MCP_MAPPINGS
     runDir = "run"
 
     replace "@VERSION@", project.version
@@ -30,7 +32,7 @@ repositories {
     mavenLocal()
 }
 dependencies {
-    compile 'terrails.terracore:TerraCore-1.12:2.1.1'
+    compile 'terrails:TerraCore:1.12.2-2.1.1'
 }
 
 processResources {
