@@ -31,6 +31,7 @@ import terrails.statskeeper.data.world.CustomWorldData;
 import terrails.statskeeper.potion.ModPotions;
 import terrails.terracore.helper.PlayerStats;
 import terrails.terracore.helper.StringHelper;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 
 @Mod.EventBusSubscriber
 public class HealthEvent {
@@ -61,6 +62,16 @@ public class HealthEvent {
     }
     private static int getItemAddedHealth(String item) {
         return item.contains(", ") ? Integer.parseInt(CharMatcher.DIGIT.retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
+    }
+
+    @SubscribeEvent
+    public static void onDimensionChange(PlayerChangedDimensionEvent event) {
+        IHealth health = event.player.getCapability(CapabilityHealth.HEALTH_CAPABILITY, null);
+        if (!event.player.getEntityWorld().isRemote && health != null) {
+            if (ConfigHandler.healthSystem) {
+                PlayerStats.setMaxHealth(event.player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+            }
+        }
     }
 
     @SubscribeEvent
@@ -313,36 +324,4 @@ public class HealthEvent {
             }
         }
     }
-/*
-    @SubscribeEvent
-    public static void onTick(TickEvent.ServerTickEvent event) {
-        List<EntityPlayerMP> players = event.side == Side.CLIENT ? PlayerHelper.getPlayerListIntegrated() : PlayerHelper.getPlayerListServer();
-        if (event.phase == TickEvent.Phase.END) {
-            for (EntityPlayerMP player : players) {
-
-                IHealth health = player.getCapability(CapabilityHealth.HEALTH_CAPABILITY, null);
-                CustomWorldData worldData = CustomWorldData.get(player.getEntityWorld());
-
-                if (health != null && worldData != null) {
-
-                    if (ConfigHandler.healthSystem) {
-                        worldData.markDirty();
-
-                        if (worldData.getOldMaxHealth() != worldData.getMaxHealth() || !health.getHasAddedHealth()) {
-                            health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                            worldData.setOldMaxHealth(worldData.getMaxHealth());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
-                            health.setHasAddedHealth(true);
-                            debugMessage("ServerTickEvent", "Health has been changed to: " + health.getAddedHealth());
-                        }
-                    } else {
-                        PlayerStats.removeMaxHealthModifier(player, STATS_KEEPER_HEALTH_UUID);
-                        health.setHasAddedHealth(false);
-                        debugMessage("ServerTickEvent", "Health System is disabled");
-                    }
-                }
-            }
-        }
-    }
-*/
 }
