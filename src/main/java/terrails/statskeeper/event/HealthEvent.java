@@ -31,6 +31,7 @@ import terrails.statskeeper.data.world.CustomWorldData;
 import terrails.statskeeper.potion.ModPotions;
 import terrails.terracore.helper.PlayerStats;
 import terrails.terracore.helper.StringHelper;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 
 @Mod.EventBusSubscriber
 public class HealthEvent {
@@ -61,6 +62,16 @@ public class HealthEvent {
     }
     private static int getItemAddedHealth(String item) {
         return item.contains(", ") ? Integer.parseInt(CharMatcher.DIGIT.retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
+    }
+
+    @SubscribeEvent
+    public static void onDimensionChange(PlayerChangedDimensionEvent event) {
+        IHealth health = event.player.getCapability(CapabilityHealth.HEALTH_CAPABILITY, null);
+        if (!event.player.getEntityWorld().isRemote && health != null) {
+            if (ConfigHandler.healthSystem) {
+                PlayerStats.setMaxHealth(event.player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+            }
+        }
     }
 
     @SubscribeEvent
