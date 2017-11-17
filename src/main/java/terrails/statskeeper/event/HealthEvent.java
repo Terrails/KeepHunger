@@ -45,7 +45,7 @@ public class HealthEvent {
      */
     private static final boolean ENABLE_DEBUGGING = false;
     private static void debugMessage(String event, String string) {
-         {
+        if (ENABLE_DEBUGGING) {
             Constants.getLogger(event).info(string);
         }
     }
