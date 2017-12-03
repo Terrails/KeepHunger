@@ -14,25 +14,21 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava { sourceCompatibility = targetCompatibility = '1.8' }
 
-
-version = MC_VERSION + "-" + MOD_VERSION
+version = "1.12" + "-" + getVersions('VERSION')
 group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper"
 
 minecraft {
-    version = MC_VERSION + "-" + FORGE_VERSION
-    mappings = MCP_MAPPINGS
+    version = "1.12.2" + "-" + "14.23.1.2559"
+	mappings = "snapshot_20171003"
     runDir = "run"
-
-    replace "@VERSION@", project.version
-    replaceIn "Constants.java"
 }
 
 repositories {
     mavenLocal()
 }
 dependencies {
-    compile 'terrails:TerraCore:1.12.2-2.1.1'
+    compile 'terrails:TerraCore:1.12.2-2.1.4'
 }
 
 processResources {
@@ -47,5 +43,25 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+}
+
+String getVersions(String type) {
+    String major = "0"
+    String revision = "0"
+    String patch = "0"
+    String prefix = "public static final String $type = \""
+    File file = file("src/main/java/terrails/statskeeper/Constants.java")
+    file.eachLine { String s ->
+        s = s.trim()
+        if (s.startsWith(prefix)) {
+            s = s.substring(prefix.length(), s.length() - 2)
+            String[] pts = s.split("\\.")
+
+            major = pts[0]
+            revision = pts[1]
+            patch = pts[2]
+        }
+        return "$major.$revision.$patch"
     }
 }

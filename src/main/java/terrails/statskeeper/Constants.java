@@ -14,7 +14,7 @@ public class Constants {
 
     public static final String MOD_ID = "stats_keeper";
     public static final String MOD_NAME = "Stats Keeper";
-    public static final String MOD_VERSION = "@VERSION@";
+    public static final String VERSION = "2.1.7";
     public static final String TERRACORE_VERSION = "2.1.1";
     public static final String MC_VERSION = "[1.12],[1.12.1],[1.12.2]";
     public static final String GUI_FACTORY = "terrails.statskeeper.config.ConfigFactoryGUI";
