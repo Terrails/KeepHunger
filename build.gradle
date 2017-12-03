@@ -24,11 +24,7 @@ minecraft {
     runDir = "run"
 }
 
-repositories {
-    mavenLocal()
-}
 dependencies {
-    compile 'terrails:TerraCore:1.12.2-2.1.4'
 }
 
 processResources {
