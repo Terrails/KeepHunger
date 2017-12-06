@@ -25,6 +25,7 @@ minecraft {
 }
 
 dependencies {
+    compile project(':TerraCore')
 }
 
 processResources {
