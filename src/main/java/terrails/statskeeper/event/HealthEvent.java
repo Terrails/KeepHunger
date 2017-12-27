@@ -2,7 +2,6 @@ package terrails.statskeeper.event;
 
 import com.google.common.base.CharMatcher;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -15,24 +14,20 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import terrails.statskeeper.Constants;
 import terrails.statskeeper.api.capabilities.health.IHealth;
 import terrails.statskeeper.config.ConfigHandler;
 import terrails.statskeeper.data.capabilities.health.CapabilityHealth;
 import terrails.statskeeper.data.world.CustomWorldData;
 import terrails.statskeeper.potion.ModPotions;
-import terrails.terracore.helper.PlayerHelper;
 import terrails.terracore.helper.PlayerStats;
 import terrails.terracore.helper.StringHelper;
 
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -67,6 +62,9 @@ public class HealthEvent {
         return item.contains(", ") ? Integer.parseInt(CharMatcher.digit().retainFrom(StringHelper.getSubstringAfter(item, ","))) : 2;
     }
 
+    public static void setMaxHealth(EntityPlayer player, UUID modifierUUID, double health) {
+        PlayerStats.setMaxHealth(player, modifierUUID, health, "StatsKeeper HP");
+    }
 
     @SubscribeEvent
     public static void onTick(TickEvent.WorldTickEvent event) {
@@ -85,7 +83,7 @@ public class HealthEvent {
                             if (worldData.getOldMaxHealth() != worldData.getMaxHealth() || !health.getHasAddedHealth()) {
                                 health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                                 worldData.setOldMaxHealth(worldData.getMaxHealth());
-                                PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                                setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                                 health.setHasAddedHealth(true);
                                 TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMaxHealth());
                                 if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
@@ -95,7 +93,7 @@ public class HealthEvent {
                             if (worldData.getOldMinHealth() != worldData.getMinHealth() || !health.getHasAddedHealth()) {
                                 health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                                 worldData.setOldMinHealth(worldData.getMinHealth());
-                                PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                                setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                                 health.setHasAddedHealth(true);
                                 TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMinHealth());
                                 if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
@@ -105,7 +103,7 @@ public class HealthEvent {
                         if (worldData.getOldMinHealth() != worldData.getMinHealth() && worldData.getOldMinHealth() < worldData.getMinHealth()) {
                             health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
                             worldData.setOldMinHealth(worldData.getMinHealth());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             health.setHasAddedHealth(true);
                             TextComponentTranslation text = new TextComponentTranslation("change.health", (int) worldData.getMinHealth());
                             if (!text.getFormattedText().isEmpty() && ConfigHandler.healthMessage) Constants.playerMessage(player, text.getFormattedText());
@@ -135,12 +133,12 @@ public class HealthEvent {
                 if (!ConfigHandler.startWithMinHealth) {
                     worldData.setOldMaxHealth(worldData.getMaxHealth());
                     health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                    PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                    setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                     health.setHasAddedHealth(true);
                 } else {
                     worldData.setOldMinHealth(worldData.getMinHealth());
                     health.setAddedHealth(worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                    PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                    setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                     health.setHasAddedHealth(true);
                 }
 
@@ -164,7 +162,7 @@ public class HealthEvent {
 
                 if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() == 0 && worldData.getRemoveHealth() == 0) {
                     newHealth.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue());
-                    PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
+                    setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
                 } 
                 
                 if (worldData.getMaxHealth() != 0 && worldData.getMinHealth() != 0) {
@@ -173,7 +171,7 @@ public class HealthEvent {
                     double removedHealth = oldHealth.getAddedHealth() - worldData.getRemoveHealth();
                     double addedHealth = removedHealth <= worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue() ? worldData.getMinHealth() - PlayerStats.getMaxHealthAttribute(newPlayer).getBaseValue() : removedHealth;
                     newHealth.setAddedHealth(addedHealth);
-                    PlayerStats.setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
+                    setMaxHealth(newPlayer, STATS_KEEPER_HEALTH_UUID, newHealth.getAddedHealth());
 
                     int removedAmount = (int) (oldHealth.getAddedHealth() - newHealth.getAddedHealth());
 
@@ -213,13 +211,13 @@ public class HealthEvent {
                         if (worldData.getMaxHealth() <= player.getMaxHealth() + healthAmount) {
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().shrink(1);
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         } else {
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().shrink(1);
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         }
@@ -258,13 +256,13 @@ public class HealthEvent {
                         if (worldData.getMaxHealth() <= player.getMaxHealth() + healthAmount) {
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth(worldData.getMaxHealth() - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().shrink(1);
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         } else {
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health Before Item: " + health.getAddedHealth());
                             health.setAddedHealth((player.getMaxHealth() + healthAmount) - PlayerStats.getMaxHealthAttribute(player).getBaseValue());
-                            PlayerStats.setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
+                            setMaxHealth(player, STATS_KEEPER_HEALTH_UUID, health.getAddedHealth());
                             event.getItem().shrink(1);
                             debugMessage("LivingEntityUseItemEvent.Start", "Added Health After Item: " + health.getAddedHealth());
                         }
