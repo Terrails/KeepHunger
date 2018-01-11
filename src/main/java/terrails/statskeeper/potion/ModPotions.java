@@ -1,29 +1,38 @@
 package terrails.statskeeper.potion;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import terrails.statskeeper.Constants;
-import terrails.terracore.registry.PotionRegistry;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Mod.EventBusSubscriber
-public class ModPotions extends PotionRegistry {
+public class ModPotions {
 
-    private static Map<String, Potion> potionMap = new HashMap<>();
+    private static List<Potion> potions = Lists.newArrayList();
 
     public static Potion APPETITE;
 
     public static void init() {
-        APPETITE = addPotion(new NoAppetiteEffect("appetite"));
+        APPETITE = add(new NoAppetiteEffect("appetite"));
+    }
+
+    public static <T extends Potion> T add(T potion) {
+        potions.add(potion);
+        return potion;
+    }
+
+    public static Potion[] get() {
+        return potions.toArray(new Potion[potions.size()]);
     }
 
     @SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<Potion> event) {
-        event.getRegistry().registerAll(getPotions());
+        event.getRegistry().registerAll(get());
     }
 }
