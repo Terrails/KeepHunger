@@ -14,12 +14,12 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava { sourceCompatibility = targetCompatibility = '1.8' }
 
-version = "1.12" + "-" + getVersions('VERSION')
+version = "1.12" + "-" + getModVersion('VERSION')
 group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper"
 
 minecraft {
-    version = "1.12.2" + "-" + "14.23.1.2582"
+    version = "1.12.2" + "-" + "14.23.2.2611"
 	mappings = "snapshot_20171003"
     runDir = "run"
 }
@@ -43,7 +43,7 @@ processResources {
     }
 }
 
-String getVersions(String type) {
+String getModVersion(String type) {
     String major = "0"
     String revision = "0"
     String patch = "0"
