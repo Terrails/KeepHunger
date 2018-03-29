@@ -22,7 +22,7 @@ public class GUIConfig extends GuiConfig {
    @SuppressWarnings("deprecation")
     private static List<IConfigElement> getConfigElements() {
 
-        List<IConfigElement> list = new ArrayList<IConfigElement>();
+        List<IConfigElement> list = new ArrayList<>();
         List<IConfigElement> GENERAL_SETTINGS = new ConfigElement(ConfigHandler.configFile.getCategory(ConfigHandler.GENERAL_SETTINGS)).getChildElements();
         List<IConfigElement> TAN_SETTINGS = new ConfigElement(ConfigHandler.configFile.getCategory(ConfigHandler.TAN_SETTINGS)).getChildElements();
 

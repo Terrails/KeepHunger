@@ -1,6 +1,5 @@
 package terrails.statskeeper.event;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumAction;
 import net.minecraft.potion.PotionEffect;
@@ -10,7 +9,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import terrails.statskeeper.config.ConfigHandler;
 import terrails.statskeeper.potion.ModPotions;
-import terrails.statskeeper.potion.NoAppetiteEffect;
 
 @Mod.EventBusSubscriber
 public class AppetiteEvent {

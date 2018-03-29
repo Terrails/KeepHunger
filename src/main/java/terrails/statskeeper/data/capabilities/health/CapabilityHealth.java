@@ -9,7 +9,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -17,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.Constants;
 import terrails.statskeeper.api.capabilities.health.IHealth;
+import terrails.terracore.capabilities.CapabilitySerializable;
 
 /**
  * Capability for {@link IHealth}.
@@ -24,31 +24,11 @@ import terrails.statskeeper.api.capabilities.health.IHealth;
  * @author Terrails
  */
 
-public class CapabilityHealth implements ICapabilitySerializable<NBTBase> {
+public class CapabilityHealth {
 
     @CapabilityInject(IHealth.class)
-    public static final Capability<IHealth> HEALTH_CAPABILITY = null;
-    public static final ResourceLocation CAPABILITY = new ResourceLocation(Constants.MOD_ID, "Health");
+    public static final Capability<IHealth> HEALTH_CAPABILITY;
 
-    private IHealth instance = HEALTH_CAPABILITY.getDefaultInstance();
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == HEALTH_CAPABILITY;
-    }
-    @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        return capability == HEALTH_CAPABILITY ? HEALTH_CAPABILITY.<T>cast(this.instance) : null;
-    }
-
-    @Override
-    public NBTBase serializeNBT() {
-        return HEALTH_CAPABILITY.writeNBT(this.instance, null);
-    }
-    @Override
-    public void deserializeNBT(NBTBase nbt) {
-        HEALTH_CAPABILITY.readNBT(this.instance, null, nbt);
-    }
     public static void register() {
         CapabilityManager.INSTANCE.register(IHealth.class, new Capability.IStorage<IHealth>() {
 
@@ -67,7 +47,7 @@ public class CapabilityHealth implements ICapabilitySerializable<NBTBase> {
                 instance.setAddedHealth(compound.getDouble("addedHealth"));
                 instance.setLastItemName(compound.getString("lastHealthItem"));
             }
-        }, () -> new Health());
+        }, Health::new);
     }
 
     @Mod.EventBusSubscriber
@@ -75,7 +55,7 @@ public class CapabilityHealth implements ICapabilitySerializable<NBTBase> {
         @SubscribeEvent
         public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
             if (event.getObject() instanceof EntityPlayer) {
-                event.addCapability(CAPABILITY, new CapabilityHealth());
+                event.addCapability(new ResourceLocation(Constants.MOD_ID, "Health"), new CapabilitySerializable<>(CapabilityHealth.HEALTH_CAPABILITY));
             }
         }
 
@@ -89,5 +69,9 @@ public class CapabilityHealth implements ICapabilitySerializable<NBTBase> {
                 health.setLastItemName(oldHealth.getLastItemName());
             }
         }
+    }
+
+    static {
+        HEALTH_CAPABILITY = null;
     }
 }
