@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.Constants;
+import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.health.IHealth;
 import terrails.terracore.capabilities.CapabilitySerializable;
 
@@ -55,7 +56,7 @@ public class CapabilityHealth {
         @SubscribeEvent
         public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
             if (event.getObject() instanceof EntityPlayer) {
-                event.addCapability(new ResourceLocation(Constants.MOD_ID, "Health"), new CapabilitySerializable<>(CapabilityHealth.HEALTH_CAPABILITY));
+                event.addCapability(new ResourceLocation(StatsKeeper.MOD_ID, "Health"), new CapabilitySerializable<>(CapabilityHealth.HEALTH_CAPABILITY));
             }
         }
 

@@ -7,6 +7,7 @@ import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.common.Loader;
 import terrails.statskeeper.Constants;
+import terrails.statskeeper.StatsKeeper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,8 @@ public class GUIConfig extends GuiConfig {
 
    public GUIConfig(GuiScreen parentScreen) {
        super(parentScreen,
-               GUIConfig.getConfigElements(), Constants.MOD_ID,
-               false, false, "/" + Constants.MOD_ID + ".cfg");
+               GUIConfig.getConfigElements(), StatsKeeper.MOD_ID,
+               false, false, "/" + StatsKeeper.MOD_ID + ".cfg");
    }
 
    @SuppressWarnings("deprecation")

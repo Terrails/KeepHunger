@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.Constants;
+import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.tan.ITAN;
 import terrails.terracore.capabilities.CapabilitySerializable;
 
@@ -55,7 +56,7 @@ public class CapabilityTAN {
         public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
             if (Loader.isModLoaded("ToughAsNails") || Loader.isModLoaded("toughasnails")) {
                 if (event.getObject() instanceof EntityPlayer) {
-                    event.addCapability(new ResourceLocation(Constants.MOD_ID, "TAN"), new CapabilitySerializable<>(CapabilityTAN.TAN_CAPABILITY));
+                    event.addCapability(new ResourceLocation(StatsKeeper.MOD_ID, "TAN"), new CapabilitySerializable<>(CapabilityTAN.TAN_CAPABILITY));
                 }
             }
         }

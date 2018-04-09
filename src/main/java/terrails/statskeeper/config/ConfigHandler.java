@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.Constants;
+import terrails.statskeeper.StatsKeeper;
 
 import java.io.File;
 
@@ -52,13 +53,13 @@ public class ConfigHandler
 
 
     public static void init(File directory) {
-        configFile = new Configuration(new File(directory, Constants.MOD_ID + ".cfg"));
+        configFile = new Configuration(new File(directory, StatsKeeper.MOD_ID + ".cfg"));
         syncConfig();
     }
 
     @SubscribeEvent
     public static void configChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equals(Constants.MOD_ID)) {
+        if (event.getModID().equals(StatsKeeper.MOD_ID)) {
             syncConfig();
         }
     }

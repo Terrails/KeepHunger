@@ -11,21 +11,29 @@ buildscript {
 /**───────────────────────────────────────────────────────────────────────────────────**/
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava { sourceCompatibility = targetCompatibility = '1.8' }
+def minecraft_major = minecraft_version.substring(0, minecraft_version.lastIndexOf("."))
 
-version = "1.12" + "-" + getModVersion('VERSION')
-group = "terrails.statskeeper"
-archivesBaseName = "StatsKeeper"
+version = "${minecraft_major}-${mod_version}"
+group = "terrails.${mod_name}".toLowerCase()
+archivesBaseName = "${mod_name}"
 
 minecraft {
-    version = "1.12.2" + "-" + "14.23.2.2611"
-	mappings = "snapshot_20171003"
+    version = "${minecraft_version}-${forge_version}"
+    mappings = "${mappings_version}"
     runDir = "run"
+
+    replace "@VERSION@", project.version
+    replace "terracore@[0.0.0,);", "terracore@[${terracore_version},);"
+}
+
+repositories {
+    maven {
+        url 'http://maven.blamejared.com'
+    }
 }
 
 dependencies {
-    compile project(':TerraCore')
+    deobfCompile(group: "terrails.terracore", name: "TerraCore", version: "${minecraft_major}-${terracore_version}-SNAPSHOT.+")
 }
 
 processResources {
@@ -43,22 +51,5 @@ processResources {
     }
 }
 
-String getModVersion(String type) {
-    String major = "0"
-    String revision = "0"
-    String patch = "0"
-    String prefix = "public static final String $type = \""
-    File file = file("src/main/java/terrails/statskeeper/Constants.java")
-    file.eachLine { String s ->
-        s = s.trim()
-        if (s.startsWith(prefix)) {
-            s = s.substring(prefix.length(), s.length() - 2)
-            String[] pts = s.split("\\.")
-
-            major = pts[0]
-            revision = pts[1]
-            patch = pts[2]
-        }
-        return "$major.$revision.$patch"
-    }
-}
+sourceCompatibility = targetCompatibility = '1.8'
+sourceCompatibility = targetCompatibility = '1.8'
