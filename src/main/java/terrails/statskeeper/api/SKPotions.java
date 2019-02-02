@@ -1,8 +1,8 @@
 package terrails.statskeeper.api;
 
-import net.minecraft.potion.Potion;
+import net.minecraft.entity.effect.StatusEffect;
 
 public class SKPotions {
 
-    public static Potion APPETITE;
+    public static StatusEffect NO_APPETITE;
 }

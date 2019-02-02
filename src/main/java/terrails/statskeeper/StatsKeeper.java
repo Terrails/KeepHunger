@@ -1,92 +1,42 @@
 package terrails.statskeeper;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.*;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.events.PlayerInteractionEvent;
+import net.fabricmc.fabric.events.ServerEvent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import terrails.statskeeper.api.SKPotions;
 import terrails.statskeeper.config.SKConfig;
-import terrails.statskeeper.data.health.CapabilityHealth;
-import terrails.statskeeper.data.tan.CapabilityTAN;
-import terrails.statskeeper.event.*;
-import terrails.statskeeper.packet.ThirstMessage;
-import terrails.statskeeper.potion.ModPotions;
-import terrails.terracore.base.MainModClass;
-import terrails.terracore.base.proxies.ProxyBase;
-import terrails.terracore.base.registry.RegistryList;
-import terrails.terracore.base.registry.RegistryType;
+import terrails.statskeeper.effect.NoAppetiteEffect;
+import terrails.statskeeper.event.InteractEvent;
+import terrails.statskeeper.event.PlayerEvent;
+import terrails.statskeeper.event.handler.BasicHandler;
+import terrails.statskeeper.event.handler.PlayerHealthHandler;
+import terrails.statskeeper.event.handler.PlayerHungerHandler;
 
-@Mod(modid = StatsKeeper.MOD_ID,
-        name = StatsKeeper.MOD_NAME,
-        version = StatsKeeper.VERSION,
-        guiFactory = StatsKeeper.GUI_FACTORY,
-        dependencies = "required-after:terracore@[0.0.0,);")
-public class StatsKeeper extends MainModClass<StatsKeeper> {
+public class StatsKeeper implements ModInitializer {
 
-    public static final String MOD_ID = "stats_keeper";
+    public static final String MOD_ID = "statskeeper";
     public static final String MOD_NAME = "Stats Keeper";
-    public static final String VERSION = "@VERSION@";
-    public static final String GUI_FACTORY = "terrails.statskeeper.config.ConfigFactoryGUI";
-    public static final Logger LOGGER = LogManager.getLogger(StatsKeeper.MOD_NAME);
-
-    public static ProxyBase proxy;
-    public static SimpleNetworkWrapper networkWrapper;
-
-    public StatsKeeper() {
-        super(MOD_ID, MOD_NAME, VERSION);
-        StatsKeeper.proxy = getProxy();
-    }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void registerForgeEntries(RegistryList list) {
-        if (list.getType() == RegistryType.POTION) {
-            ModPotions.init();
-            list.addAll(ModPotions.potions);
-        }
-    }
-
-    @Mod.EventHandler
-    @Override
-    public void preInit(FMLPreInitializationEvent event) {
-        super.preInit(event);
-        SKConfig.initialize(event.getModConfigurationDirectory());
-        StatsKeeper.initializeCapabilities();
+    public void onInitialize() {
+        SKConfig.initialize();
+        SKPotions.NO_APPETITE = Registry.register(Registry.STATUS_EFFECT, new Identifier(StatsKeeper.MOD_ID, "no_appetite"), new NoAppetiteEffect());
         StatsKeeper.initializeEvents();
-        networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
-        networkWrapper.registerMessage(ThirstMessage.MessageHandler.class, ThirstMessage.class, 0, Side.CLIENT);
-    }
-
-    private static void initializeCapabilities() {
-        CapabilityHealth.register();
-        if (Loader.isModLoaded("toughasnails")) CapabilityTAN.register();
     }
 
     private static void initializeEvents() {
-        MinecraftForge.EVENT_BUS.register(new BasicEventHandler());
-        MinecraftForge.EVENT_BUS.register(new HungerEventHandler());
-        MinecraftForge.EVENT_BUS.register(new HealthEventHandler());
-        if (Loader.isModLoaded("toughasnails")) MinecraftForge.EVENT_BUS.register(new TANEvent());
-    }
-
-    @Mod.EventHandler
-    @Override
-    public void init(FMLInitializationEvent event) {
-        super.init(event);
-    }
-
-    @Mod.EventHandler
-    @Override
-    public void postInit(FMLPostInitializationEvent event) {
-        super.postInit(event);
-    }
-
-    @Override
-    public StatsKeeper getInstance() {
-        return this;
+        PlayerEvent.PLAYER_CLONE.register(PlayerHealthHandler.playerCloneEvent);
+        PlayerEvent.PLAYER_CLONE.register(PlayerHungerHandler.playerCloneEvent);
+        PlayerEvent.PLAYER_CLONE.register(BasicHandler.playerCloneEvent);
+        PlayerEvent.PLAYER_JOIN.register(PlayerHealthHandler.playerJoinEvent);
+        PlayerEvent.PLAYER_RESPAWN.register(PlayerHungerHandler.playerRespawnEvent);
+        InteractEvent.PLAYER_USE_FINISHED.register(PlayerHealthHandler.itemUseFinishedEvent);
+        PlayerInteractionEvent.INTERACT_BLOCK.register(PlayerHungerHandler.blockInteractEvent);
+        PlayerInteractionEvent.INTERACT_ITEM.register(PlayerHungerHandler.itemInteractEvent);
+        PlayerInteractionEvent.INTERACT_ITEM.register(PlayerHealthHandler.itemInteractEvent);
+        ServerEvent.START.register((MinecraftServer server) -> SKConfig.initialize());
     }
 }

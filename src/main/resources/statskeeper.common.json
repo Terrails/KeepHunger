@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "terrails.statskeeper.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ServerPlayerEntityMixin",
+    "LivingEntityMixin",
+    "BucketMilkItemMixin",
+    "PlayerManagerMixin",
+    "HungerManagerMixin",
+    "ServerPlayNetworkHandlerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,56 +1,29 @@
-/**───────────────────────────────────────────────────────────────────────────────────**/
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
-    }
+plugins {
+	id 'fabric-loom' version '0.2.0-SNAPSHOT'
 }
-/**───────────────────────────────────────────────────────────────────────────────────**/
-apply plugin: 'net.minecraftforge.gradle.forge'
 
-def minecraft_major = minecraft_version.substring(0, minecraft_version.lastIndexOf("."))
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-version = "${minecraft_major}-${mod_version}"
-group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper"
+version = "3.0.0"
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    mappings = "${mappings_version}"
-    runDir = "run"
-
-    replace "@VERSION@", project.version
-    replace "terracore@[0.0.0,);", "terracore@[${terracore_version},);"
-}
-
-repositories {
-    maven {
-        url 'http://maven.blamejared.com'
-    }
 }
 
 dependencies {
-    deobfCompile("terrails.terracore:TerraCore:${minecraft_major}-${terracore_version}-SNAPSHOT.+")
-    deobfCompile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${minecraft_version}-${tan_version}:universal")
+	minecraft "com.mojang:minecraft:19w05a"
+	mappings "net.fabricmc:yarn:19w05a.6"
+	modCompile "net.fabricmc:fabric-loader:0.3.4.105"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modCompile "net.fabricmc:fabric:0.1.5.87"
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
 }
-
-sourceCompatibility = targetCompatibility = '1.8'
-sourceCompatibility = targetCompatibility = '1.8'
