@@ -13,6 +13,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 def minecraft_major = minecraft_version.substring(0, minecraft_version.lastIndexOf("."))
 
+sourceCompatibility = targetCompatibility = '1.8'
 version = "${minecraft_major}-${mod_version}"
 group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper"
@@ -37,6 +38,10 @@ dependencies {
     deobfCompile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${minecraft_version}-${tan_version}:universal")
 }
 
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
 processResources {
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
@@ -51,6 +56,3 @@ processResources {
         exclude 'mcmod.info'
     }
 }
-
-sourceCompatibility = targetCompatibility = '1.8'
-sourceCompatibility = targetCompatibility = '1.8'
