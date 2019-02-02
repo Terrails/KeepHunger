@@ -14,8 +14,8 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 def minecraft_major = minecraft_version.substring(0, minecraft_version.lastIndexOf("."))
 
 version = "${minecraft_major}-${mod_version}"
-group = "terrails.${mod_name}".toLowerCase()
-archivesBaseName = "${mod_name}"
+group = "terrails.statskeeper"
+archivesBaseName = "StatsKeeper"
 
 minecraft {
     version = "${minecraft_version}-${forge_version}"
@@ -33,7 +33,8 @@ repositories {
 }
 
 dependencies {
-    deobfCompile(group: "terrails.terracore", name: "TerraCore", version: "${minecraft_major}-${terracore_version}-SNAPSHOT.+")
+    deobfCompile("terrails.terracore:TerraCore:${minecraft_major}-${terracore_version}-SNAPSHOT.+")
+    deobfCompile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${minecraft_version}-${tan_version}:universal")
 }
 
 processResources {

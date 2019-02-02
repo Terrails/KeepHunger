@@ -20,12 +20,6 @@ public class ConfigFactoryGUI implements IModGuiFactory {
     public void initialize(Minecraft minecraftInstance) {
     }
 
-    @SuppressWarnings( "deprecation" )
-    public Class<? extends GuiScreen> mainConfigGuiClass() {
-        return GUIConfig.class;
-    }
-
-    @SuppressWarnings( "deprecation" )
     @Override
     public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;

@@ -1,20 +1,24 @@
 package terrails.statskeeper;
 
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import terrails.statskeeper.data.capabilities.health.CapabilityHealth;
-import terrails.statskeeper.config.ConfigHandler;
-import terrails.statskeeper.data.capabilities.tan.CapabilityTAN;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import terrails.statskeeper.config.SKConfig;
+import terrails.statskeeper.data.health.CapabilityHealth;
+import terrails.statskeeper.data.tan.CapabilityTAN;
+import terrails.statskeeper.event.*;
 import terrails.statskeeper.packet.ThirstMessage;
 import terrails.statskeeper.potion.ModPotions;
 import terrails.terracore.base.MainModClass;
 import terrails.terracore.base.proxies.ProxyBase;
 import terrails.terracore.base.registry.RegistryList;
+import terrails.terracore.base.registry.RegistryType;
 
 @Mod(modid = StatsKeeper.MOD_ID,
         name = StatsKeeper.MOD_NAME,
@@ -27,6 +31,7 @@ public class StatsKeeper extends MainModClass<StatsKeeper> {
     public static final String MOD_NAME = "Stats Keeper";
     public static final String VERSION = "@VERSION@";
     public static final String GUI_FACTORY = "terrails.statskeeper.config.ConfigFactoryGUI";
+    public static final Logger LOGGER = LogManager.getLogger(StatsKeeper.MOD_NAME);
 
     public static ProxyBase proxy;
     public static SimpleNetworkWrapper networkWrapper;
@@ -39,10 +44,9 @@ public class StatsKeeper extends MainModClass<StatsKeeper> {
     @Override
     @SuppressWarnings("unchecked")
     public void registerForgeEntries(RegistryList list) {
-        switch (list.getType()) {
-            case POTION:
-                list.addAll(ModPotions.potions);
-                break;
+        if (list.getType() == RegistryType.POTION) {
+            ModPotions.init();
+            list.addAll(ModPotions.potions);
         }
     }
 
@@ -50,14 +54,23 @@ public class StatsKeeper extends MainModClass<StatsKeeper> {
     @Override
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
-        ConfigHandler.init(event.getModConfigurationDirectory());
-
-        ModPotions.init();
-        CapabilityHealth.register();
-        CapabilityTAN.register();
-
+        SKConfig.initialize(event.getModConfigurationDirectory());
+        StatsKeeper.initializeCapabilities();
+        StatsKeeper.initializeEvents();
         networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
         networkWrapper.registerMessage(ThirstMessage.MessageHandler.class, ThirstMessage.class, 0, Side.CLIENT);
+    }
+
+    private static void initializeCapabilities() {
+        CapabilityHealth.register();
+        if (Loader.isModLoaded("toughasnails")) CapabilityTAN.register();
+    }
+
+    private static void initializeEvents() {
+        MinecraftForge.EVENT_BUS.register(new BasicEventHandler());
+        MinecraftForge.EVENT_BUS.register(new HungerEventHandler());
+        MinecraftForge.EVENT_BUS.register(new HealthEventHandler());
+        if (Loader.isModLoaded("toughasnails")) MinecraftForge.EVENT_BUS.register(new TANEvent());
     }
 
     @Mod.EventHandler

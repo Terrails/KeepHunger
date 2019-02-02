@@ -1,6 +1,4 @@
-package terrails.statskeeper.data.capabilities.tan;
-
-import terrails.statskeeper.api.capabilities.tan.ITAN;
+package terrails.statskeeper.data.tan;
 
 public class TAN implements ITAN {
 
