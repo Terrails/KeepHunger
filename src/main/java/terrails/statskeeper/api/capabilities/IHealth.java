@@ -16,4 +16,6 @@ public interface IHealth {
     int getMinHealth();
     void setMinHealth(int health);
 
+    boolean isMinStart();
+    void setMinStart(boolean val);
 }

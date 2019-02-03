@@ -26,6 +26,7 @@ public class CapabilityHealth {
             public NBTBase writeNBT(Capability<IHealth> capability, IHealth instance, EnumFacing side) {
                 NBTTagCompound compound = new NBTTagCompound();
                 compound.setBoolean("sk:is_enabled", instance.isHealthEnabled());
+                compound.setBoolean("sk:is_min_start", instance.isMinStart());
                 compound.setInteger("sk:additional_health", instance.getAdditionalHealth());
                 compound.setInteger("sk:max_health", instance.getMaxHealth());
                 compound.setInteger("sk:min_health", instance.getMinHealth());
@@ -36,6 +37,10 @@ public class CapabilityHealth {
                 NBTTagCompound compound = (NBTTagCompound)nbt;
                 if (compound.hasKey("sk:is_enabled")) {
                     instance.setHealthEnabled(compound.getBoolean("sk:is_enabled"));
+                }
+
+                if (compound.hasKey("sk:is_min_start")) {
+                    instance.setMinStart(compound.getBoolean("sk:is_min_start"));
                 }
 
                 if (compound.hasKey("sk:additional_health")) {
