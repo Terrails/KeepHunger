@@ -7,7 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SKConfig {
@@ -37,7 +36,6 @@ public class SKConfig {
         public boolean min_health_start = true;
         public boolean on_change_reset = true;
         public boolean health_message = true;
-        public boolean render_missing = true;
 
         public int max_health = 20;
         public int min_health = 6;

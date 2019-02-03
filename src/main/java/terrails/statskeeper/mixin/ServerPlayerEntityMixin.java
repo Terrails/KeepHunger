@@ -25,6 +25,7 @@ public class ServerPlayerEntityMixin implements IPlayerHealth {
 
     private int additional_health = 0;
     private boolean is_health_enabled = false;
+    private boolean is_min_start = false;
     private int max_health = 0;
     private int min_health = 0;
 
@@ -73,10 +74,24 @@ public class ServerPlayerEntityMixin implements IPlayerHealth {
         this.min_health = health;
     }
 
+    @Override
+    public boolean isSKMinStart() {
+        return this.is_min_start;
+    }
+
+    @Override
+    public void setSKMinStart(boolean val) {
+        this.is_min_start = val;
+    }
+
     @Inject(method = "readCustomDataFromTag", at = @At("RETURN"))
     private void readCustomDataFromTag(CompoundTag tag, CallbackInfo info) {
         if (tag.containsKey("sk:is_enabled")) {
             this.setSKHealthEnabled(tag.getBoolean("sk:is_enabled"));
+        }
+
+        if (tag.containsKey("sk:is_min_start")) {
+            this.setSKMinStart(tag.getBoolean("sk:is_min_start"));
         }
 
         if (tag.containsKey("sk:additional_health")) {
@@ -95,6 +110,7 @@ public class ServerPlayerEntityMixin implements IPlayerHealth {
     @Inject(method = "writeCustomDataToTag", at = @At("RETURN"))
     private void writeCustomDataToTag(CompoundTag tag, CallbackInfo info) {
         tag.putBoolean("sk:is_enabled", this.isSKHealthEnabled());
+        tag.putBoolean("sk:is_min_start", this.isSKMinStart());
         tag.putInt("sk:additional_health", this.getSKAdditionalHealth());
         tag.putInt("sk:max_health", this.getSKMaxHealth());
         tag.putInt("sk:min_health", this.getSKMinHealth());

@@ -15,4 +15,7 @@ public interface IPlayerHealth {
 
     int getSKMinHealth();
     void setSKMinHealth(int health);
+
+    boolean isSKMinStart();
+    void setSKMinStart(boolean val);
 }

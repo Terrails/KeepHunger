@@ -46,6 +46,14 @@ public class PlayerHealthHandler {
                     if (config.max_health != health.getSKMaxHealth() && !config.min_health_start) {
                         PlayerHealthHandler.setHealth(player, Operation.MAX);
                     }
+
+                    if (health.isSKMinStart() != config.min_health_start) {
+                        if (config.min_health_start) {
+                            PlayerHealthHandler.setHealth(player, Operation.MIN);
+                        } else {
+                            PlayerHealthHandler.setHealth(player, Operation.MAX);
+                        }
+                    }
                 }
 
                 if (config.min_health > 0 && health.getSKAdditionalHealth() < config.min_health - baseHealth) {
@@ -149,6 +157,7 @@ public class PlayerHealthHandler {
         int baseHealth = (int) PlayerHealthHandler.getAttribute(player).getBaseValue();
 
         health.setSKHealthEnabled(true);
+        health.setSKMinStart(config.min_health_start);
         switch (type) {
             case MAX:
                 health.setSKMaxHealth(config.max_health);

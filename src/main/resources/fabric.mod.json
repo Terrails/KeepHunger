@@ -2,7 +2,7 @@
   "id": "statskeeper",
   "name": "Stats Keeper",
   "description": "Configurator for stats!",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "side": "universal",
   "initializers": [
     "terrails.statskeeper.StatsKeeper"
@@ -11,7 +11,6 @@
     "fabric": "*"
   },
   "mixins": {
-    "client": "statskeeper.client.json",
     "common": "statskeeper.common.json"
   }
 }
