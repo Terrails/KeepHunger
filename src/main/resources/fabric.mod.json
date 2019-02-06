@@ -11,6 +11,7 @@
     "fabric": "*"
   },
   "mixins": {
-    "common": "statskeeper.common.json"
+    "common": "statskeeper.common.json",
+    "client": "statskeeper.client.json"
   }
 }
