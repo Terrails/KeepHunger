@@ -5,8 +5,8 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-archivesBaseName = "StatsKeeper"
-version = "3.0.1"
+archivesBaseName = "StatsKeeper-Fabric.1.14"
+version = "3.0.2"
 
 minecraft {
 }
@@ -18,6 +18,13 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modCompile "net.fabricmc:fabric:0.1.5.88"
+}
+
+processResources {
+	filesMatching('fabric.mod.json') {
+		expand 'version': project.version
+	}
+	inputs.property "version", project.version
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
