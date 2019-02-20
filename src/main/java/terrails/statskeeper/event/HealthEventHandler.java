@@ -76,8 +76,14 @@ public class HealthEventHandler {
                 }
             }
         } else {
-            HealthEventHandler.removeModifier(player);
-            player.setHealth(player.getMaxHealth());
+            boolean z = false;
+            if (HealthEventHandler.hasModifier(player)) {
+                HealthEventHandler.removeModifier(player);
+                z = true;
+            }
+            if (z) {
+                player.setHealth(player.getMaxHealth());
+            }
         }
     }
 
