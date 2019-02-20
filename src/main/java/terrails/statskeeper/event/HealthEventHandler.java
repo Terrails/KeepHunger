@@ -27,13 +27,14 @@ public class HealthEventHandler {
 
     @SubscribeEvent
     public void playerJoin(PlayerLoggedInEvent event) {
+        EntityPlayer player = event.player;
+        IHealth health = player.getCapability(SKCapabilities.HEALTH_CAPABILITY, null);
+        if (health == null)
+            return;
+
         if (SKConfig.Health.enabled) {
-            EntityPlayer player = event.player;
-            IHealth health = player.getCapability(SKCapabilities.HEALTH_CAPABILITY, null);
 
             int baseHealth = (int) HealthEventHandler.getAttribute(player).getBaseValue();
-            if (health == null)
-                return;
 
             if (!health.isHealthEnabled()) {
 
@@ -43,6 +44,10 @@ public class HealthEventHandler {
                     HealthEventHandler.setHealth(player, Operation.MAX);
                 }
             } else {
+
+                if (!HealthEventHandler.hasModifier(player)) {
+                    HealthEventHandler.setAdditionalHealth(player, health.getAdditionalHealth());
+                }
 
                 if (SKConfig.Health.on_change_reset) {
                     if (SKConfig.Health.min_health != health.getMinHealth() && SKConfig.Health.min_health_start) {
@@ -70,6 +75,9 @@ public class HealthEventHandler {
                     HealthEventHandler.setHealth(player, Operation.MAX);
                 }
             }
+        } else {
+            HealthEventHandler.removeModifier(player);
+            player.setHealth(player.getMaxHealth());
         }
     }
 
@@ -245,6 +253,10 @@ public class HealthEventHandler {
         if (modifier != null) {
             HealthEventHandler.getAttribute(player).removeModifier(modifier);
         }
+    }
+
+    private static boolean hasModifier(EntityPlayer player) {
+        return HealthEventHandler.getAttribute(player).getModifier(STATS_KEEPER_HEALTH_UUID) != null;
     }
 
     private static void playerMessage(EntityPlayer player, String message) {

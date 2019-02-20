@@ -18,10 +18,10 @@ def minecraft_version = "1.12.2"
 def forge_version = "14.23.5.2810"
 def mappings_version = "stable_39"
 
-def terracore_version = "1.12-2.1.10"
+def terracore_version = "1.12-2.1.10-SNAPSHOT.+"
 def tan_version = "1.12.2-3.1.0.140"
 
-version = "3.0.1"
+version = "3.0.2"
 group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper-${minecraft_version}"
 
@@ -41,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    deobfCompile("terrails.terracore:TerraCore:${terracore_version}-SNAPSHOT.+")
+    deobfCompile("terrails.terracore:TerraCore:${terracore_version}")
     deobfCompile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${tan_version}:universal")
 }
 

@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.IHealth;
 import terrails.statskeeper.api.capabilities.SKCapabilities;
+import terrails.statskeeper.config.SKConfig;
 import terrails.terracore.capabilities.CapabilitySerializable;
 
 public class CapabilityHealth {
@@ -53,6 +54,14 @@ public class CapabilityHealth {
 
                 if (compound.hasKey("sk:min_health")) {
                     instance.setMinHealth(compound.getInteger("sk:min_health"));
+                }
+
+                if (compound.hasKey("addedHealth")) {
+                    instance.setAdditionalHealth((int) compound.getDouble("addedHealth"));
+                    instance.setMinStart(SKConfig.Health.min_health_start);
+                    instance.setMaxHealth(SKConfig.Health.max_health);
+                    instance.setMinHealth(SKConfig.Health.min_health);
+                    instance.setHealthEnabled(true);
                 }
             }
         }, Health::new);
