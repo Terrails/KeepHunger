@@ -1,4 +1,4 @@
-package terrails.statskeeper.api;
+package terrails.statskeeper.api.data;
 
 public interface IPlayerHealth {
 

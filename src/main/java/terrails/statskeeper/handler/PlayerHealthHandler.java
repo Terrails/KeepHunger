@@ -1,6 +1,6 @@
-package terrails.statskeeper.event.handler;
+package terrails.statskeeper.handler;
 
-import net.fabricmc.fabric.events.PlayerInteractionEvent;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.entity.attribute.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -11,10 +11,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 import terrails.statskeeper.StatsKeeper;
-import terrails.statskeeper.api.IPlayerHealth;
+import terrails.statskeeper.api.data.IPlayerHealth;
 import terrails.statskeeper.config.SKConfig;
-import terrails.statskeeper.event.InteractEvent;
-import terrails.statskeeper.event.PlayerEvent;
+import terrails.statskeeper.api.event.PlayerCloneCallback;
+import terrails.statskeeper.api.event.PlayerJoinCallback;
+import terrails.statskeeper.api.event.PlayerUseFinishedCallback;
 
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class PlayerHealthHandler {
 
     private static final UUID STATS_KEEPER_HEALTH_UUID = UUID.fromString("b4720be1-df42-4347-9625-34152fb82b3f");
 
-    public static PlayerEvent.Join playerJoinEvent = (PlayerEntity player) -> {
+    public static PlayerJoinCallback playerJoinEvent = (PlayerEntity player) -> {
         IPlayerHealth health = (IPlayerHealth) player;
         SKConfig.Health config = SKConfig.instance.HEALTH_STATS;
 
@@ -74,7 +75,7 @@ public class PlayerHealthHandler {
         }
     };
 
-    public static PlayerEvent.Clone playerCloneEvent = (PlayerEntity player, PlayerEntity oldPlayer, boolean isEnd) -> {
+    public static PlayerCloneCallback playerCloneEvent = (PlayerEntity player, PlayerEntity oldPlayer, boolean isEnd) -> {
         SKConfig.Health config = SKConfig.instance.HEALTH_STATS;
 
         if (config.enabled) {
@@ -111,7 +112,7 @@ public class PlayerHealthHandler {
         }
     };
 
-    public static InteractEvent.UseFinished itemUseFinishedEvent = (PlayerEntity player, ItemStack stack) -> {
+    public static PlayerUseFinishedCallback itemUseFinishedEvent = (PlayerEntity player, ItemStack stack) -> {
         SKConfig.Health config = SKConfig.instance.HEALTH_STATS;
 
         if (!config.enabled) {
@@ -129,7 +130,7 @@ public class PlayerHealthHandler {
         }
     };
 
-    public static PlayerInteractionEvent.Item itemInteractEvent = (PlayerEntity player, World world, Hand hand) -> {
+    public static UseItemCallback itemInteractEvent = (PlayerEntity player, World world, Hand hand) -> {
         if (player.isSpectator() || world.isClient)
             return ActionResult.PASS;
 

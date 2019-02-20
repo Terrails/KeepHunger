@@ -1,6 +1,7 @@
-package terrails.statskeeper.event.handler;
+package terrails.statskeeper.handler;
 
-import net.fabricmc.fabric.events.PlayerInteractionEvent;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.block.CakeBlock;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.HungerManager;
@@ -8,17 +9,17 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.UseAction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.World;
-import terrails.statskeeper.api.ISaturation;
-import terrails.statskeeper.api.SKPotions;
+import terrails.statskeeper.api.data.ISaturation;
+import terrails.statskeeper.api.potion.SKPotions;
 import terrails.statskeeper.config.SKConfig;
-import terrails.statskeeper.event.PlayerEvent;
+import terrails.statskeeper.api.event.PlayerCloneCallback;
+import terrails.statskeeper.api.event.PlayerRespawnCallback;
 
 public class PlayerHungerHandler {
 
-    public static PlayerEvent.Clone playerCloneEvent = (PlayerEntity player, PlayerEntity oldPlayer, boolean isEnd) -> {
+    public static PlayerCloneCallback playerCloneEvent = (PlayerEntity player, PlayerEntity oldPlayer, boolean isEnd) -> {
         if (!isEnd) {
             SKConfig.Hunger config = SKConfig.instance.HUNGER_STATS;
 
@@ -43,7 +44,7 @@ public class PlayerHungerHandler {
         }
     };
 
-    public static PlayerEvent.Respawn playerRespawnEvent = (PlayerEntity player, boolean isEnd) -> {
+    public static PlayerRespawnCallback playerRespawnEvent = (PlayerEntity player, boolean isEnd) -> {
         if (!isEnd) {
             SKConfig.Hunger config = SKConfig.instance.HUNGER_STATS;
 
@@ -53,16 +54,17 @@ public class PlayerHungerHandler {
         }
     };
 
-    public static PlayerInteractionEvent.BlockPositioned blockInteractEvent = (PlayerEntity player, World world, Hand hand, BlockPos pos, Direction direction, float hitX, float hitY, float hitZ) -> {
+    public static UseBlockCallback blockInteractEvent = (PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) -> {
         if (player.isSpectator()) return ActionResult.PASS;
 
-        if (SKConfig.instance.HUNGER_STATS.no_appetite_time > 0 && player.hasPotionEffect(SKPotions.NO_APPETITE) && world.getBlockState(pos).getBlock() instanceof CakeBlock) {
+        if (SKConfig.instance.HUNGER_STATS.no_appetite_time > 0 && player.hasPotionEffect(SKPotions.NO_APPETITE)
+                && world.getBlockState(hitResult.getBlockPos()).getBlock() instanceof CakeBlock) {
             return ActionResult.FAILURE;
         }
         return ActionResult.PASS;
     };
 
-    public static PlayerInteractionEvent.Item itemInteractEvent = (PlayerEntity player, World world, Hand hand) -> {
+    public static UseItemCallback itemInteractEvent = (PlayerEntity player, World world, Hand hand) -> {
         if (player.isSpectator()) return ActionResult.PASS;
 
         if (SKConfig.instance.HUNGER_STATS.no_appetite_time > 0 && player.hasPotionEffect(SKPotions.NO_APPETITE)

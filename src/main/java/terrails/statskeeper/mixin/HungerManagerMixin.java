@@ -3,7 +3,7 @@ package terrails.statskeeper.mixin;
 import net.minecraft.entity.player.HungerManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import terrails.statskeeper.api.ISaturation;
+import terrails.statskeeper.api.data.ISaturation;
 
 @Mixin(HungerManager.class)
 public class HungerManagerMixin implements ISaturation {

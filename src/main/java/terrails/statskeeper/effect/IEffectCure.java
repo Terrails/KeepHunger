@@ -1,4 +1,4 @@
-package terrails.statskeeper.api;
+package terrails.statskeeper.effect;
 
 import net.minecraft.item.ItemStack;
 

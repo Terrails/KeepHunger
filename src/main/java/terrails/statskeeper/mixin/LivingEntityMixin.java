@@ -1,6 +1,5 @@
 package terrails.statskeeper.mixin;
 
-import net.fabricmc.fabric.util.HandlerArray;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -11,10 +10,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import terrails.statskeeper.api.IEffectCure;
-import terrails.statskeeper.api.SKPotions;
+import terrails.statskeeper.effect.IEffectCure;
+import terrails.statskeeper.api.potion.SKPotions;
 import terrails.statskeeper.config.SKConfig;
-import terrails.statskeeper.event.InteractEvent;
+import terrails.statskeeper.api.event.PlayerUseFinishedCallback;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -65,11 +64,7 @@ public class LivingEntityMixin implements IEffectCure {
         LivingEntity entity = (LivingEntity) (Object) this;
         //noinspection ConstantConditions
         if (entity instanceof PlayerEntity) {
-            HandlerArray<InteractEvent.UseFinished> handler = InteractEvent.PLAYER_USE_FINISHED;
-
-            for (InteractEvent.UseFinished event : handler.getBackingArray()) {
-                event.onItemUseFinished((PlayerEntity) entity, this.activeItemStack);
-            }
+            PlayerUseFinishedCallback.EVENT.invoker().onItemUseFinished((PlayerEntity) entity, this.activeItemStack);
         }
     }
 }

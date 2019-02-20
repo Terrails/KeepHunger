@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import terrails.statskeeper.api.IEffectCure;
-import terrails.statskeeper.api.SKPotions;
+import terrails.statskeeper.effect.IEffectCure;
+import terrails.statskeeper.api.potion.SKPotions;
 
 @Mixin(BucketMilkItem.class)
 public class BucketMilkItemMixin {

@@ -2,7 +2,7 @@ package terrails.statskeeper.config;
 
 import com.google.common.collect.Lists;
 import com.google.gson.*;
-import net.fabricmc.loader.FabricLoader;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 
@@ -64,7 +64,7 @@ public class SKConfig {
     }
 
     public static void initialize() {
-        File configFile = new File(FabricLoader.INSTANCE.getConfigDirectory(), "statskeeper.json");
+        File configFile = new File(FabricLoader.getInstance().getConfigDirectory(), "statskeeper.json");
 
         if (configFile.exists()) {
             try {

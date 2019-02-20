@@ -1,19 +1,19 @@
 package terrails.statskeeper;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.events.PlayerInteractionEvent;
-import net.fabricmc.fabric.events.ServerEvent;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import terrails.statskeeper.api.SKPotions;
+import terrails.statskeeper.api.event.*;
+import terrails.statskeeper.api.potion.SKPotions;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.effect.NoAppetiteEffect;
-import terrails.statskeeper.event.InteractEvent;
-import terrails.statskeeper.event.PlayerEvent;
-import terrails.statskeeper.event.handler.BasicHandler;
-import terrails.statskeeper.event.handler.PlayerHealthHandler;
-import terrails.statskeeper.event.handler.PlayerHungerHandler;
+import terrails.statskeeper.handler.BasicHandler;
+import terrails.statskeeper.handler.PlayerHealthHandler;
+import terrails.statskeeper.handler.PlayerHungerHandler;
 
 public class StatsKeeper implements ModInitializer {
 
@@ -28,15 +28,15 @@ public class StatsKeeper implements ModInitializer {
     }
 
     private static void initializeEvents() {
-        PlayerEvent.PLAYER_CLONE.register(PlayerHealthHandler.playerCloneEvent);
-        PlayerEvent.PLAYER_CLONE.register(PlayerHungerHandler.playerCloneEvent);
-        PlayerEvent.PLAYER_CLONE.register(BasicHandler.playerCloneEvent);
-        PlayerEvent.PLAYER_JOIN.register(PlayerHealthHandler.playerJoinEvent);
-        PlayerEvent.PLAYER_RESPAWN.register(PlayerHungerHandler.playerRespawnEvent);
-        InteractEvent.PLAYER_USE_FINISHED.register(PlayerHealthHandler.itemUseFinishedEvent);
-        PlayerInteractionEvent.INTERACT_BLOCK.register(PlayerHungerHandler.blockInteractEvent);
-        PlayerInteractionEvent.INTERACT_ITEM.register(PlayerHungerHandler.itemInteractEvent);
-        PlayerInteractionEvent.INTERACT_ITEM.register(PlayerHealthHandler.itemInteractEvent);
-        ServerEvent.START.register((MinecraftServer server) -> SKConfig.initialize());
+        PlayerCloneCallback.EVENT.register(PlayerHealthHandler.playerCloneEvent);
+        PlayerCloneCallback.EVENT.register(PlayerHungerHandler.playerCloneEvent);
+        PlayerCloneCallback.EVENT.register(BasicHandler.playerCloneEvent);
+        PlayerJoinCallback.EVENT.register(PlayerHealthHandler.playerJoinEvent);
+        PlayerRespawnCallback.EVENT.register(PlayerHungerHandler.playerRespawnEvent);
+        PlayerUseFinishedCallback.EVENT.register(PlayerHealthHandler.itemUseFinishedEvent);
+        UseBlockCallback.EVENT.register(PlayerHungerHandler.blockInteractEvent);
+        UseItemCallback.EVENT.register(PlayerHungerHandler.itemInteractEvent);
+        UseItemCallback.EVENT.register(PlayerHealthHandler.itemInteractEvent);
+        ServerStartCallback.EVENT.register((MinecraftServer server) -> SKConfig.initialize());
     }
 }

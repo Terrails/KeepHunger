@@ -1,26 +1,21 @@
 package terrails.statskeeper.mixin;
 
-import net.fabricmc.fabric.util.HandlerArray;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import terrails.statskeeper.api.IPlayerHealth;
-import terrails.statskeeper.event.PlayerEvent;
+import terrails.statskeeper.api.data.IPlayerHealth;
+import terrails.statskeeper.api.event.PlayerCloneCallback;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin implements IPlayerHealth {
 
     @Inject(method = "method_14203(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", at = @At("RETURN"))
     private void onPlayerClone(ServerPlayerEntity oldPlayer, boolean isEnd, CallbackInfo callbackInfo) {
-        HandlerArray<PlayerEvent.Clone> handler = PlayerEvent.PLAYER_CLONE;
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-
-        for (PlayerEvent.Clone event : handler.getBackingArray()) {
-            event.onPlayerClone(player, oldPlayer, isEnd);
-        }
+        PlayerCloneCallback.EVENT.invoker().onPlayerClone(player, oldPlayer, isEnd);
     }
 
     private int additional_health = 0;
