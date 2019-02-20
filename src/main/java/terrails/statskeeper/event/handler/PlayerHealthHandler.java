@@ -38,6 +38,10 @@ public class PlayerHealthHandler {
                 }
             } else {
 
+                if (!PlayerHealthHandler.hasModifier(player)) {
+                    PlayerHealthHandler.setAdditionalHealth(player, health.getSKAdditionalHealth());
+                }
+
                 if (config.on_change_reset) {
                     if (config.min_health != health.getSKMinHealth() && config.min_health_start) {
                         PlayerHealthHandler.setHealth(player, Operation.MIN);
@@ -64,6 +68,9 @@ public class PlayerHealthHandler {
                     PlayerHealthHandler.setHealth(player, Operation.MAX);
                 }
             }
+        } else {
+            PlayerHealthHandler.removeModifier(player);
+            player.setHealth(player.getHealthMaximum());
         }
     };
 
@@ -229,6 +236,10 @@ public class PlayerHealthHandler {
         if (modifier != null) {
             PlayerHealthHandler.getAttribute(player).removeModifier(modifier);
         }
+    }
+
+    private static boolean hasModifier(PlayerEntity player) {
+        return PlayerHealthHandler.getAttribute(player).getModifier(STATS_KEEPER_HEALTH_UUID) != null;
     }
 
     private static void playerMessage(PlayerEntity player, String message) {
