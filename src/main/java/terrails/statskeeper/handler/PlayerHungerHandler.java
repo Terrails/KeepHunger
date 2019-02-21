@@ -59,7 +59,7 @@ public class PlayerHungerHandler {
 
         if (SKConfig.instance.HUNGER_STATS.no_appetite_time > 0 && player.hasPotionEffect(SKPotions.NO_APPETITE)
                 && world.getBlockState(hitResult.getBlockPos()).getBlock() instanceof CakeBlock) {
-            return ActionResult.FAILURE;
+            return ActionResult.FAIL;
         }
         return ActionResult.PASS;
     };
@@ -69,7 +69,7 @@ public class PlayerHungerHandler {
 
         if (SKConfig.instance.HUNGER_STATS.no_appetite_time > 0 && player.hasPotionEffect(SKPotions.NO_APPETITE)
                 && (player.getMainHandStack().getUseAction() == UseAction.EAT || player.getOffHandStack().getUseAction() == UseAction.EAT)) {
-            return ActionResult.FAILURE;
+            return ActionResult.FAIL;
         }
         return ActionResult.PASS;
     };

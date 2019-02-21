@@ -1,13 +1,21 @@
 package terrails.statskeeper.mixin;
 
+import net.minecraft.client.network.packet.EntityAttributesS2CPacket;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrails.statskeeper.api.data.IPlayerHealth;
 import terrails.statskeeper.api.event.PlayerCloneCallback;
+
+import java.util.Collection;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin implements IPlayerHealth {
@@ -16,6 +24,14 @@ public class ServerPlayerEntityMixin implements IPlayerHealth {
     private void onPlayerClone(ServerPlayerEntity oldPlayer, boolean isEnd, CallbackInfo callbackInfo) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         PlayerCloneCallback.EVENT.invoker().onPlayerClone(player, oldPlayer, isEnd);
+    }
+
+    @Inject(method = "changeDimension", at = @At("RETURN"))
+    private void changeDimension(DimensionType dimensionType, CallbackInfoReturnable<Entity> info) {
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+        EntityAttributeContainer attributeContainer = (EntityAttributeContainer) player.getAttributeContainer();
+        Collection<EntityAttributeInstance> attributeInstances = attributeContainer.method_6213();
+        if (!attributeInstances.isEmpty()) player.networkHandler.sendPacket(new EntityAttributesS2CPacket(player.getEntityId(), attributeInstances));
     }
 
     private int additional_health = 0;

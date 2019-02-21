@@ -5,13 +5,13 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-archivesBaseName = "StatsKeeper-1.14"
-version = "3.0.3"
+archivesBaseName = "StatsKeeper-Fabric.1.14"
+version = "3.0.4"
 
-def minecraft_version = "19w07a"
-def yarn_version = "19w07a.9"
-def loader_version = "0.3.6.107"
-def fabric_version = "0.2.1.98"
+def minecraft_version = "19w08a"
+def yarn_version = "19w08a.4"
+def loader_version = "0.3.7.109"
+def fabric_version = "0.2.2.103"
 
 minecraft {
 }
