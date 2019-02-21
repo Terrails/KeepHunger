@@ -15,7 +15,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 def minecraft_version = "1.12.2"
-def forge_version = "14.23.5.2810"
+def forge_version = "14.23.5.2814"
 def mappings_version = "stable_39"
 
 def terracore_version = "1.12-2.1.10-SNAPSHOT.+"
