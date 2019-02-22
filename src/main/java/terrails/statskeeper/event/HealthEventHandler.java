@@ -75,15 +75,9 @@ public class HealthEventHandler {
                     HealthEventHandler.setHealth(player, Operation.MAX);
                 }
             }
-        } else {
-            boolean z = false;
-            if (HealthEventHandler.hasModifier(player)) {
-                HealthEventHandler.removeModifier(player);
-                z = true;
-            }
-            if (z) {
-                player.setHealth(player.getMaxHealth());
-            }
+        } else if (HealthEventHandler.hasModifier(player)) {
+            HealthEventHandler.removeModifier(player);
+            player.setHealth(player.getMaxHealth());
         }
     }
 
