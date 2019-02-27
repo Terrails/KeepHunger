@@ -24,22 +24,14 @@ public class PlayerHungerHandler {
             SKConfig.Hunger config = SKConfig.instance.HUNGER_STATS;
 
             if (config.keep_hunger) {
-                int hungerValue = oldPlayer.getHungerManager().getFoodLevel();
-                if (config.lowest_hunger > hungerValue) {
-                    hungerValue = config.lowest_hunger;
-                }
-                player.getHungerManager().setFoodLevel(hungerValue);
+                int value = Math.max(config.lowest_hunger, oldPlayer.getHungerManager().getFoodLevel());
+                player.getHungerManager().setFoodLevel(value);
             }
 
             if (config.keep_saturation) {
-                HungerManager foodStats = player.getHungerManager();
-                float saturationLevel = oldPlayer.getHungerManager().getSaturationLevel();
-                if (config.lowest_saturation > saturationLevel) {
-                    saturationLevel = config.lowest_saturation;
-                }
-
-                ISaturation manager = (ISaturation) foodStats;
-                manager.setSaturationLevel(saturationLevel);
+                float value = Math.max(config.lowest_saturation, oldPlayer.getHungerManager().getSaturationLevel());
+                ISaturation manager = (ISaturation) player.getHungerManager();
+                manager.setSaturationLevel(value);
             }
         }
     };

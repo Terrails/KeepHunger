@@ -70,12 +70,8 @@ public class PlayerHealthHandler {
                 }
             }
         } else {
-            boolean z = false;
             if (PlayerHealthHandler.hasModifier(player)) {
                 PlayerHealthHandler.removeModifier(player);
-                z = true;
-            }
-            if (z) {
                 player.setHealth(player.getHealthMaximum());
             }
         }
@@ -185,7 +181,7 @@ public class PlayerHealthHandler {
                 health.setSKMaxHealth(config.max_health);
                 health.setSKMinHealth(config.min_health);
                 int removedHealth = health.getSKAdditionalHealth() - config.health_decrease;
-                int addedHealth = removedHealth < config.min_health - baseHealth ? config.min_health - baseHealth : removedHealth;
+                int addedHealth = Math.min(removedHealth, config.min_health - baseHealth);
                 PlayerHealthHandler.setAdditionalHealth(player, addedHealth);
                 break;
             case SAVE:
