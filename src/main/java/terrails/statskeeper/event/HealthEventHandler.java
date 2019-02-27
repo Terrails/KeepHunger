@@ -192,7 +192,7 @@ public class HealthEventHandler {
                 health.setMaxHealth(SKConfig.Health.max_health);
                 health.setMinHealth(SKConfig.Health.min_health);
                 int removedHealth = health.getAdditionalHealth() - SKConfig.Health.health_decrease;
-                int addedHealth = removedHealth < SKConfig.Health.min_health - baseHealth ? SKConfig.Health.min_health - baseHealth : removedHealth;
+                int addedHealth = Math.min(removedHealth, SKConfig.Health.min_health - baseHealth);
                 HealthEventHandler.setAdditionalHealth(player, addedHealth);
                 break;
             case SAVE:

@@ -64,7 +64,7 @@ public class CapabilityHealth {
                     instance.setHealthEnabled(true);
                 }
             }
-        }, Health::new);
+        }, HealthHandler::new);
     }
 
     public static class Handler {

@@ -2,7 +2,7 @@ package terrails.statskeeper.data.health;
 
 import terrails.statskeeper.api.capabilities.IHealth;
 
-public class Health implements IHealth {
+public class HealthHandler implements IHealth {
 
     private int additional_health = 0;
     private boolean is_health_enabled = false;

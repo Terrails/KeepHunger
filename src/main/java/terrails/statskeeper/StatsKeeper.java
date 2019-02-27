@@ -11,9 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.data.health.CapabilityHealth;
-import terrails.statskeeper.data.tan.CapabilityTAN;
 import terrails.statskeeper.event.*;
-import terrails.statskeeper.packet.ThirstMessage;
+import terrails.statskeeper.packet.StatsMessageTAN;
 import terrails.statskeeper.potion.ModPotions;
 import terrails.terracore.base.MainModClass;
 import terrails.terracore.base.proxies.ProxyBase;
@@ -57,13 +56,14 @@ public class StatsKeeper extends MainModClass<StatsKeeper> {
         SKConfig.initialize(event.getModConfigurationDirectory());
         StatsKeeper.initializeCapabilities();
         StatsKeeper.initializeEvents();
-        networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
-        networkWrapper.registerMessage(ThirstMessage.MessageHandler.class, ThirstMessage.class, 0, Side.CLIENT);
+        if (Loader.isModLoaded("toughasnails")) {
+            networkWrapper = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+            networkWrapper.registerMessage(StatsMessageTAN.MessageHandler.class, StatsMessageTAN.class, 0, Side.CLIENT);
+        }
     }
 
     private static void initializeCapabilities() {
         CapabilityHealth.register();
-        if (Loader.isModLoaded("toughasnails")) CapabilityTAN.register();
     }
 
     private static void initializeEvents() {

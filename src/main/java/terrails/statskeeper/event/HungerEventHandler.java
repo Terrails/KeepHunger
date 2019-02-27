@@ -21,23 +21,17 @@ public class HungerEventHandler {
         if (event.isWasDeath()) {
 
             if (SKConfig.Hunger.keep_hunger) {
-                int hungerLevel = event.getOriginal().getFoodStats().getFoodLevel();
-                if (SKConfig.Hunger.lowest_hunger > hungerLevel) {
-                    hungerLevel = SKConfig.Hunger.lowest_hunger;
-                }
-                event.getEntityPlayer().getFoodStats().setFoodLevel(hungerLevel);
+                int value = Math.max(SKConfig.Hunger.lowest_hunger, event.getOriginal().getFoodStats().getFoodLevel());
+                event.getEntityPlayer().getFoodStats().setFoodLevel(value);
             }
 
             if (SKConfig.Hunger.keep_saturation) {
-                FoodStats foodStats = event.getEntityPlayer().getFoodStats();
-                float saturationLevel = event.getOriginal().getFoodStats().getSaturationLevel();
-                if (SKConfig.Hunger.lowest_saturation > saturationLevel) {
-                    saturationLevel = SKConfig.Hunger.lowest_saturation;
-                }
+                float value = Math.max(SKConfig.Hunger.lowest_saturation, event.getOriginal().getFoodStats().getSaturationLevel());
 
                 try {
+                    FoodStats foodStats = event.getEntityPlayer().getFoodStats();
                     Field setSaturationLevel = ObfuscationReflectionHelper.findField(FoodStats.class, "field_75125_b");
-                    setSaturationLevel.set(foodStats, saturationLevel);
+                    setSaturationLevel.set(foodStats, value);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
