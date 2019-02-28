@@ -121,6 +121,7 @@ public class PlayerHealthHandler {
             return;
         }
 
+        SKConfig.initialize();
         for (SKConfig.Health.HealthItem healthItem : config.health_items) {
 
             if (healthItem.getItem() != stack.getItem()) {
@@ -146,6 +147,7 @@ public class PlayerHealthHandler {
             return ActionResult.PASS;
         }
 
+        SKConfig.initialize();
         for (SKConfig.Health.HealthItem healthItem : config.health_items) {
 
             if (healthItem.getItem() != stack.getItem()) {
