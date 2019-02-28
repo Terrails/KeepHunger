@@ -97,6 +97,7 @@ public class SKConfig {
     public void configChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (event.getModID().equals(StatsKeeper.MOD_ID)) {
             SKConfig.syncConfig();
+            SKConfig.syncRegenerativeItems();
         }
     }
 
@@ -128,6 +129,19 @@ public class SKConfig {
         Hunger.no_appetite_time = configFile.get(HUNGER, "No Appetite Time (Seconds)", 300, "", 0, Integer.MAX_VALUE).getInt();
     }
     private static void syncHealth() {
+        configFile.getStringList("Health Items", HEALTH, new String[]{
+                "// toughasnails:lifeblood_crystal", "// cyclicmagic:heart_food", "// minecraft:wool;15 // metadata example, black wool",
+                "minecraft:nether_star, 4 // amount example, 2 hearts instead of default 1"}, "items that will add max health on right click");
+        Health.enabled = configFile.get(HEALTH, "Enabled", true, "If using mods that mess with health system like ToughAsNails" +
+                "\nmake sure to disable theirs in config files before using this health system").getBoolean();
+        Health.min_health_start = configFile.get(HEALTH, "Min Health Start", true).getBoolean();
+        Health.min_health = configFile.get(HEALTH, "Min Health", 6, "", 0, Integer.MAX_VALUE).getInt();
+        Health.max_health = configFile.get(HEALTH, "Max Health", 20, "", 0, Integer.MAX_VALUE).getInt();
+        Health.health_decrease = configFile.get(HEALTH, "Health Reduction", 1, "",0, Integer.MAX_VALUE).getInt();
+        Health.on_change_reset = configFile.get(HEALTH, "On Change Reset", true, "Reset the health of each player on config change").getBoolean();
+        Health.health_message = configFile.get(HEALTH, "Health Message", true, "Should the message for health removal be shown to the player").getBoolean();
+    }
+    public static void syncRegenerativeItems() {
         String[] itemsArray = configFile.getStringList("Health Items", HEALTH, new String[]{
                 "// toughasnails:lifeblood_crystal", "// cyclicmagic:heart_food", "// minecraft:wool;15 // metadata example, black wool",
                 "minecraft:nether_star, 4 // amount example, 2 hearts instead of default 1"}, "items that will add max health on right click");
@@ -160,15 +174,6 @@ public class SKConfig {
 
             Health.health_items.add(new Health.HealthItem(item, meta, amount));
         }
-
-        Health.enabled = configFile.get(HEALTH, "Enabled", true, "If using mods that mess with health system like ToughAsNails" +
-                "\nmake sure to disable theirs in config files before using this health system").getBoolean();
-        Health.min_health_start = configFile.get(HEALTH, "Min Health Start", true).getBoolean();
-        Health.min_health = configFile.get(HEALTH, "Min Health", 6, "", 0, Integer.MAX_VALUE).getInt();
-        Health.max_health = configFile.get(HEALTH, "Max Health", 20, "", 0, Integer.MAX_VALUE).getInt();
-        Health.health_decrease = configFile.get(HEALTH, "Health Reduction", 1, "",0, Integer.MAX_VALUE).getInt();
-        Health.on_change_reset = configFile.get(HEALTH, "On Change Reset", true, "Reset the health of each player on config change").getBoolean();
-        Health.health_message = configFile.get(HEALTH, "Health Message", true, "Should the message for health removal be shown to the player").getBoolean();
     }
     private static void syncModComp() {
         if(Loader.isModLoaded("toughasnails")){
