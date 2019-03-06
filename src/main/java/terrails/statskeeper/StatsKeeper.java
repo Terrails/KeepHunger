@@ -83,7 +83,7 @@ public class StatsKeeper extends MainModClass<StatsKeeper> {
     @Override
     public void postInit(FMLPostInitializationEvent event) {
         super.postInit(event);
-        SKConfig.syncRegenerativeItems();
+        SKConfig.syncPostConfig();
     }
 
     @Override

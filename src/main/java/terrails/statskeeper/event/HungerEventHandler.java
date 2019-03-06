@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import terrails.statskeeper.api.SKPotions;
-import terrails.statskeeper.config.SKConfig;
+import terrails.statskeeper.config.configs.SKHungerConfig;
 
 import java.lang.reflect.Field;
 
@@ -20,13 +20,13 @@ public class HungerEventHandler {
     public void playerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
 
-            if (SKConfig.Hunger.keep_hunger) {
-                int value = Math.max(SKConfig.Hunger.lowest_hunger, event.getOriginal().getFoodStats().getFoodLevel());
+            if (SKHungerConfig.keep_hunger) {
+                int value = Math.max(SKHungerConfig.lowest_hunger, event.getOriginal().getFoodStats().getFoodLevel());
                 event.getEntityPlayer().getFoodStats().setFoodLevel(value);
             }
 
-            if (SKConfig.Hunger.keep_saturation) {
-                float value = Math.max(SKConfig.Hunger.lowest_saturation, event.getOriginal().getFoodStats().getSaturationLevel());
+            if (SKHungerConfig.keep_saturation) {
+                float value = Math.max(SKHungerConfig.lowest_saturation, event.getOriginal().getFoodStats().getSaturationLevel());
 
                 try {
                     FoodStats foodStats = event.getEntityPlayer().getFoodStats();
@@ -41,22 +41,22 @@ public class HungerEventHandler {
 
     @SubscribeEvent
     public void applyEffect(PlayerRespawnEvent event) {
-        if (SKConfig.Hunger.no_appetite_time > 0 && !event.player.isCreative()) {
-            event.player.addPotionEffect(new PotionEffect(SKPotions.APPETITE, SKConfig.Hunger.no_appetite_time * 20, 0, false, false));
+        if (SKHungerConfig.no_appetite_time > 0 && !event.player.isCreative()) {
+            event.player.addPotionEffect(new PotionEffect(SKPotions.APPETITE, SKHungerConfig.no_appetite_time * 20, 0, false, false));
         }
     }
 
     @SubscribeEvent
     public void itemInteract(PlayerInteractEvent.RightClickItem event) {
         EnumAction action = event.getItemStack().getItemUseAction();
-        if (SKConfig.Hunger.no_appetite_time > 0 && (action == EnumAction.EAT || action == EnumAction.DRINK) && event.getEntityPlayer().isPotionActive(SKPotions.APPETITE)) {
+        if (SKHungerConfig.no_appetite_time > 0 && (action == EnumAction.EAT || action == EnumAction.DRINK) && event.getEntityPlayer().isPotionActive(SKPotions.APPETITE)) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public void blockInteract(PlayerInteractEvent.RightClickBlock event) {
-        if (SKConfig.Hunger.no_appetite_time > 0 && event.getWorld().getBlockState(event.getPos()).getBlock() == Blocks.CAKE && event.getEntityPlayer().isPotionActive(SKPotions.APPETITE)) {
+        if (SKHungerConfig.no_appetite_time > 0 && event.getWorld().getBlockState(event.getPos()).getBlock() == Blocks.CAKE && event.getEntityPlayer().isPotionActive(SKPotions.APPETITE)) {
             event.setCanceled(true);
         }
     }

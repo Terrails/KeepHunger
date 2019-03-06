@@ -6,7 +6,8 @@ public class HealthHandler implements IHealth {
 
     private int additional_health = 0;
     private boolean is_health_enabled = false;
-    private boolean is_min_start = false;
+    private int health_threshold = 0;
+    private int starting_health = 0;
     private int max_health = 0;
     private int min_health = 0;
 
@@ -56,12 +57,22 @@ public class HealthHandler implements IHealth {
     }
 
     @Override
-    public boolean isMinStart() {
-        return this.is_min_start;
+    public int getStartingHealth() {
+        return this.starting_health;
     }
 
     @Override
-    public void setMinStart(boolean val) {
-        this.is_min_start = val;
+    public void setStartingHealth(int health) {
+        this.starting_health = health;
+    }
+
+    @Override
+    public int getCurrentThreshold() {
+        return this.health_threshold;
+    }
+
+    @Override
+    public void setCurrentThreshold(int health) {
+        this.health_threshold = health;
     }
 }

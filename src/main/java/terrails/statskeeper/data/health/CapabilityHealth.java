@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.IHealth;
 import terrails.statskeeper.api.capabilities.SKCapabilities;
-import terrails.statskeeper.config.SKConfig;
+import terrails.statskeeper.config.configs.SKHealthConfig;
 import terrails.terracore.capabilities.CapabilitySerializable;
 
 public class CapabilityHealth {
@@ -27,10 +27,11 @@ public class CapabilityHealth {
             public NBTBase writeNBT(Capability<IHealth> capability, IHealth instance, EnumFacing side) {
                 NBTTagCompound compound = new NBTTagCompound();
                 compound.setBoolean("sk:is_enabled", instance.isHealthEnabled());
-                compound.setBoolean("sk:is_min_start", instance.isMinStart());
                 compound.setInteger("sk:additional_health", instance.getAdditionalHealth());
                 compound.setInteger("sk:max_health", instance.getMaxHealth());
                 compound.setInteger("sk:min_health", instance.getMinHealth());
+                compound.setInteger("sk:starting_health", instance.getStartingHealth());
+                compound.setInteger("sk:health_threshold", instance.getCurrentThreshold());
                 return compound;
             }
             @Override
@@ -40,8 +41,8 @@ public class CapabilityHealth {
                     instance.setHealthEnabled(compound.getBoolean("sk:is_enabled"));
                 }
 
-                if (compound.hasKey("sk:is_min_start")) {
-                    instance.setMinStart(compound.getBoolean("sk:is_min_start"));
+                if (compound.hasKey("sk:starting_health")) {
+                    instance.setStartingHealth(compound.getInteger("sk:starting_health"));
                 }
 
                 if (compound.hasKey("sk:additional_health")) {
@@ -56,12 +57,21 @@ public class CapabilityHealth {
                     instance.setMinHealth(compound.getInteger("sk:min_health"));
                 }
 
+                if (compound.hasKey("sk:health_threshold")) {
+                    instance.setCurrentThreshold(compound.getInteger("sk:health_threshold"));
+                }
+
+                // Compatibility for older versions
                 if (compound.hasKey("addedHealth")) {
                     instance.setAdditionalHealth((int) compound.getDouble("addedHealth"));
-                    instance.setMinStart(SKConfig.Health.min_health_start);
-                    instance.setMaxHealth(SKConfig.Health.max_health);
-                    instance.setMinHealth(SKConfig.Health.min_health);
+                    instance.setStartingHealth(SKHealthConfig.starting_health);
+                    instance.setMaxHealth(SKHealthConfig.max_health);
+                    instance.setMinHealth(SKHealthConfig.min_health);
                     instance.setHealthEnabled(true);
+                }
+
+                if (compound.hasKey("sk:is_min_start")) {
+                    instance.setStartingHealth(SKHealthConfig.min_health);
                 }
             }
         }, HealthHandler::new);

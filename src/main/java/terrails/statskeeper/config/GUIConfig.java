@@ -21,9 +21,9 @@ public class GUIConfig extends GuiConfig {
    }
 
     private static List<IConfigElement> getConfigElements() {
-        List<IConfigElement> BASIC = new ConfigElement(SKConfig.configFile.getCategory(SKConfig.BASIC)).getChildElements();
-        List<IConfigElement> HUNGER = new ConfigElement(SKConfig.configFile.getCategory(SKConfig.HUNGER)).getChildElements();
-        List<IConfigElement> MOD_COMP = new ConfigElement(SKConfig.configFile.getCategory(SKConfig.MOD_COMP)).getChildElements();
+        List<IConfigElement> BASIC = new ConfigElement(SKConfig.configuration.getCategory(SKConfig.Categories.BASIC)).getChildElements();
+        List<IConfigElement> HUNGER = new ConfigElement(SKConfig.configuration.getCategory(SKConfig.Categories.HUNGER)).getChildElements();
+        List<IConfigElement> MOD_COMP = new ConfigElement(SKConfig.configuration.getCategory(SKConfig.Categories.MOD_COMP)).getChildElements();
 
         List<IConfigElement> list = new ArrayList<>(BASIC);
         list.add(new SKDummyCategoryElement("Hunger", HUNGER));
@@ -42,7 +42,7 @@ public class GUIConfig extends GuiConfig {
 
         @Override
         protected GuiScreen buildChildScreen() {
-            return new GuiConfig(owningScreen, new ConfigElement(SKConfig.configFile.getCategory(SKConfig.HEALTH)).getChildElements(), owningScreen.modID,
+            return new GuiConfig(owningScreen, new ConfigElement(SKConfig.configuration.getCategory(SKConfig.Categories.HEALTH)).getChildElements(), owningScreen.modID,
                     true, false, "/" + StatsKeeper.MOD_ID + ".cfg");
         }
     }
@@ -58,7 +58,7 @@ public class GUIConfig extends GuiConfig {
         }
 
         private static List<IConfigElement> getConfigElements() {
-            List<IConfigElement> TAN = new ConfigElement(SKConfig.configFile.getCategory(SKConfig.TOUGH_AS_NAILS)).getChildElements();
+            List<IConfigElement> TAN = new ConfigElement(SKConfig.configuration.getCategory(SKConfig.Categories.TOUGH_AS_NAILS)).getChildElements();
             List<IConfigElement> list = new ArrayList<>();
 
             if (Loader.isModLoaded("toughasnails")) {

@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensio
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import terrails.statskeeper.StatsKeeper;
-import terrails.statskeeper.config.SKConfig;
+import terrails.statskeeper.config.configs.SKTANConfig;
 import terrails.statskeeper.packet.StatsMessageTAN;
 import toughasnails.api.TANCapabilities;
 import toughasnails.api.stat.IPlayerStat;
@@ -39,15 +39,15 @@ public class TANEvent {
             return;
         }
 
-        if (SKConfig.Compatibility.TAN.keep_thirst) {
-            int value = Math.max(SKConfig.Compatibility.TAN.lowest_thirst, oldThirst.getThirst());
+        if (SKTANConfig.keep_thirst) {
+            int value = Math.max(SKTANConfig.lowest_thirst, oldThirst.getThirst());
             thirst.setThirst(value);
         }
-        if (SKConfig.Compatibility.TAN.keep_hydration) {
-            float value = Math.max(SKConfig.Compatibility.TAN.lowest_hydration, oldThirst.getHydration());
+        if (SKTANConfig.keep_hydration) {
+            float value = Math.max(SKTANConfig.lowest_hydration, oldThirst.getHydration());
             thirst.setHydration(value);
         }
-        if (SKConfig.Compatibility.TAN.keep_temperature) {
+        if (SKTANConfig.keep_temperature) {
             temp.setTemperature(oldTemp.getTemperature());
         }
     }
@@ -59,22 +59,22 @@ public class TANEvent {
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onJoin(PlayerLoggedInEvent event) {
-        if (SKConfig.Compatibility.TAN.keep_thirst || SKConfig.Compatibility.TAN.keep_hydration) {
+        if (SKTANConfig.keep_thirst || SKTANConfig.keep_hydration) {
             readAndSyncData(TANCapabilities.THIRST, event.player);
         }
 
-        if (SKConfig.Compatibility.TAN.keep_temperature) {
+        if (SKTANConfig.keep_temperature) {
             readAndSyncData(TANCapabilities.TEMPERATURE, event.player);
         }
     }
 
     @SubscribeEvent
     public void onRespawn(PlayerRespawnEvent event) {
-        if (SKConfig.Compatibility.TAN.keep_thirst || SKConfig.Compatibility.TAN.keep_hydration) {
+        if (SKTANConfig.keep_thirst || SKTANConfig.keep_hydration) {
             readAndSyncData(TANCapabilities.THIRST, event.player);
         }
 
-        if (SKConfig.Compatibility.TAN.keep_temperature) {
+        if (SKTANConfig.keep_temperature) {
             readAndSyncData(TANCapabilities.TEMPERATURE, event.player);
         }
     }
@@ -82,11 +82,11 @@ public class TANEvent {
 
     @SubscribeEvent
     public void onWorldChange(PlayerChangedDimensionEvent event) {
-        if (SKConfig.Compatibility.TAN.keep_thirst || SKConfig.Compatibility.TAN.keep_hydration) {
+        if (SKTANConfig.keep_thirst || SKTANConfig.keep_hydration) {
             readAndSyncData(TANCapabilities.THIRST, event.player);
         }
 
-        if (SKConfig.Compatibility.TAN.keep_temperature) {
+        if (SKTANConfig.keep_temperature) {
             readAndSyncData(TANCapabilities.TEMPERATURE, event.player);
         }
     }
