@@ -6,6 +6,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
+import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -117,7 +118,7 @@ public class HealthEventHandler {
             return;
 
         ItemStack stack = player.getHeldItem(event.getHand());
-        if (stack.getItemUseAction() == EnumAction.EAT || player.canEat(false)) {
+        if (stack.getItem() instanceof ItemFood && player.canEat(false)) {
             return;
         }
 
