@@ -71,7 +71,8 @@ public class CapabilityHealth {
                 }
 
                 if (compound.hasKey("sk:is_min_start")) {
-                    instance.setStartingHealth(SKHealthConfig.min_health);
+                    boolean min_start = compound.getBoolean("sk:is_min_start");
+                    instance.setStartingHealth(min_start ? SKHealthConfig.min_health : SKHealthConfig.max_health);
                 }
             }
         }, HealthHandler::new);
