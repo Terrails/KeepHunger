@@ -12,13 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import terrails.statskeeper.api.data.IPlayerHealth;
+import terrails.statskeeper.StatsKeeper;
+import terrails.statskeeper.api.data.health.IHealth;
+import terrails.statskeeper.api.data.health.IHealthManager;
 import terrails.statskeeper.api.event.PlayerCloneCallback;
+import terrails.statskeeper.config.SKHealthConfig;
+import terrails.statskeeper.handler.health.HealthManager;
 
 import java.util.Collection;
 
 @Mixin(ServerPlayerEntity.class)
-public class ServerPlayerEntityMixin implements IPlayerHealth {
+public class ServerPlayerEntityMixin implements IHealthManager {
 
     @Inject(method = "method_14203(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", at = @At("RETURN"))
     private void onPlayerClone(ServerPlayerEntity oldPlayer, boolean isEnd, CallbackInfo callbackInfo) {
@@ -34,96 +38,60 @@ public class ServerPlayerEntityMixin implements IPlayerHealth {
         if (!attributeInstances.isEmpty()) player.networkHandler.sendPacket(new EntityAttributesS2CPacket(player.getEntityId(), attributeInstances));
     }
 
-    private int additional_health = 0;
-    private boolean is_health_enabled = false;
-    private boolean is_min_start = false;
-    private int max_health = 0;
-    private int min_health = 0;
+    private IHealth health_handler = new HealthManager();
 
     @Override
-    public boolean hasSKAdditionalHealth() {
-        return additional_health > 0;
-    }
-
-    @Override
-    public void setSKAdditionalHealth(int health) {
-        this.additional_health = health;
-    }
-
-    @Override
-    public int getSKAdditionalHealth() {
-        return this.additional_health;
-    }
-
-    @Override
-    public boolean isSKHealthEnabled() {
-        return this.is_health_enabled;
-    }
-
-    @Override
-    public void setSKHealthEnabled(boolean val) {
-        this.is_health_enabled = val;
-    }
-
-    @Override
-    public int getSKMaxHealth() {
-        return this.max_health;
-    }
-
-    @Override
-    public void setSKMaxHealth(int health) {
-        this.max_health = health;
-    }
-
-    @Override
-    public int getSKMinHealth() {
-        return this.min_health;
-    }
-
-    @Override
-    public void setSKMinHealth(int health) {
-        this.min_health = health;
-    }
-
-    @Override
-    public boolean isSKMinStart() {
-        return this.is_min_start;
-    }
-
-    @Override
-    public void setSKMinStart(boolean val) {
-        this.is_min_start = val;
+    public IHealth getHealthHandler() {
+        return this.health_handler;
     }
 
     @Inject(method = "readCustomDataFromTag", at = @At("RETURN"))
     private void readCustomDataFromTag(CompoundTag tag, CallbackInfo info) {
-        if (tag.containsKey("sk:is_enabled")) {
-            this.setSKHealthEnabled(tag.getBoolean("sk:is_enabled"));
+        if (tag.containsKey(StatsKeeper.MOD_ID)) {
+            tag = tag.getCompound(StatsKeeper.MOD_ID);
         }
 
-        if (tag.containsKey("sk:is_min_start")) {
-            this.setSKMinStart(tag.getBoolean("sk:is_min_start"));
+        if (tag.containsKey("sk:is_enabled")) {
+            this.health_handler.setHealthEnabled(tag.getBoolean("sk:is_enabled"));
+        }
+
+        if (tag.containsKey("sk:starting_health")) {
+            this.health_handler.setStartingHealth(tag.getInt("sk:starting_health"));
         }
 
         if (tag.containsKey("sk:additional_health")) {
-            this.setSKAdditionalHealth(tag.getInt("sk:additional_health"));
+            this.health_handler.setAdditionalHealth(tag.getInt("sk:additional_health"));
         }
 
         if (tag.containsKey("sk:max_health")) {
-            this.setSKMaxHealth(tag.getInt("sk:max_health"));
+            this.health_handler.setMaxHealth(tag.getInt("sk:max_health"));
         }
 
         if (tag.containsKey("sk:min_health")) {
-            this.setSKMinHealth(tag.getInt("sk:min_health"));
+            this.health_handler.setMinHealth(tag.getInt("sk:min_health"));
         }
+
+        if (tag.containsKey("sk:health_threshold")) {
+            this.health_handler.setCurrentThreshold(tag.getInt("sk:health_threshold"));
+        }
+
+        // Compatibility for older versions
+        if (tag.containsKey("sk:is_min_start")) {
+            boolean min_start = tag.getBoolean("sk:is_min_start");
+            this.health_handler.setStartingHealth(min_start ? SKHealthConfig.min_health : SKHealthConfig.max_health);
+        }
+
     }
 
     @Inject(method = "writeCustomDataToTag", at = @At("RETURN"))
-    private void writeCustomDataToTag(CompoundTag tag, CallbackInfo info) {
-        tag.putBoolean("sk:is_enabled", this.isSKHealthEnabled());
-        tag.putBoolean("sk:is_min_start", this.isSKMinStart());
-        tag.putInt("sk:additional_health", this.getSKAdditionalHealth());
-        tag.putInt("sk:max_health", this.getSKMaxHealth());
-        tag.putInt("sk:min_health", this.getSKMinHealth());
+    private void writeCustomDataToTag(CompoundTag compound, CallbackInfo info) {
+        CompoundTag tag = new CompoundTag();
+        tag.putBoolean("sk:is_enabled", this.health_handler.isHealthEnabled());
+        tag.putInt("sk:additional_health", this.health_handler.getAdditionalHealth());
+        tag.putInt("sk:max_health", this.health_handler.getMaxHealth());
+        tag.putInt("sk:min_health", this.health_handler.getMinHealth());
+        tag.putInt("sk:starting_health", this.health_handler.getStartingHealth());
+        tag.putInt("sk:health_threshold", this.health_handler.getCurrentThreshold());
+        compound.put(StatsKeeper.MOD_ID, tag);
     }
 }

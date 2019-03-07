@@ -10,9 +10,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.effect.IEffectCure;
 import terrails.statskeeper.api.potion.SKPotions;
-import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.api.event.PlayerUseFinishedCallback;
 
 import java.util.Iterator;
@@ -25,7 +25,7 @@ public class LivingEntityMixin implements IEffectCure {
     private int dropExperience(int amount) {
         LivingEntity entity = (LivingEntity) (Object) this;
         //noinspection ConstantConditions
-        if (!SKConfig.instance.drop_experience && entity instanceof PlayerEntity) {
+        if (!SKConfig.drop_experience && entity instanceof PlayerEntity) {
             return 0;
         }
         return amount;

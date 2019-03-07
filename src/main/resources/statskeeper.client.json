@@ -2,7 +2,9 @@
   "required": true,
   "package": "terrails.statskeeper.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
+  "mixins": [
+    "MinecraftClientMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

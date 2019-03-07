@@ -22,7 +22,6 @@ public class StatsKeeper implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        SKConfig.initialize();
         SKPotions.NO_APPETITE = Registry.register(Registry.STATUS_EFFECT, new Identifier(StatsKeeper.MOD_ID, "no_appetite"), new NoAppetiteEffect());
         StatsKeeper.initializeEvents();
     }
