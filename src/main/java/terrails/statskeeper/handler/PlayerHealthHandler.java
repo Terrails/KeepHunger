@@ -11,6 +11,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 import terrails.statskeeper.StatsKeeper;
+import terrails.statskeeper.api.data.IAlwaysConsumable;
 import terrails.statskeeper.api.data.health.IHealth;
 import terrails.statskeeper.api.data.health.IHealthManager;
 import terrails.statskeeper.api.event.PlayerCloneCallback;
@@ -90,7 +91,7 @@ public class PlayerHealthHandler {
     };
 
     public static PlayerUseFinishedCallback itemUseFinishedEvent = (PlayerEntity player, ItemStack stack) -> {
-        if (!SKHealthConfig.enabled) {
+        if (!SKHealthConfig.enabled || player.world.isClient) {
             return;
         }
 
@@ -110,7 +111,7 @@ public class PlayerHealthHandler {
             return ActionResult.PASS;
 
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.getItem() instanceof FoodItem && player.canConsume(false)) {
+        if (stack.getItem() instanceof FoodItem && player.canConsume(((IAlwaysConsumable) stack.getItem()).isAlwaysConsumable())) {
             return ActionResult.PASS;
         }
 
@@ -129,6 +130,7 @@ public class PlayerHealthHandler {
             }
 
             if (addHealth(player, healthItem.getHealthAmount())) {
+                stack.use(world, player, hand);
                 stack.subtractAmount(1);
                 return ActionResult.SUCCESS;
             }
@@ -181,21 +183,32 @@ public class PlayerHealthHandler {
 
     private static boolean addHealth(PlayerEntity player, int amount) {
         IHealth health = IHealthManager.getInstance(player);
-        int baseHealth = (int) getAttribute(player).getBaseValue();
+        if (amount > 0) {
 
-        if (health.getAdditionalHealth() >= SKHealthConfig.max_health - baseHealth) {
-            return false;
-        }
+            if (getCurrentHealth(player) >= SKHealthConfig.max_health) {
+                return false;
+            }
 
-        if (health.getAdditionalHealth() + amount > SKHealthConfig.max_health - baseHealth) {
-            amount = SKHealthConfig.max_health - baseHealth - health.getAdditionalHealth();
+            if (getCurrentHealth(player) + amount > SKHealthConfig.max_health) {
+                amount = SKHealthConfig.max_health - getCurrentHealth(player);
+            }
+        } else if (amount < 0) {
+
+            if (getCurrentHealth(player) <= SKHealthConfig.min_health) {
+                return false;
+            }
+
+            if (getCurrentHealth(player) + amount < SKHealthConfig.min_health) {
+                amount = SKHealthConfig.min_health - getCurrentHealth(player);
+            }
         }
 
         health.setAdditionalHealth(health.getAdditionalHealth() + amount);
         setAdditionalHealth(player, health.getAdditionalHealth());
         setHealth(player, Operation.SAVE);
         if (!updateThreshold(player)) {
-            playerMessage(player, "health.statskeeper.item_add", amount);
+            String key = amount > 0 ? "health.statskeeper.item_add" : "health.statskeeper.item_lose";
+            playerMessage(player, key, Math.abs(amount));
         }
         return true;
     }
@@ -250,7 +263,7 @@ public class PlayerHealthHandler {
         List<Integer> thresholdList = Arrays.stream(SKHealthConfig.health_thresholds).boxed().collect(Collectors.toList());
 
         int oldThreshold = health.getCurrentThreshold();
-        if (health.getCurrentThreshold() != 0 && !thresholdList.contains(health.getCurrentThreshold())) {
+        if ((health.getCurrentThreshold() != 0 && !thresholdList.contains(health.getCurrentThreshold())) || getCurrentHealth(player) < health.getCurrentThreshold()) {
             Stream<Integer> stream = thresholdList.stream().filter(i -> Math.abs(i) <= getCurrentHealth(player));
             int value = stream.reduce((first, second) -> second).orElse(thresholdList.get(0));
             health.setCurrentThreshold(value);
@@ -268,7 +281,7 @@ public class PlayerHealthHandler {
             }
         }
 
-        if (oldThreshold != health.getCurrentThreshold() && (oldThreshold != 0 || thresholdList.get(0) > 0)) {
+        if ((oldThreshold != health.getCurrentThreshold()) && (oldThreshold != 0 || thresholdList.get(0) > 0)) {
             playerMessage(player, "health.statskeeper.threshold", Math.abs(health.getCurrentThreshold()));
             return true;
         }

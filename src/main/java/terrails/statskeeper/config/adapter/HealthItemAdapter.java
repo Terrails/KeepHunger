@@ -27,8 +27,6 @@ public class HealthItemAdapter implements JsonSerializer<SKHealthConfig.HealthIt
 
         if (item == Items.AIR) {
             throw new IllegalArgumentException("Expected an item for " + object.toString());
-        } else if (amount == 0) {
-            throw new IllegalArgumentException("Expected a number greater than 0 for " + object.toString());
         }
 
         return new SKHealthConfig.HealthItem(item, amount);

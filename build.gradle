@@ -6,7 +6,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 archivesBaseName = "StatsKeeper-Fabric.1.14"
-version = "3.1.11"
+version = "3.1.12"
 
 def minecraft_version = "19w09a"
 def yarn_version = "19w09a.4"
