@@ -130,7 +130,6 @@ public class PlayerHealthHandler {
             }
 
             if (addHealth(player, healthItem.getHealthAmount())) {
-                stack.use(world, player, hand);
                 stack.subtractAmount(1);
                 return ActionResult.SUCCESS;
             }
