@@ -53,6 +53,7 @@ public class SKConfig {
             configuration.save();
         }
     }
+
     public static void syncPostConfig() {
         SKHealthConfig.postInit(configuration, Categories.HEALTH);
     }

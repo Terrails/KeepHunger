@@ -118,7 +118,7 @@ public class HealthEventHandler {
             return;
 
         ItemStack stack = player.getHeldItem(event.getHand());
-        if (stack.getItem() instanceof ItemFood && player.canEat(false)) {
+        if (stack.getItem() instanceof ItemFood && player.canEat(((ItemFood) stack.getItem()).alwaysEdible)) {
             return;
         }
 
@@ -191,21 +191,32 @@ public class HealthEventHandler {
 
     private boolean addHealth(EntityPlayer player, int amount) {
         IHealth health = SKCapabilities.getCapability(player);
-        int baseHealth = (int) this.getAttribute(player).getBaseValue();
+        if (amount > 0) {
 
-        if (health.getAdditionalHealth() >= SKHealthConfig.max_health - baseHealth) {
-            return false;
-        }
+            if (getCurrentHealth(player) >= SKHealthConfig.max_health) {
+                return false;
+            }
 
-        if (health.getAdditionalHealth() + amount > SKHealthConfig.max_health - baseHealth) {
-            amount = SKHealthConfig.max_health - baseHealth - health.getAdditionalHealth();
+            if (getCurrentHealth(player) + amount > SKHealthConfig.max_health) {
+                amount = SKHealthConfig.max_health - getCurrentHealth(player);
+            }
+        } else if (amount < 0) {
+
+            if (getCurrentHealth(player) <= SKHealthConfig.min_health) {
+                return false;
+            }
+
+            if (getCurrentHealth(player) + amount < SKHealthConfig.min_health) {
+                amount = SKHealthConfig.min_health - getCurrentHealth(player);
+            }
         }
 
         health.setAdditionalHealth(health.getAdditionalHealth() + amount);
         this.setAdditionalHealth(player, health.getAdditionalHealth());
         this.setHealth(player, Operation.SAVE);
         if (!this.updateThreshold(player)) {
-            this.playerMessage(player, "health.statskeeper.item_add", amount);
+            String key = amount > 0 ? "health.statskeeper.item_add" : "health.statskeeper.item_lose";
+            this.playerMessage(player, key, Math.abs(amount));
         }
         return true;
     }
@@ -260,7 +271,7 @@ public class HealthEventHandler {
         List<Integer> thresholdList = Arrays.stream(SKHealthConfig.health_thresholds).boxed().collect(Collectors.toList());
 
         int oldThreshold = health.getCurrentThreshold();
-        if (health.getCurrentThreshold() != 0 && !thresholdList.contains(health.getCurrentThreshold())) {
+        if ((health.getCurrentThreshold() != 0 && !thresholdList.contains(health.getCurrentThreshold())) || getCurrentHealth(player) < health.getCurrentThreshold()) {
             Stream<Integer> stream = thresholdList.stream().filter(i -> Math.abs(i) <= this.getCurrentHealth(player));
             int value = stream.reduce((first, second) -> second).orElse(thresholdList.get(0));
             health.setCurrentThreshold(value);

@@ -83,13 +83,13 @@ public class SKHealthConfig {
             }
 
             String metaString = string.contains(";") ? StringUtils.substringAfter(string ,";") : "-1";
-            String metaString2 = metaString.contains(",") ? StringUtils.substringBefore(string, ",") : metaString;
-            char minus_plus = metaString2.replaceAll("\\s+", "").charAt(0) == '-' ? '-' : '+';
-            int meta = Integer.parseInt(minus_plus + metaString2.replaceAll("\\D+", ""));
+            String metaString2 = metaString.contains(",") ? StringUtils.substringBefore(metaString, ",") : metaString;
+            String metaString3 = metaString2.contains("//") ? StringUtils.substringBefore(metaString2, "//") : metaString2;
+            int meta = Integer.parseInt(metaString3.replaceAll("[^0-9-]", ""));
             meta = meta < 0 ? OreDictionary.WILDCARD_VALUE : meta;
 
             String amountString = string.contains(",") ? StringUtils.substringAfter(string, ",") : "2";
-            int amount = Integer.parseInt((amountString.contains("//") ? StringUtils.substringBefore(amountString, "//") : amountString).replaceAll("\\D+", ""));
+            int amount = Integer.parseInt((amountString.contains("//") ? StringUtils.substringBefore(amountString, "//") : amountString).replaceAll("[^0-9-]", ""));
 
             health_items.add(new HealthItem(item, meta, amount));
         }
