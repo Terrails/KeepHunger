@@ -2,13 +2,13 @@
   {
     "modid": "stats_keeper",
     "name": "Stats Keeper",
-    "description": "Save all the stats!",
+    "description": "Configure your stats!",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "https://minecraft.curseforge.com/projects/stats-keeper",
     "updateUrl": "",
     "authorList": ["Terrails"],
-    "credits": "Authored by Terrails, based on idea from Tinker's Construct",
+    "credits": "",
     "logoFile": "",
     "screenshots": [],
     "dependencies": []

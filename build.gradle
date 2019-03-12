@@ -16,12 +16,12 @@ targetCompatibility = 1.8
 
 def minecraft_version = "1.12.2"
 def forge_version = "14.23.5.2814"
-def mappings_version = "stable_39"
+def mappings_version = "snapshot_20171003"
 
 def terracore_version = "1.12-2.1.10-SNAPSHOT.+"
 def tan_version = "1.12.2-3.1.0.140"
 
-version = "3.1.11"
+version = "3.1.12"
 group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper-${minecraft_version}"
 
@@ -42,11 +42,7 @@ repositories {
 
 dependencies {
     deobfCompile("terrails.terracore:TerraCore:${terracore_version}")
-    deobfCompile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${tan_version}:universal")
-}
-
-jar {
-    manifest.attributes('FMLAT': 'statskeeper_at.cfg')
+    compile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${tan_version}:deobf")
 }
 
 processResources {

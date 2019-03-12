@@ -12,8 +12,6 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import terrails.statskeeper.api.SKPotions;
 import terrails.statskeeper.config.configs.SKHungerConfig;
 
-import java.lang.reflect.Field;
-
 public class HungerEventHandler {
 
     @SubscribeEvent
@@ -27,14 +25,8 @@ public class HungerEventHandler {
 
             if (SKHungerConfig.keep_saturation) {
                 float value = Math.max(SKHungerConfig.lowest_saturation, event.getOriginal().getFoodStats().getSaturationLevel());
-
-                try {
-                    FoodStats foodStats = event.getEntityPlayer().getFoodStats();
-                    Field setSaturationLevel = ObfuscationReflectionHelper.findField(FoodStats.class, "field_75125_b");
-                    setSaturationLevel.set(foodStats, value);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+                FoodStats foodStats = event.getEntityPlayer().getFoodStats();
+                ObfuscationReflectionHelper.setPrivateValue(FoodStats.class, foodStats, value, "field_75125_b");
             }
         }
     }

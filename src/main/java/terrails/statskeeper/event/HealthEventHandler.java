@@ -12,6 +12,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
@@ -20,6 +21,7 @@ import terrails.statskeeper.api.capabilities.IHealth;
 import terrails.statskeeper.api.capabilities.SKCapabilities;
 import terrails.statskeeper.config.configs.SKHealthConfig;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -117,16 +119,16 @@ public class HealthEventHandler {
         if (player.isSpectator() || event.getWorld().isRemote)
             return;
 
+        if (!SKHealthConfig.enabled) {
+            return;
+        }
+
         ItemStack stack = player.getHeldItem(event.getHand());
-        if (stack.getItem() instanceof ItemFood && player.canEat(((ItemFood) stack.getItem()).alwaysEdible)) {
+        if (stack.getItem() instanceof ItemFood && player.canEat(this.isItemFoodAlwaysEdible((ItemFood) stack.getItem()))) {
             return;
         }
 
         if (stack.getItemUseAction() == EnumAction.DRINK) {
-            return;
-        }
-
-        if (!SKHealthConfig.enabled) {
             return;
         }
 
@@ -145,6 +147,10 @@ public class HealthEventHandler {
             }
             break;
         }
+    }
+
+    private boolean isItemFoodAlwaysEdible(ItemFood item) {
+        return ObfuscationReflectionHelper.getPrivateValue(ItemFood.class, item, "field_77852_bZ");
     }
 
     private void setHealth(EntityPlayer player, Operation type) {
