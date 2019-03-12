@@ -1,65 +1,65 @@
-/**───────────────────────────────────────────────────────────────────────────────────**/
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-/**───────────────────────────────────────────────────────────────────────────────────**/
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-def minecraft_version = "1.12.2"
-def forge_version = "14.23.5.2814"
-def mappings_version = "stable_39"
-
-def terracore_version = "1.12-2.1.10-SNAPSHOT.+"
-def tan_version = "1.12.2-3.1.0.140"
-
-version = "3.1.11"
-group = "terrails.statskeeper"
-archivesBaseName = "StatsKeeper-${minecraft_version}"
+version = '3.1.12'
+group = 'terrails.statskeeper'
+archivesBaseName = 'StatsKeeper'
 
 minecraft {
-    version = "${minecraft_version}-${forge_version}"
-    mappings = "${mappings_version}"
-    runDir = "run"
+    mappings channel: 'snapshot', version: '20180921-1.13'
+    accessTransformer = file('src/main/resources/META-INF/statskeeper_at.cfg')
 
-    replace "@VERSION@", project.version
-    replace "terracore@[0.0.0,);", "terracore@[${terracore_version},);"
-}
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-repositories {
-    maven {
-        url 'http://maven.blamejared.com'
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                statskeeper {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                statskeeper {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }
 
-dependencies {
-    deobfCompile("terrails.terracore:TerraCore:${terracore_version}")
-    deobfCompile("com.github.glitchfiend.biomesoplenty:ToughAsNails:${tan_version}:universal")
-}
-
+/*
 jar {
     manifest.attributes('FMLAT': 'statskeeper_at.cfg')
 }
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+ */
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.79'
 }

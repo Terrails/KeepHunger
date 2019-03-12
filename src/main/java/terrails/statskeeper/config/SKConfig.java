@@ -1,60 +1,77 @@
 package terrails.statskeeper.config;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.config.ModConfig;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.config.configs.SKHealthConfig;
 import terrails.statskeeper.config.configs.SKHungerConfig;
-import terrails.statskeeper.config.configs.SKTANConfig;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public class SKConfig {
 
-    static Configuration configuration;
+    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-    static class Categories {
-        static final String BASIC = "Basic";
-        static final String HUNGER = "Hunger";
-        static final String HEALTH = "Health";
+    public static final ForgeConfigSpec CONFIG;
 
-        static final String MOD_COMP = "Mod-Compatibility";
-        static final String TOUGH_AS_NAILS = MOD_COMP + "." + "ToughAsNails";
+    public static BooleanValue KEEP_EXPERIENCE;
+    public static BooleanValue DROP_EXPERIENCE;
+
+    static {
+        BUILDER.push("experience");
+
+        KEEP_EXPERIENCE = BUILDER
+                .comment("Make the player keep experience when respawning")
+                .define("keepExperience", true);
+
+        DROP_EXPERIENCE = BUILDER
+                .comment("Make the player drop experience on death, \n" +
+                        "make sure to disable this when using the keep option because of XP dupes")
+                .define("dropExperience", false);
+
+        BUILDER.pop();
+
+        SKHungerConfig.init(BUILDER);
+        SKHealthConfig.init(BUILDER);
+
+        CONFIG = BUILDER.build();
     }
-
-    public static boolean keep_experience;
-    public static boolean drop_experience;
 
     @SubscribeEvent
-    public void configChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equals(StatsKeeper.MOD_ID)) {
-            SKConfig.syncConfig();
-            SKConfig.syncPostConfig();
-        }
+    public static void configLoading(final ModConfig.Loading event) {
+        if (!event.getConfig().getModId().equals(StatsKeeper.MOD_ID))
+            return;
+
+        SKHealthConfig.configReloading(event);
+        StatsKeeper.LOGGER.debug("Loaded {} config file {}", StatsKeeper.MOD_ID, event.getConfig().getFileName());
     }
 
-    public static void initialize(File directory) {
-        configuration = new Configuration(new File(directory, StatsKeeper.MOD_ID + ".cfg"));
-        MinecraftForge.EVENT_BUS.register(new SKConfig());
-        syncConfig();
+    @SubscribeEvent
+    public static void configReloading(final ModConfig.ConfigReloading event) {
+        if (!event.getConfig().getModId().equals(StatsKeeper.MOD_ID))
+            return;
+
+        SKHealthConfig.configReloading(event);
+        StatsKeeper.LOGGER.debug("Loaded {} config file {}", StatsKeeper.MOD_ID, event.getConfig().getFileName());
     }
 
-    private static void syncConfig(){
-        keep_experience = configuration.get(Categories.BASIC, "Keep Experience", true).getBoolean();
-        drop_experience = configuration.get(Categories.BASIC, "Drop Experience", false).getBoolean();
+    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+        StatsKeeper.LOGGER.debug("Loading config file {}", path);
 
-        SKHealthConfig.init(configuration, Categories.HEALTH);
-        SKHungerConfig.init(configuration, Categories.HUNGER);
-        SKTANConfig.init(configuration, Categories.TOUGH_AS_NAILS);
+        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
+                .sync()
+                .autosave()
+                .writingMode(WritingMode.REPLACE)
+                .build();
 
-        if (configuration.hasChanged()) {
-            configuration.save();
-        }
+        StatsKeeper.LOGGER.debug("Built TOML config for {}", path.toString());
+        configData.load();
+        StatsKeeper.LOGGER.debug("Loaded TOML config file {}", path.toString());
+        spec.setConfig(configData);
     }
 
-    public static void syncPostConfig() {
-        SKHealthConfig.postInit(configuration, Categories.HEALTH);
-    }
 }

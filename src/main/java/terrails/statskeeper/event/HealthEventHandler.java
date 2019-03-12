@@ -8,20 +8,20 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.oredict.OreDictionary;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.IHealth;
 import terrails.statskeeper.api.capabilities.SKCapabilities;
 import terrails.statskeeper.config.configs.SKHealthConfig;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class HealthEventHandler {
@@ -30,10 +30,10 @@ public class HealthEventHandler {
 
     @SubscribeEvent
     public void playerJoin(PlayerLoggedInEvent event) {
-        EntityPlayer player = event.player;
+        EntityPlayer player = event.getPlayer();
         IHealth health = SKCapabilities.getCapability(player);
 
-        if (SKHealthConfig.enabled) {
+        if (SKHealthConfig.ENABLED.get()) {
 
             if (!health.isHealthEnabled() || this.hasConfigChanged(player)) {
                 this.clearHealthData(player);
@@ -47,11 +47,11 @@ public class HealthEventHandler {
 
                 if (health.getCurrentThreshold() > 0 && this.getCurrentHealth(player) < health.getCurrentThreshold()) {
                     this.setHealth(player, Operation.THRESHOLD);
-                } else if (this.getCurrentHealth(player) < SKHealthConfig.min_health) {
+                } else if (this.getCurrentHealth(player) < SKHealthConfig.MIN_HEALTH.get()) {
                     this.setHealth(player, Operation.MIN);
-                } else if (this.getCurrentHealth(player) > SKHealthConfig.max_health) {
+                } else if (this.getCurrentHealth(player) > SKHealthConfig.MAX_HEALTH.get()) {
                     this.setHealth(player, Operation.MAX);
-                } else if (this.getCurrentHealth(player) < SKHealthConfig.max_health && SKHealthConfig.min_health <= 0) {
+                } else if (this.getCurrentHealth(player) < SKHealthConfig.MAX_HEALTH.get() && SKHealthConfig.MIN_HEALTH.get() <= 0) {
                     this.setHealth(player, Operation.MAX);
                 }
             }
@@ -64,7 +64,7 @@ public class HealthEventHandler {
 
     @SubscribeEvent
     public void playerClone(PlayerEvent.Clone event) {
-        if (SKHealthConfig.enabled) {
+        if (SKHealthConfig.ENABLED.get()) {
             EntityPlayer player = event.getEntityPlayer();
             IHealth oldHealth = SKCapabilities.getCapability(event.getOriginal());
             IHealth health = SKCapabilities.getCapability(player);
@@ -72,7 +72,7 @@ public class HealthEventHandler {
             if (!oldHealth.isHealthEnabled())
                 return;
 
-            if (SKHealthConfig.starting_health == SKHealthConfig.max_health && SKHealthConfig.min_health <= 0) {
+            if (SKHealthConfig.STARTING_HEALTH == (int) SKHealthConfig.MAX_HEALTH.get() && SKHealthConfig.MIN_HEALTH.get() <= 0) {
                 this.setHealth(player, Operation.MAX);
                 return;
             }
@@ -82,10 +82,10 @@ public class HealthEventHandler {
             health.setCurrentThreshold(oldHealth.getCurrentThreshold());
             this.updateThreshold(player);
 
-            if (event.isWasDeath() && SKHealthConfig.health_decrease > 0 && SKHealthConfig.min_health > 0 && this.getCurrentHealth(player) > Math.abs(health.getCurrentThreshold())) {
+            if (event.isWasDeath() && SKHealthConfig.HEALTH_DECREASE.get() > 0 && SKHealthConfig.MIN_HEALTH.get() > 0 && this.getCurrentHealth(player) > Math.abs(health.getCurrentThreshold())) {
                 this.setHealth(player, Operation.REMOVE);
                 double removedAmount = (oldHealth.getAdditionalHealth()) - health.getAdditionalHealth();
-                if (SKHealthConfig.health_message && removedAmount > 0) {
+                if (SKHealthConfig.HEALTH_MESSAGE.get() && removedAmount > 0) {
                     this.playerMessage(player, "health.statskeeper.death_remove", removedAmount);
                 }
             } else this.setAdditionalHealth(player, oldHealth.getAdditionalHealth());
@@ -94,19 +94,19 @@ public class HealthEventHandler {
 
     @SubscribeEvent
     public void itemUseFinished(LivingEntityUseItemEvent.Finish event) {
-        if (!SKHealthConfig.enabled || !(event.getEntity() instanceof EntityPlayerMP)) {
+        if (!SKHealthConfig.ENABLED.get() || !(event.getEntity() instanceof EntityPlayerMP)) {
             return;
         }
 
-        for (SKHealthConfig.HealthItem healthItem : SKHealthConfig.health_items) {
+        for (Map.Entry<ResourceLocation, Integer> entrySet : SKHealthConfig.REGENERATIVE_ITEMS.entrySet()) {
 
-            if (healthItem.getItem() != event.getItem().getItem())
+            ResourceLocation name = entrySet.getKey();
+            int amount = entrySet.getValue();
+
+            if (!name.equals(event.getItem().getItem().getRegistryName()))
                 continue;
 
-            if (healthItem.getMeta() != event.getItem().getMetadata() && healthItem.getMeta() != OreDictionary.WILDCARD_VALUE)
-                continue;
-
-            this.addHealth((EntityPlayer) event.getEntityLiving(), healthItem.getHealthAmount());
+            this.addHealth((EntityPlayer) event.getEntity(), amount);
             break;
         }
     }
@@ -117,34 +117,37 @@ public class HealthEventHandler {
         if (player.isSpectator() || event.getWorld().isRemote)
             return;
 
+        if (!SKHealthConfig.ENABLED.get()) {
+            return;
+        }
+
         ItemStack stack = player.getHeldItem(event.getHand());
-        if (stack.getItem() instanceof ItemFood && player.canEat(((ItemFood) stack.getItem()).alwaysEdible)) {
+        if (stack.getItem() instanceof ItemFood && player.canEat(/*((ItemFood) stack.getItem()).alwaysEdible)*/this.isItemFoodAlwaysEdible((ItemFood) stack.getItem()))) {
             return;
         }
 
-        if (stack.getItemUseAction() == EnumAction.DRINK) {
+        if (stack.getUseAction() == EnumAction.DRINK) {
             return;
         }
 
-        if (!SKHealthConfig.enabled) {
-            return;
-        }
+        for (Map.Entry<ResourceLocation, Integer> entrySet : SKHealthConfig.REGENERATIVE_ITEMS.entrySet()) {
 
-        for (SKHealthConfig.HealthItem healthItem : SKHealthConfig.health_items) {
+            ResourceLocation name = entrySet.getKey();
+            int amount = entrySet.getValue();
 
-            if (healthItem.getItem() != stack.getItem()) {
-                continue;
-            }
-
-            if (healthItem.getMeta() != stack.getMetadata() && healthItem.getMeta() != OreDictionary.WILDCARD_VALUE)
+            if (!name.equals(stack.getItem().getRegistryName()))
                 continue;
 
-            if (this.addHealth(player, healthItem.getHealthAmount())) {
+            if (this.addHealth(player, amount)) {
                 stack.shrink(1);
                 return;
             }
             break;
         }
+    }
+
+    private boolean isItemFoodAlwaysEdible(ItemFood item) {
+        return ObfuscationReflectionHelper.getPrivateValue(ItemFood.class, item, "field_77852_bZ");
     }
 
     private void setHealth(EntityPlayer player, Operation type) {
@@ -154,18 +157,18 @@ public class HealthEventHandler {
         health.setHealthEnabled(true);
         switch (type) {
             case STARTING:
-                health.setStartingHealth(SKHealthConfig.starting_health);
-                this.setAdditionalHealth(player, SKHealthConfig.starting_health - baseHealth);
+                health.setStartingHealth(SKHealthConfig.STARTING_HEALTH);
+                this.setAdditionalHealth(player, SKHealthConfig.STARTING_HEALTH - baseHealth);
                 setHealth(player, Operation.SAVE);
                 break;
             case MAX:
-                health.setMaxHealth(SKHealthConfig.max_health);
-                this.setAdditionalHealth(player, SKHealthConfig.max_health - baseHealth);
+                health.setMaxHealth(SKHealthConfig.MAX_HEALTH.get());
+                this.setAdditionalHealth(player, SKHealthConfig.MAX_HEALTH.get() - baseHealth);
                 setHealth(player, Operation.SAVE);
                 break;
             case MIN:
-                health.setMinHealth(SKHealthConfig.min_health);
-                this.setAdditionalHealth(player, SKHealthConfig.min_health - baseHealth);
+                health.setMinHealth(SKHealthConfig.MIN_HEALTH.get());
+                this.setAdditionalHealth(player, SKHealthConfig.MIN_HEALTH.get() - baseHealth);
                 setHealth(player, Operation.SAVE);
                 break;
             case THRESHOLD:
@@ -173,18 +176,18 @@ public class HealthEventHandler {
                 setHealth(player, Operation.SAVE);
                 break;
             case REMOVE:
-                health.setMaxHealth(SKHealthConfig.max_health);
-                health.setMinHealth(SKHealthConfig.min_health);
-                int min_health = Math.max(SKHealthConfig.min_health, Math.abs(health.getCurrentThreshold()));
-                int removedHealth = getCurrentHealth(player) - SKHealthConfig.health_decrease;
+                health.setMaxHealth(SKHealthConfig.MAX_HEALTH.get());
+                health.setMinHealth(SKHealthConfig.MIN_HEALTH.get());
+                int min_health = Math.max(SKHealthConfig.MIN_HEALTH.get(), Math.abs(health.getCurrentThreshold()));
+                int removedHealth = getCurrentHealth(player) - SKHealthConfig.HEALTH_DECREASE.get();
                 int addedHealth = Math.max(removedHealth, min_health) - baseHealth;
                 this.setAdditionalHealth(player, addedHealth);
                 setHealth(player, Operation.SAVE);
                 break;
             case SAVE:
-                health.setMaxHealth(SKHealthConfig.max_health);
-                health.setMinHealth(SKHealthConfig.min_health);
-                health.setStartingHealth(SKHealthConfig.starting_health);
+                health.setMaxHealth(SKHealthConfig.MAX_HEALTH.get());
+                health.setMinHealth(SKHealthConfig.MIN_HEALTH.get());
+                health.setStartingHealth(SKHealthConfig.STARTING_HEALTH);
                 break;
         }
     }
@@ -193,21 +196,21 @@ public class HealthEventHandler {
         IHealth health = SKCapabilities.getCapability(player);
         if (amount > 0) {
 
-            if (getCurrentHealth(player) >= SKHealthConfig.max_health) {
+            if (getCurrentHealth(player) >= SKHealthConfig.MAX_HEALTH.get()) {
                 return false;
             }
 
-            if (getCurrentHealth(player) + amount > SKHealthConfig.max_health) {
-                amount = SKHealthConfig.max_health - getCurrentHealth(player);
+            if (getCurrentHealth(player) + amount > SKHealthConfig.MAX_HEALTH.get()) {
+                amount = SKHealthConfig.MAX_HEALTH.get() - getCurrentHealth(player);
             }
         } else if (amount < 0) {
 
-            if (getCurrentHealth(player) <= SKHealthConfig.min_health) {
+            if (getCurrentHealth(player) <= SKHealthConfig.MIN_HEALTH.get()) {
                 return false;
             }
 
-            if (getCurrentHealth(player) + amount < SKHealthConfig.min_health) {
-                amount = SKHealthConfig.min_health - getCurrentHealth(player);
+            if (getCurrentHealth(player) + amount < SKHealthConfig.MIN_HEALTH.get()) {
+                amount = SKHealthConfig.MIN_HEALTH.get() - getCurrentHealth(player);
             }
         }
 
@@ -236,18 +239,18 @@ public class HealthEventHandler {
     private boolean hasConfigChanged(EntityPlayer player) {
         IHealth health = SKCapabilities.getCapability(player);
 
-        for (String string : SKHealthConfig.on_change_reset) {
+        for (String string : SKHealthConfig.ON_CHANGE_RESET.get()) {
             string = string.toUpperCase();
 
-            if (string.equals("MIN_HEALTH") && SKHealthConfig.min_health != health.getMinHealth()) {
+            if (string.equals("MIN_HEALTH") && SKHealthConfig.MIN_HEALTH.get() != health.getMinHealth()) {
                 return true;
             }
 
-            if (string.equals("MAX_HEALTH") && SKHealthConfig.max_health != health.getMaxHealth()) {
+            if (string.equals("MAX_HEALTH") && SKHealthConfig.MAX_HEALTH.get() != health.getMaxHealth()) {
                 return true;
             }
 
-            if (string.equals("STARTING_HEALTH") && SKHealthConfig.starting_health != health.getStartingHealth()) {
+            if (string.equals("STARTING_HEALTH") && SKHealthConfig.STARTING_HEALTH != health.getStartingHealth()) {
                 return true;
             }
         }
@@ -263,13 +266,12 @@ public class HealthEventHandler {
     private boolean updateThreshold(EntityPlayer player) {
         IHealth health = SKCapabilities.getCapability(player);
 
-        if (SKHealthConfig.health_thresholds.length == 0) {
+        if (SKHealthConfig.HEALTH_THRESHOLDS.get().size() == 0) {
             health.setCurrentThreshold(0);
             return false;
         }
 
-        List<Integer> thresholdList = Arrays.stream(SKHealthConfig.health_thresholds).boxed().collect(Collectors.toList());
-
+        List<Integer> thresholdList = new ArrayList<>(SKHealthConfig.HEALTH_THRESHOLDS.get());
         int oldThreshold = health.getCurrentThreshold();
         if ((health.getCurrentThreshold() != 0 && !thresholdList.contains(health.getCurrentThreshold())) || getCurrentHealth(player) < health.getCurrentThreshold()) {
             Stream<Integer> stream = thresholdList.stream().filter(i -> Math.abs(i) <= this.getCurrentHealth(player));
@@ -277,7 +279,7 @@ public class HealthEventHandler {
             health.setCurrentThreshold(value);
         }
 
-        for (int i : SKHealthConfig.health_thresholds) {
+        for (int i : SKHealthConfig.HEALTH_THRESHOLDS.get()) {
 
             if (health.getCurrentThreshold() == 0 && i < 0) {
                 health.setCurrentThreshold(i);
@@ -307,7 +309,7 @@ public class HealthEventHandler {
     }
 
     private IAttributeInstance getAttribute(EntityPlayer player) {
-        return player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+        return player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
     }
 
     private void addModifier(EntityPlayer player, int amount) {

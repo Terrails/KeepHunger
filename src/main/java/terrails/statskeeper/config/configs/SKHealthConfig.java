@@ -1,164 +1,161 @@
 package terrails.statskeeper.config.configs;
 
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.oredict.OreDictionary;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.collect.Lists;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.registries.ForgeRegistries;
+import terrails.statskeeper.StatsKeeper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class SKHealthConfig {
 
-    public static boolean enabled;
-    public static boolean health_message;
-    public static String[] on_change_reset;
+    public static BooleanValue ENABLED;
+    public static BooleanValue HEALTH_MESSAGE;
+    public static ConfigValue<List<? extends String>> ON_CHANGE_RESET;
 
-    public static int max_health;
-    public static int min_health;
-    public static int health_decrease;
+    public static IntValue MAX_HEALTH;
+    public static IntValue MIN_HEALTH;
+    public static IntValue HEALTH_DECREASE;
 
-    public static int starting_health;
-    public static int[] health_thresholds;
-    public static List<HealthItem> health_items;
+    public static Integer STARTING_HEALTH;
+    public static Map<ResourceLocation, Integer> REGENERATIVE_ITEMS;
+    public static ConfigValue<List<? extends Integer>> HEALTH_THRESHOLDS;
 
-    private static class CommentsOrDefaults {
+    private static ConfigValue<String> STARTING_HEALTH_TMP;
+    private static ConfigValue<List<? extends String>> REGENERATIVE_ITEMS_TMP;
 
-        static String[] on_change_reset_defaults = {
-                "MIN_HEALTH",
-                "MAX_HEALTH",
-                "STARTING_HEALTH"
-        };
-        static String[] health_thresholds_defaults = {
-                "8 KEEP // Disables the health decreasing when the player is at or below this value, has to be the first (and lowest) and only one is allowed",
-                "16 // Moves the lowest health from min to this value when achieved"
-        };
-        static String[] health_items_defaults = {
-                "// toughasnails:lifeblood_crystal",
-                "// cyclicmagic:heart_food",
-                "// minecraft:wool;15 // metadata example, black wool",
-                "minecraft:nether_star, 1 // amount example, 0,5 hearts instead of default 1"
-        };
-        static String health_items_comment = "Items that increase maximal health when used";
-        static String health_message_comment = "Should the message for health removal and threshold achievement be shown to the player";
-        static String enabled_comment = "In case that mods that modify health are present, make sure to disable them before using this";
-        static String on_change_reset_comment = "Config options which should be considered for the reset of health, " +
-                "\nall the available values are used by default";
-        static String starting_health_comment = "Health with which the player should start with, values = CUSTOM(value), MIN, MAX";
-        static String health_threshold_comment = "Values which, when achieved, move the lowest health of the player to the achieved value," +
-                "\nit is also possible to make a non-decreasable threshold with 'KEEP' after the number";
+    public static void init(ForgeConfigSpec.Builder BUILDER) {
+        BUILDER.push("health");
 
+        ENABLED = BUILDER.worldRestart().define("enabled", true);
+
+        BUILDER.push("values");
+
+        MAX_HEALTH = BUILDER
+                .comment("The highest amount of health a player can have")
+                .worldRestart()
+                .defineInRange("maxHealthAmount", 20, 1, 1024);
+
+        MIN_HEALTH = BUILDER
+                .comment("The lowest amount of health a player can have. Can be set to 0 in case only maxHealthAmount is wanted")
+                .worldRestart()
+                .defineInRange("minHealthAmount", 6, 0, 1024);
+
+        HEALTH_DECREASE = BUILDER
+                .comment("The amount of health lost on each death. It will only work if minHealthAmount is higher than 0")
+                .worldRestart()
+                .defineInRange("deathDecreasedHealthAmount", 1, 0, 1024);
+
+        STARTING_HEALTH_TMP = BUILDER
+                .comment("The starting health for the player. Possible values are MIN, MAX or just a number")
+                .worldRestart()
+                .define("startingHealthAmount", "MIN");
+
+        BUILDER.pop();
+
+        BUILDER.push("additional");
+
+        List<String> resetDefaults = Arrays.asList("MIN_HEALTH", "MAX_HEALTH", "STARTING_HEALTH");
+        ON_CHANGE_RESET = BUILDER
+                .comment("Config options which should be considered for the reset of health. All available are used by default")
+                .worldRestart()
+                .defineList("configChangeReset", resetDefaults, o -> o != null && String.class.isAssignableFrom(o.getClass()) && resetDefaults.contains(o));
+
+        HEALTH_MESSAGE = BUILDER
+                .comment("Show a message when a threshold is reached and when health is gained or lost")
+                .define("healthChangeMessage", true);
+
+        HEALTH_THRESHOLDS = BUILDER
+                .comment("Values which, when achieved, move the lowest health of the player to the achieved value.\n" +
+                        "The first threshold can also be non-removable, meaning that the health won't be removed till the player is over that threshold.\n" +
+                        "This can only be used on the first threshold. To use it make the number negative. Make sure the values are in ascending order!")
+                .worldRestart()
+                .defineList("healthThresholds", Lists.newArrayList(-8, 16), o -> o != null && Integer.class.isAssignableFrom(o.getClass()));
+
+        REGENERATIVE_ITEMS_TMP = BUILDER
+                .comment("Items that increase health when used. Use a equal sign to define how much health is gained or lost.\n" +
+                        "e.g. 'minecraft:apple = 1', the health gets increase by 0.5 hearts")
+                .worldRestart()
+                .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), new HealthItems());
+
+        BUILDER.pop(2);
     }
 
-    public static void init(Configuration config, String category) {
-        config.getStringList("Health Items", category, CommentsOrDefaults.health_items_defaults, CommentsOrDefaults.health_items_comment);
-        enabled = config.get(category, "Enabled", true, CommentsOrDefaults.enabled_comment).getBoolean();
-        min_health = config.get(category, "Min Health", 6, "", 0, Integer.MAX_VALUE).getInt();
-        max_health = config.get(category, "Max Health", 20, "", 1, Integer.MAX_VALUE).getInt();
-        health_decrease = config.get(category, "Health Reduction", 1, "",0, Integer.MAX_VALUE).getInt();
-        starting_health = getStartingHealth(config, category);
-        health_thresholds = getThresholds(config, category);
-        on_change_reset = config.getStringList("On Change Reset", category, CommentsOrDefaults.on_change_reset_defaults, CommentsOrDefaults.on_change_reset_comment);
-        health_message = config.get(category, "Health Message", true, CommentsOrDefaults.health_message_comment).getBoolean();
-    }
-    public static void postInit(Configuration config, String category) {
-        String[] itemsArray = config.getStringList("Health Items", category, CommentsOrDefaults.health_items_defaults, CommentsOrDefaults.health_items_comment);
-        health_items = new ArrayList<>();
-        for (String string : itemsArray) {
 
-            if (string.replaceAll("\\s+", "").startsWith("//"))
-                continue;
+    public static void configReloading(ModConfig.ModConfigEvent event) {
+        if (!event.getConfig().getModId().equals(StatsKeeper.MOD_ID)) {
+            return;
+        }
 
-            String itemString = string.contains(";") ? StringUtils.substringBefore(string, ";") : string.contains(",") ? StringUtils.substringBefore(string, ",") : string;
-            Item item = Item.getByNameOrId(itemString.replaceAll("\\s+", ""));
-
-            try {
-                if (item == null || item == Items.AIR) {
-                    throw new IllegalArgumentException("Non-existent item found '" + itemString + "', make sure to remove or comment the items which don't exist with '//'");
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-                continue;
+        String startingHealth = STARTING_HEALTH_TMP.get();
+        if (!startingHealth.isEmpty()) {
+            if (startingHealth.equals("MIN")) {
+                STARTING_HEALTH = MIN_HEALTH.get();
+            } else if (startingHealth.equals("MAX")) {
+                STARTING_HEALTH = MAX_HEALTH.get();
+            } else {
+                int i = Integer.parseInt(startingHealth.replaceAll("[^0-9]", ""));
+                if (i > MAX_HEALTH.get() || i < MIN_HEALTH.get()) throw new IllegalArgumentException("Starting health not in bounds!");
+                STARTING_HEALTH = i;
             }
 
-            String metaString = string.contains(";") ? StringUtils.substringAfter(string ,";") : "-1";
-            String metaString2 = metaString.contains(",") ? StringUtils.substringBefore(metaString, ",") : metaString;
-            String metaString3 = metaString2.contains("//") ? StringUtils.substringBefore(metaString2, "//") : metaString2;
-            int meta = Integer.parseInt(metaString3.replaceAll("[^0-9-]", ""));
-            meta = meta < 0 ? OreDictionary.WILDCARD_VALUE : meta;
+        } else {
+            throw new IllegalArgumentException("Starting health was not set!");
+        }
 
-            String amountString = string.contains(",") ? StringUtils.substringAfter(string, ",") : "2";
-            int amount = Integer.parseInt((amountString.contains("//") ? StringUtils.substringBefore(amountString, "//") : amountString).replaceAll("[^0-9-]", ""));
+        REGENERATIVE_ITEMS = new HashMap<>();
+        for (String string : REGENERATIVE_ITEMS_TMP.get()) {
+            string = string.replaceAll("[\\s+]", "");
 
-            health_items.add(new HealthItem(item, meta, amount));
+            String name = string.substring(0, string.indexOf("="));
+            Integer amount = Integer.parseInt(string.substring(string.indexOf("=") + 1));
+
+            REGENERATIVE_ITEMS.put(new ResourceLocation(name), amount);
+        }
+
+        List<? extends Integer> thresholds = HEALTH_THRESHOLDS.get();
+        if (!thresholds.isEmpty()) {
+
+            if (Math.abs(thresholds.get(0)) <= MIN_HEALTH.get()) {
+                throw new IllegalArgumentException("Health threshold cannot be lower or equal to minHealth");
+            }
+
+            if (thresholds.get(thresholds.size() - 1) >= MAX_HEALTH.get()) {
+                throw new IllegalArgumentException("Health threshold cannot be higher or equal to maxHealth");
+            }
         }
     }
 
-    private static int[] getThresholds(Configuration config, String category) {
-        String[] thresholds = config.getStringList("Health Thresholds", category, CommentsOrDefaults.health_thresholds_defaults, CommentsOrDefaults.health_threshold_comment);
+    private static class HealthItems implements Predicate<Object> {
 
-        int[] values = new int[thresholds.length];
-        for (int i = 0; i < thresholds.length; i++) {
-            if (i > 0 && thresholds[i].toUpperCase().contains("KEEP")) {
-                throw new IllegalArgumentException("Only the first threshold can contain a KEEP argument '" + thresholds[i] + "'");
+        @Override
+        public boolean test(Object o) {
+            String string = (String) o;
+            string = string.replaceAll("[\\s+]", "");
+
+            if (!string.contains("=")) {
+                StatsKeeper.LOGGER.error("Regenerative item '{}' is missing gained health amount. Skipping...", o);
+                return false;
             }
 
-            int value = Integer.parseInt(thresholds[i].replaceAll("[^0-9]+", ""));
+            String name = string.substring(0, string.indexOf("="));
+            int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1));
 
-            if (i > 0 && value < values[i - 1]) {
-                throw new IllegalArgumentException("Thresholds have to be in ascending order!");
+            if (!ForgeRegistries.ITEMS.containsKey(new ResourceLocation(name))) {
+                StatsKeeper.LOGGER.warn("Regenerative Item '{}' could not be found in the item registry. Skipping ...", name);
+                return false;
             }
 
-            if (i == 0 && thresholds[i].toUpperCase().contains("KEEP")) {
-                values[i] = -value;
-                continue;
+            if (amount == 0) {
+                StatsKeeper.LOGGER.error("Regenerative item '{}' cannot have gained/lost amount of 0. Skipping...", name);
+                return false;
             }
 
-            values[i] = value;
-        }
-
-        if (values.length > 0 && values[0] > 0 && values[0] <= starting_health) {
-            throw new IllegalArgumentException("Threshold cannot be equal or smaller than starting health");
-        }
-
-        return values;
-    }
-    private static int getStartingHealth(Configuration config, String category) {
-        String string = config.get(category, "Starting Health", "MIN", CommentsOrDefaults.starting_health_comment).getString().toUpperCase();
-        if (string.startsWith("CUSTOM")) {
-            int i = Integer.parseInt(string.substring(string.indexOf("(") + 1, string.indexOf(")")));
-            if (i > max_health || i < min_health ) throw new IllegalArgumentException("Starting health not in bounds!");
-            return i;
-        } else if (string.equals("MIN")) {
-            return min_health;
-        } else if (string.equals("MAX")) {
-            return max_health;
-        } else throw new NullPointerException("Starting health was not set!");
-    }
-
-    public static class HealthItem {
-
-        private Item item;
-        private int meta;
-        private int amount;
-
-        HealthItem(Item item, int meta, int amount) {
-            this.item = item;
-            this.meta = meta;
-            this.amount = amount;
-        }
-
-        public Item getItem() {
-            return this.item;
-        }
-
-        public int getMeta() {
-            return this.meta;
-        }
-
-        public int getHealthAmount() {
-            return this.amount;
+            return true;
         }
     }
 }

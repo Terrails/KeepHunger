@@ -3,6 +3,9 @@ package terrails.statskeeper.api.capabilities;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.util.LazyOptional;
+
+import java.util.Optional;
 
 public class SKCapabilities {
 
@@ -10,7 +13,8 @@ public class SKCapabilities {
     public static final Capability<IHealth> HEALTH_CAPABILITY;
 
     public static IHealth getCapability(EntityPlayer player) {
-        return player.getCapability(SKCapabilities.HEALTH_CAPABILITY, null);
+        LazyOptional<IHealth> optional = player.getCapability(SKCapabilities.HEALTH_CAPABILITY);
+        return optional.orElseThrow(() -> new RuntimeException("Health capability missing, can not continue!"));
     }
 
     static {
