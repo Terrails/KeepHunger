@@ -6,12 +6,12 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 archivesBaseName = "StatsKeeper-Fabric.1.14"
-version = "3.1.12"
+version = "3.1.13"
 
-def minecraft_version = "19w09a"
-def yarn_version = "19w09a.4"
+def minecraft_version = "19w11b"
+def yarn_version = "19w11b.2"
 def loader_version = "0.3.7.109"
-def fabric_version = "0.2.3.109"
+def fabric_version = "0.2.3.110"
 
 minecraft {
 }

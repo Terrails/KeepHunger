@@ -8,8 +8,7 @@
     "BucketMilkItemMixin",
     "PlayerManagerMixin",
     "HungerManagerMixin",
-    "ServerPlayNetworkHandlerMixin",
-    "FoodItemMixin"
+    "ServerPlayNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

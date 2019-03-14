@@ -3,7 +3,6 @@ package terrails.statskeeper.handler;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.entity.attribute.*;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.FoodItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.ActionResult;
@@ -11,7 +10,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 import terrails.statskeeper.StatsKeeper;
-import terrails.statskeeper.api.data.IAlwaysConsumable;
 import terrails.statskeeper.api.data.health.IHealth;
 import terrails.statskeeper.api.data.health.IHealthManager;
 import terrails.statskeeper.api.event.PlayerCloneCallback;
@@ -111,7 +109,7 @@ public class PlayerHealthHandler {
             return ActionResult.PASS;
 
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.getItem() instanceof FoodItem && player.canConsume(((IAlwaysConsumable) stack.getItem()).isAlwaysConsumable())) {
+        if (stack.getItem().method_19263() && player.canConsume(stack.getItem().method_19264().method_19233())) {
             return ActionResult.PASS;
         }
 

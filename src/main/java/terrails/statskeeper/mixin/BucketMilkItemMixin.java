@@ -1,8 +1,8 @@
 package terrails.statskeeper.mixin;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.BucketMilkItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.MilkBucketItem;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrails.statskeeper.effect.IEffectCure;
 import terrails.statskeeper.api.potion.SKPotions;
 
-@Mixin(BucketMilkItem.class)
+@Mixin(MilkBucketItem.class)
 public class BucketMilkItemMixin {
 
     @Inject(method = "onItemFinishedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;incrementStat(Lnet/minecraft/stat/Stat;)V"))
