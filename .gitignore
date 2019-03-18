@@ -20,5 +20,7 @@ build
 # other
 eclipse
 run
+
+# custom
 *.ps1
 *.lnk
