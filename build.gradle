@@ -16,7 +16,6 @@ archivesBaseName = 'StatsKeeper'
 
 minecraft {
     mappings channel: 'snapshot', version: '20180921-1.13'
-    accessTransformer = file('src/main/resources/META-INF/statskeeper_at.cfg')
 
     runs {
         client {
@@ -53,13 +52,6 @@ minecraft {
     }
 }
 
-/*
-jar {
-    manifest.attributes('FMLAT': 'statskeeper_at.cfg')
-}
-
- */
-
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.79'
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.88'
 }

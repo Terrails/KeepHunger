@@ -122,7 +122,7 @@ public class HealthEventHandler {
         }
 
         ItemStack stack = player.getHeldItem(event.getHand());
-        if (stack.getItem() instanceof ItemFood && player.canEat(/*((ItemFood) stack.getItem()).alwaysEdible)*/this.isItemFoodAlwaysEdible((ItemFood) stack.getItem()))) {
+        if (stack.getItem() instanceof ItemFood && player.canEat(this.isItemFoodAlwaysEdible((ItemFood) stack.getItem()))) {
             return;
         }
 

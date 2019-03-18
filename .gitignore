@@ -20,7 +20,7 @@ build
 # other
 eclipse
 run
-*.ps1
 
-# Files from Forge MDK
-forge*changelog.txt
+# custom
+*.ps1
+*.lnk
