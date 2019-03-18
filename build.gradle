@@ -9,9 +9,9 @@ archivesBaseName = "StatsKeeper-Fabric.1.14"
 version = "3.1.13"
 
 def minecraft_version = "19w11b"
-def yarn_version = "19w11b.2"
+def yarn_version = "19w11b.9"
 def loader_version = "0.3.7.109"
-def fabric_version = "0.2.3.110"
+def fabric_version = "0.2.3.111"
 
 minecraft {
 }

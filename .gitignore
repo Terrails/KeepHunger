@@ -22,3 +22,8 @@ bin/
 # fabric
 
 run/
+
+# other
+
+*.ps1
+*.lnk
