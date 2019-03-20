@@ -109,7 +109,7 @@ public class PlayerHealthHandler {
             return ActionResult.PASS;
 
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.getItem().method_19263() && player.canConsume(stack.getItem().method_19264().method_19233())) {
+        if (stack.getItem().getFoodSetting() != null && player.canConsume(stack.getItem().getFoodSetting().isAlwaysEdible())) {
             return ActionResult.PASS;
         }
 

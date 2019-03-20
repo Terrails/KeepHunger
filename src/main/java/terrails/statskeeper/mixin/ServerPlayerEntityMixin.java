@@ -34,7 +34,7 @@ public class ServerPlayerEntityMixin implements IHealthManager {
     private void changeDimension(DimensionType dimensionType, CallbackInfoReturnable<Entity> info) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         EntityAttributeContainer attributeContainer = (EntityAttributeContainer) player.getAttributeContainer();
-        Collection<EntityAttributeInstance> attributeInstances = attributeContainer.method_6213();
+        Collection<EntityAttributeInstance> attributeInstances = attributeContainer.buildTrackedAttributesCollection();
         if (!attributeInstances.isEmpty()) player.networkHandler.sendPacket(new EntityAttributesS2CPacket(player.getEntityId(), attributeInstances));
     }
 

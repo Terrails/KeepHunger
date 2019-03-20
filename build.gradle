@@ -8,10 +8,10 @@ targetCompatibility = 1.8
 archivesBaseName = "StatsKeeper-Fabric.1.14"
 version = "3.1.13"
 
-def minecraft_version = "19w11b"
-def yarn_version = "19w11b.9"
+def minecraft_version = "19w12a"
+def yarn_version = "19w12a.1"
 def loader_version = "0.3.7.109"
-def fabric_version = "0.2.3.111"
+def fabric_version = "0.2.4.112"
 
 minecraft {
 }
