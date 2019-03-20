@@ -8,18 +8,22 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.IHealth;
 import terrails.statskeeper.api.capabilities.SKCapabilities;
 import terrails.statskeeper.config.configs.SKHealthConfig;
+import terrails.statskeeper.data.health.HealthHandler;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -63,6 +67,42 @@ public class HealthEventHandler {
     }
 
     @SubscribeEvent
+    public void playerRespawn(PlayerRespawnEvent event) {
+        if (SKHealthConfig.ENABLED.get()) {
+            EntityPlayer player = event.getPlayer();
+            IHealth health = SKCapabilities.getCapability(player);
+            IHealth oldHealth = new HealthHandler();
+            NBTTagCompound compound = player.writeWithoutTypeId(new NBTTagCompound());
+            if (compound.contains("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
+                compound = compound.getCompound("ForgeCaps");
+                SKCapabilities.HEALTH_CAPABILITY.getStorage().readNBT(SKCapabilities.HEALTH_CAPABILITY, oldHealth, null, compound);
+            }
+
+            if (!oldHealth.isHealthEnabled())
+                return;
+
+            if (SKHealthConfig.STARTING_HEALTH == (int) SKHealthConfig.MAX_HEALTH.get() && SKHealthConfig.MIN_HEALTH.get() <= 0) {
+                this.setHealth(player, Operation.MAX);
+                return;
+            }
+
+            this.setHealth(player, Operation.SAVE);
+            health.setAdditionalHealth(oldHealth.getAdditionalHealth());
+            health.setCurrentThreshold(oldHealth.getCurrentThreshold());
+            this.updateThreshold(player);
+
+            if (!event.isEndConquered() && SKHealthConfig.HEALTH_DECREASE.get() > 0 && SKHealthConfig.MIN_HEALTH.get() > 0 && this.getCurrentHealth(player) > Math.abs(health.getCurrentThreshold())) {
+                this.setHealth(player, Operation.REMOVE);
+                double removedAmount = (oldHealth.getAdditionalHealth()) - health.getAdditionalHealth();
+                if (SKHealthConfig.HEALTH_MESSAGE.get() && removedAmount > 0) {
+                    this.playerMessage(player, "health.statskeeper.death_remove", removedAmount);
+                }
+            } else this.setAdditionalHealth(player, oldHealth.getAdditionalHealth());
+        }
+    }
+
+    /*
+    @SubscribeEvent
     public void playerClone(PlayerEvent.Clone event) {
         if (SKHealthConfig.ENABLED.get()) {
             EntityPlayer player = event.getEntityPlayer();
@@ -91,6 +131,7 @@ public class HealthEventHandler {
             } else this.setAdditionalHealth(player, oldHealth.getAdditionalHealth());
         }
     }
+    */
 
     @SubscribeEvent
     public void itemUseFinished(LivingEntityUseItemEvent.Finish event) {

@@ -17,6 +17,9 @@ import terrails.statskeeper.api.capabilities.SKCapabilities;
 
 public class CapabilityHealth {
 
+    // TODO: Write your own way of syncing capabilities by saving the data into
+    //  WorldSavedData and then copying it over on respawn List<UUID, IHealth>
+
     @SubscribeEvent
     public void attach(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof EntityPlayer) {
@@ -31,38 +34,38 @@ public class CapabilityHealth {
             @Override
             public INBTBase writeNBT(Capability<IHealth> capability, IHealth instance, EnumFacing side) {
                 NBTTagCompound compound = new NBTTagCompound();
-                compound.setBoolean("sk:is_enabled", instance.isHealthEnabled());
-                compound.setInt("sk:additional_health", instance.getAdditionalHealth());
-                compound.setInt("sk:max_health", instance.getMaxHealth());
-                compound.setInt("sk:min_health", instance.getMinHealth());
-                compound.setInt("sk:starting_health", instance.getStartingHealth());
-                compound.setInt("sk:health_threshold", instance.getCurrentThreshold());
+                compound.putBoolean("sk:is_enabled", instance.isHealthEnabled());
+                compound.putInt("sk:additional_health", instance.getAdditionalHealth());
+                compound.putInt("sk:max_health", instance.getMaxHealth());
+                compound.putInt("sk:min_health", instance.getMinHealth());
+                compound.putInt("sk:starting_health", instance.getStartingHealth());
+                compound.putInt("sk:health_threshold", instance.getCurrentThreshold());
                 return compound;
             }
             @Override
             public void readNBT(Capability<IHealth> capability, IHealth instance, EnumFacing side, INBTBase nbt) {
                 NBTTagCompound compound = (NBTTagCompound) nbt;
-                if (compound.hasKey("sk:is_enabled")) {
+                if (compound.contains("sk:is_enabled")) {
                     instance.setHealthEnabled(compound.getBoolean("sk:is_enabled"));
                 }
 
-                if (compound.hasKey("sk:starting_health")) {
+                if (compound.contains("sk:starting_health")) {
                     instance.setStartingHealth(compound.getInt("sk:starting_health"));
                 }
 
-                if (compound.hasKey("sk:additional_health")) {
+                if (compound.contains("sk:additional_health")) {
                     instance.setAdditionalHealth(compound.getInt("sk:additional_health"));
                 }
 
-                if (compound.hasKey("sk:max_health")) {
+                if (compound.contains("sk:max_health")) {
                     instance.setMaxHealth(compound.getInt("sk:max_health"));
                 }
 
-                if (compound.hasKey("sk:min_health")) {
+                if (compound.contains("sk:min_health")) {
                     instance.setMinHealth(compound.getInt("sk:min_health"));
                 }
 
-                if (compound.hasKey("sk:health_threshold")) {
+                if (compound.contains("sk:health_threshold")) {
                     instance.setCurrentThreshold(compound.getInt("sk:health_threshold"));
                 }
             }

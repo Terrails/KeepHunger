@@ -10,12 +10,16 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-version = '3.1.12'
+def minecraft_version = "1.13.2"
+def forge_version = "25.0.90"
+def mappings_version = ['stable', '45-1.13.1']
+
+version = '4.0.0'
 group = 'terrails.statskeeper'
 archivesBaseName = 'StatsKeeper'
 
 minecraft {
-    mappings channel: 'snapshot', version: '20180921-1.13'
+    mappings channel: mappings_version.get(0), version: mappings_version.get(1)
 
     runs {
         client {
@@ -53,5 +57,5 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.88'
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }

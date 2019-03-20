@@ -5,8 +5,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.util.LazyOptional;
 
-import java.util.Optional;
-
 public class SKCapabilities {
 
     @CapabilityInject(IHealth.class)

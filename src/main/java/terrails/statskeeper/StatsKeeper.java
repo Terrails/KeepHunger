@@ -15,6 +15,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import terrails.statskeeper.api.SKPotions;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.data.health.CapabilityHealth;
 import terrails.statskeeper.event.*;
@@ -46,6 +47,7 @@ public class StatsKeeper {
 
     @SubscribeEvent
     public static void registerPotions(final RegistryEvent.Register<Potion> event) {
-        event.getRegistry().register(new PotionNoAppetite());
+        SKPotions.NO_APPETITE = new PotionNoAppetite();
+        event.getRegistry().register(SKPotions.NO_APPETITE);
     }
 }
