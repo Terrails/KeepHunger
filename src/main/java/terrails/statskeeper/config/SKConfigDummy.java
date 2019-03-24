@@ -20,7 +20,6 @@ class SKConfigDummy {
         boolean keep_saturation = true;
         int lowest_saturation = 2;
 
-        boolean show_effect_icon = true;
         int no_appetite_time = 300;
     }
     static class Health {

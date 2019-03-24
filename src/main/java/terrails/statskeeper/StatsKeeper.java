@@ -8,17 +8,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import terrails.statskeeper.api.event.*;
-import terrails.statskeeper.api.potion.SKPotions;
+import terrails.statskeeper.api.effect.SKPotions;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.effect.NoAppetiteEffect;
-import terrails.statskeeper.handler.BasicHandler;
-import terrails.statskeeper.handler.PlayerHealthHandler;
-import terrails.statskeeper.handler.PlayerHungerHandler;
+import terrails.statskeeper.event.BaseStatHandler;
+import terrails.statskeeper.event.PlayerHealthHandler;
+
+import java.util.UUID;
 
 public class StatsKeeper implements ModInitializer {
 
+    public static final UUID HEALTH_UUID = UUID.fromString("b4720be1-df42-4347-9625-34152fb82b3f");
     public static final String MOD_ID = "statskeeper";
-    public static final String MOD_NAME = "Stats Keeper";
 
     @Override
     public void onInitialize() {
@@ -27,15 +28,14 @@ public class StatsKeeper implements ModInitializer {
     }
 
     private static void initializeEvents() {
-        PlayerCloneCallback.EVENT.register(PlayerHealthHandler.playerCloneEvent);
-        PlayerCloneCallback.EVENT.register(PlayerHungerHandler.playerCloneEvent);
-        PlayerCloneCallback.EVENT.register(BasicHandler.playerCloneEvent);
-        PlayerJoinCallback.EVENT.register(PlayerHealthHandler.playerJoinEvent);
-        PlayerRespawnCallback.EVENT.register(PlayerHungerHandler.playerRespawnEvent);
-        PlayerUseFinishedCallback.EVENT.register(PlayerHealthHandler.itemUseFinishedEvent);
-        UseBlockCallback.EVENT.register(PlayerHungerHandler.blockInteractEvent);
-        UseItemCallback.EVENT.register(PlayerHungerHandler.itemInteractEvent);
-        UseItemCallback.EVENT.register(PlayerHealthHandler.itemInteractEvent);
+        PlayerJoinCallback.EVENT.register(PlayerHealthHandler.PLAYER_JOIN);
+        PlayerCopyCallback.EVENT.register(PlayerHealthHandler.PLAYER_COPY);
+        PlayerUseFinishedCallback.EVENT.register(PlayerHealthHandler.ITEM_USE_FINISHED);
+        UseItemCallback.EVENT.register(PlayerHealthHandler.ITEM_INTERACT);
+        PlayerCopyCallback.EVENT.register(BaseStatHandler.PLAYER_COPY);
+        PlayerRespawnCallback.EVENT.register(BaseStatHandler.PLAYER_RESPAWN);
+        UseBlockCallback.EVENT.register(BaseStatHandler.BLOCK_INTERACT);
+        UseItemCallback.EVENT.register(BaseStatHandler.ITEM_INTERACT);
         ServerStartCallback.EVENT.register((MinecraftServer server) -> SKConfig.initialize());
     }
 }

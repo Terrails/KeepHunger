@@ -1,4 +1,4 @@
-package terrails.statskeeper.api.potion;
+package terrails.statskeeper.api.effect;
 
 import net.minecraft.entity.effect.StatusEffect;
 

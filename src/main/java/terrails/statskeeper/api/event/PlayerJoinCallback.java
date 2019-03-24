@@ -6,7 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 
 public interface PlayerJoinCallback {
 
-    public static final Event<PlayerJoinCallback> EVENT = EventFactory.createArrayBacked(PlayerJoinCallback.class,
+    Event<PlayerJoinCallback> EVENT = EventFactory.createArrayBacked(PlayerJoinCallback.class,
             (listeners) -> (player) -> {
                 for (PlayerJoinCallback event : listeners) {
                     event.onPlayerJoin(player);

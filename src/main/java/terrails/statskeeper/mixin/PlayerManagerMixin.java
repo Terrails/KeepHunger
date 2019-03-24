@@ -16,4 +16,5 @@ public class PlayerManagerMixin {
     private void onPlayerJoin(ClientConnection connection, ServerPlayerEntity player, CallbackInfo info) {
         PlayerJoinCallback.EVENT.invoker().onPlayerJoin(player);
     }
+
 }

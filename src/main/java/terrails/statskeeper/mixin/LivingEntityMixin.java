@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.effect.IEffectCure;
-import terrails.statskeeper.api.potion.SKPotions;
+import terrails.statskeeper.api.effect.SKPotions;
 import terrails.statskeeper.api.event.PlayerUseFinishedCallback;
 
 import java.util.Iterator;
@@ -36,26 +36,22 @@ public class LivingEntityMixin implements IEffectCure {
     @Shadow protected void method_6129(StatusEffectInstance statusEffectInstance_1) {}
 
     @Override
-    public boolean cureStatusEffects(ItemStack stack) {
+    public void clearPlayerStatusEffects(ItemStack stack) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity.world.isClient) {
-            return false;
-        } else {
-            Iterator<StatusEffectInstance> iterator_1 = this.activePotionEffects.values().iterator();
+            return;
+        }
+        Iterator<StatusEffectInstance> iterator_1 = this.activePotionEffects.values().iterator();
 
-            boolean boolean_1;
-            for(boolean_1 = false; iterator_1.hasNext(); boolean_1 = true) {
-                StatusEffectInstance effect = iterator_1.next();
+        while (iterator_1.hasNext()) {
+            StatusEffectInstance effect = iterator_1.next();
 
-                if (effect.getEffectType()  == SKPotions.NO_APPETITE) {
-                    continue;
-                }
-
-                this.method_6129(effect);
-                iterator_1.remove();
+            if (effect.getEffectType() == SKPotions.NO_APPETITE) {
+                continue;
             }
 
-            return boolean_1;
+            this.method_6129(effect);
+            iterator_1.remove();
         }
     }
 

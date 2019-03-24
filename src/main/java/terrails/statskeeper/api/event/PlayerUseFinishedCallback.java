@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 
 public interface PlayerUseFinishedCallback {
 
-    public static final Event<PlayerUseFinishedCallback> EVENT = EventFactory.createArrayBacked(PlayerUseFinishedCallback.class,
+    Event<PlayerUseFinishedCallback> EVENT = EventFactory.createArrayBacked(PlayerUseFinishedCallback.class,
             (listeners) -> (player, stack) -> {
                 for (PlayerUseFinishedCallback event : listeners) {
                     event.onItemUseFinished(player, stack);

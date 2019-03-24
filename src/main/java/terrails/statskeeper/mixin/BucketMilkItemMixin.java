@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrails.statskeeper.effect.IEffectCure;
-import terrails.statskeeper.api.potion.SKPotions;
+import terrails.statskeeper.api.effect.SKPotions;
 
 @Mixin(MilkBucketItem.class)
 public class BucketMilkItemMixin {
@@ -18,7 +18,7 @@ public class BucketMilkItemMixin {
     @Inject(method = "onItemFinishedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;incrementStat(Lnet/minecraft/stat/Stat;)V"))
     private void onItemFinishedUsing(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable<Boolean> returnable) {
         if (entity.hasPotionEffect(SKPotions.NO_APPETITE)) {
-            ((IEffectCure) entity).cureStatusEffects(stack);
+            ((IEffectCure) entity).clearPlayerStatusEffects(stack);
         }
     }
 

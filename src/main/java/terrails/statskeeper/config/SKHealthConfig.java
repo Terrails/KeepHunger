@@ -1,8 +1,9 @@
 package terrails.statskeeper.config;
 
+import com.google.common.collect.ImmutableSortedSet;
 import net.minecraft.item.Item;
 
-import java.util.List;
+import java.util.*;
 
 public class SKHealthConfig {
 
@@ -15,7 +16,7 @@ public class SKHealthConfig {
     public static int health_decrease;
 
     public static int starting_health;
-    public static int[] health_thresholds;
+    public static NavigableSet<Integer> health_thresholds;
     public static List<HealthItem> health_items;
 
     public static void init(SKConfigDummy instance) {
@@ -27,35 +28,26 @@ public class SKHealthConfig {
         health_decrease = instance.HEALTH_STATS.health_decrease;
         starting_health = getStartingHealth(instance.HEALTH_STATS.starting_health);
         health_thresholds = getThresholds(instance.HEALTH_STATS.health_thresholds);
+
         health_items = instance.HEALTH_STATS.health_items;
     }
 
-    private static int[] getThresholds(String[] thresholds) {
-        int[] values = new int[thresholds.length];
-        for (int i = 0; i < thresholds.length; i++) {
-            if (i > 0 && thresholds[i].toUpperCase().contains("KEEP")) {
-                throw new IllegalArgumentException("Only the first threshold can contain a KEEP argument '" + thresholds[i] + "'");
+    private static NavigableSet<Integer> getThresholds(String[] strings) {
+        TreeSet<Integer> thresholds = new TreeSet<>();
+        for (int i = 0; i < strings.length; i++) {
+            if (i > 0 && strings[i].toUpperCase().contains("KEEP")) {
+                throw new IllegalArgumentException("Only the first threshold can contain a KEEP argument '" + strings[i] + "'");
             }
 
-            int value = Integer.parseInt(thresholds[i].replaceAll("[^0-9]+", ""));
+            int value = Integer.parseInt(strings[i].replaceAll("[^0-9]+", ""));
 
-            if (i > 0 && value < values[i - 1]) {
-                throw new IllegalArgumentException("Thresholds have to be in ascending order!");
+            if (i == 0 && strings[i].toUpperCase().contains("KEEP")) {
+                value = -value;
             }
 
-            if (i == 0 && thresholds[i].toUpperCase().contains("KEEP")) {
-                values[i] = -value;
-                continue;
-            }
-
-            values[i] = value;
+            thresholds.add(value);
         }
-
-        if (values.length > 0 && values[0] > 0 && values[0] <= starting_health) {
-            throw new IllegalArgumentException("Threshold cannot be equal or smaller than starting health");
-        }
-
-        return values;
+        return ImmutableSortedSet.copyOf(thresholds);
     }
     private static int getStartingHealth(String string) {
         if (string.startsWith("CUSTOM")) {
@@ -73,10 +65,18 @@ public class SKHealthConfig {
 
         private Item item;
         private int amount;
+        private boolean bypass;
+
+        public HealthItem(Item item, int amount, boolean bypass) {
+            this.item = item;
+            this.amount = amount;
+            this.bypass = bypass;
+        }
 
         public HealthItem(Item item, int amount) {
             this.item = item;
             this.amount = amount;
+            this.bypass = false;
         }
 
         public Item getItem() {
@@ -85,6 +85,10 @@ public class SKHealthConfig {
 
         public int getHealthAmount() {
             return this.amount;
+        }
+
+        public boolean doesBypassThreshold() {
+            return this.bypass;
         }
     }
 }
