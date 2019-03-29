@@ -36,7 +36,7 @@ public class PlayerHealthManager implements HealthManager {
 
     @Override
     public void update() {
-        if (!this.playerEntity.isValid()) {
+        if (!this.playerEntity.isAlive()) {
             return;
         }
 
