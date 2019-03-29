@@ -10,6 +10,7 @@ def yarn_version = "19w13a.6"
 def loader_version = "0.3.7.109"
 def fabric_version = "0.2.6.117"
 
+group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper-${minecraft_version}"
 version = "1.0.0"
 
@@ -22,6 +23,22 @@ dependencies {
 	
 	modCompile "net.fabricmc:fabric-loader:${loader_version}"
 	modCompile "net.fabricmc:fabric:${fabric_version}"
+}
+
+task apiJar(type: Jar, dependsOn: classes) {
+	from(sourceSets.main.allJava) {
+		include 'terrails/statskeeper/api/**'
+	}
+	from "LICENSE"
+	classifier = "api"
+}
+
+artifacts {
+	archives apiJar
+}
+
+jar {
+	from "LICENSE"
 }
 
 processResources {
