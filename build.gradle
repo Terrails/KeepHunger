@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 
 def minecraft_version = "1.13.2"
-def forge_version = "25.0.90"
+def forge_version = "25.0.102"
 def mappings_version = ['stable', '45-1.13.1']
 
 version = '4.0.0'

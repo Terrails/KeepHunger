@@ -28,7 +28,7 @@ displayName="Stats Keeper" #mandatory
 # A text field displayed in the mod UI
 authors="Terrails" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description=''' Configure your stats! '''
+description=''' Saves stats on death & modifies default health '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.statskeeper]] #optional
     # the modid of the dependency

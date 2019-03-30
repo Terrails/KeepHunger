@@ -17,16 +17,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import terrails.statskeeper.api.SKPotions;
 import terrails.statskeeper.config.SKConfig;
-import terrails.statskeeper.data.health.CapabilityHealth;
+import terrails.statskeeper.health.HealthCapability;
 import terrails.statskeeper.event.*;
 import terrails.statskeeper.potion.PotionNoAppetite;
+
+import java.util.UUID;
 
 @Mod(StatsKeeper.MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)
 public class StatsKeeper {
 
-    public static final String MOD_ID = "statskeeper";
+    public static final UUID HEALTH_UUID = UUID.fromString("b4720be1-df42-4347-9625-34152fb82b3f");
+
     public static final Logger LOGGER = LogManager.getLogger("Stats Keeper");
+    public static final String MOD_ID = "statskeeper";
 
     public StatsKeeper() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, SKConfig.CONFIG, "statskeeper.toml");
@@ -36,13 +40,12 @@ public class StatsKeeper {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        CapabilityHealth.register();
+        HealthCapability.register();
 
         SKConfig.loadConfig(SKConfig.CONFIG, FMLPaths.CONFIGDIR.get().resolve("statskeeper.toml"));
 
-        MinecraftForge.EVENT_BUS.register(new BasicEventHandler());
-        MinecraftForge.EVENT_BUS.register(new HungerEventHandler());
-        MinecraftForge.EVENT_BUS.register(new HealthEventHandler());
+        MinecraftForge.EVENT_BUS.register(new BasicStatHandler());
+        MinecraftForge.EVENT_BUS.register(new PlayerHealthHandler());
     }
 
     @SubscribeEvent
