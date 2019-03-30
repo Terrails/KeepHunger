@@ -80,7 +80,7 @@ public interface HealthManager {
 
     /**
      * Serializes the data to the given CompoundTag, data is
-     * saved in another CompoundTag named {@link terrails.statskeeper.StatsKeeper#MOD_ID}
+     * saved in a CompoundTag named {@link terrails.statskeeper.StatsKeeper#MOD_ID}
      * @param compound the tag to which the data will be saved
      */
     void serialize(CompoundTag compound);
