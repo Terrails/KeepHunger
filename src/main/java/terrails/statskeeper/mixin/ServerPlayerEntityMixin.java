@@ -51,7 +51,7 @@ public class ServerPlayerEntityMixin implements HealthManager.Accessor {
         }
     }
 
-    @Inject(method = "method_14203(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", at = @At("RETURN"))
+    @Inject(method = "copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", at = @At("RETURN"))
     private void onPlayerCopy(ServerPlayerEntity oldPlayer, boolean isEnd, CallbackInfo callbackInfo) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         PlayerCopyCallback.EVENT.invoker().onPlayerCopy(player, oldPlayer, isEnd);
