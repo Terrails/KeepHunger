@@ -6,7 +6,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 def minecraft_version = "19w14a"
-def yarn_version = "19w14a.1"
+def yarn_version = "19w14a.3"
 def loader_version = "0.3.7.109"
 def fabric_version = "0.2.6.117"
 def dev_mode_version = "1.0.10"
