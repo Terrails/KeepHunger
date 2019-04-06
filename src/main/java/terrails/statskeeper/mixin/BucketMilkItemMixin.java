@@ -17,13 +17,13 @@ public class BucketMilkItemMixin {
 
     @Inject(method = "onItemFinishedUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;incrementStat(Lnet/minecraft/stat/Stat;)V"))
     private void onItemFinishedUsing(ItemStack stack, World world, LivingEntity entity, CallbackInfoReturnable<Boolean> returnable) {
-        if (entity.hasPotionEffect(SKPotions.NO_APPETITE)) {
+        if (entity.hasStatusEffect(SKPotions.NO_APPETITE)) {
             ((IEffectCure) entity).clearPlayerStatusEffects(stack);
         }
     }
 
     @Redirect(method = "onItemFinishedUsing", at = @At(value = "FIELD", target = "Lnet/minecraft/world/World;isClient:Z"))
     private boolean shouldNotProceed(World theWorld, ItemStack stack, World world, LivingEntity entity) {
-        return (entity.hasPotionEffect(SKPotions.NO_APPETITE));
+        return (entity.hasStatusEffect(SKPotions.NO_APPETITE));
     }
 }

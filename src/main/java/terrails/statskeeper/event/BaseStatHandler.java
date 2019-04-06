@@ -47,7 +47,7 @@ public class BaseStatHandler {
     };
 
     public static final UseBlockCallback BLOCK_INTERACT = (PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) -> {
-        if (player.isSpectator() || !player.hasPotionEffect(SKPotions.NO_APPETITE)) return ActionResult.PASS;
+        if (player.isSpectator() || !player.hasStatusEffect(SKPotions.NO_APPETITE)) return ActionResult.PASS;
 
         if (world.getBlockState(hitResult.getBlockPos()).getBlock() instanceof CakeBlock) {
             return ActionResult.FAIL;
@@ -56,7 +56,7 @@ public class BaseStatHandler {
     };
 
     public static final UseItemCallback ITEM_INTERACT = (PlayerEntity player, World world, Hand hand) -> {
-        if (player.isSpectator() || !player.hasPotionEffect(SKPotions.NO_APPETITE)) return ActionResult.PASS;
+        if (player.isSpectator() || !player.hasStatusEffect(SKPotions.NO_APPETITE)) return ActionResult.PASS;
 
         FoodItemSetting setting = player.getMainHandStack().getItem().getFoodSetting();
         if (setting != null && player.canConsume(setting.isAlwaysEdible())) {
