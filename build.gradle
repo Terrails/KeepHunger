@@ -40,8 +40,14 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allSource
+    from "LICENSE"
+    classifier = 'sources'
+}
+
 task apiJar(type: Jar, dependsOn: classes) {
-    from(sourceSets.main.allJava) {
+    from(sourceSets.main.allSource) {
         include "terrails/statskeeper/api/**"
     }
     from "LICENSE"
@@ -49,7 +55,7 @@ task apiJar(type: Jar, dependsOn: classes) {
 }
 
 artifacts {
-    archives apiJar
+    archives sourcesJar, apiJar
 }
 
 jar {
