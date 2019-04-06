@@ -22,10 +22,6 @@ import javax.annotation.Nullable;
 
 public class HealthCapability {
 
-    // TODO: Write your own way of syncing capabilities by saving the data into
-    //  WorldSavedData and then copying it over in tick event List<UUID, IHealth>
-    //  Or wait for Forge to fix the bug...
-
     public static final ResourceLocation NAME = new ResourceLocation(StatsKeeper.MOD_ID, "health");
 
     @SubscribeEvent
@@ -61,11 +57,6 @@ public class HealthCapability {
         private CapabilitySerializable(Capability<C> capability) {
             this.capability = capability;
             this.instance = capability.getDefaultInstance();
-        }
-
-        private CapabilitySerializable(Capability<C> capability, C instance) {
-            this.capability = capability;
-            this.instance = instance;
         }
 
         @Nonnull

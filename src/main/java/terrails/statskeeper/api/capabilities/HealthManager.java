@@ -1,14 +1,25 @@
 package terrails.statskeeper.api.capabilities;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.LazyOptional;
 
 public interface HealthManager {
 
     static LazyOptional<HealthManager> getInstance(EntityPlayer player) {
-        return player.getCapability(SKCapabilities.HEALTH_CAPABILITY);
+        LazyOptional<HealthManager> optional = player.getCapability(SKCapabilities.HEALTH_CAPABILITY);
+        optional.ifPresent(health -> health.with((EntityPlayerMP) player));
+        return optional;
     }
+
+    /**
+     * Used internally, make sure to use the {@link #getInstance(EntityPlayer)}
+     * method since it sets the player each time its accessed
+     * @param player which to set the manager to
+     * @return the manager with the player
+     */
+    HealthManager with(EntityPlayerMP player);
 
     /**
      * @return the current amount of health the player has.
@@ -74,8 +85,7 @@ public interface HealthManager {
     void reset();
 
     /**
-     * Serializes the data to the given NBTTagCompound, data is
-     * saved in a NBTTagCompound named {@link terrails.statskeeper.StatsKeeper#MOD_ID}
+     * Serializes the data to the given NBTTagCompound
      * @param compound the tag to which the data will be saved
      */
     void serialize(NBTTagCompound compound);

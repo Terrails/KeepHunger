@@ -19,6 +19,7 @@ public class PotionNoAppetite extends Potion {
     public PotionNoAppetite() {
         super(true, new Color(72, 120, 68).getRGB());
         this.setRegistryName(new ResourceLocation(StatsKeeper.MOD_ID, "no_appetite"));
+        this.setIconIndex(0, 0);
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -10,13 +10,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import terrails.statskeeper.api.capabilities.HealthManager;
 import terrails.statskeeper.config.SKHealthConfig;
 import terrails.statskeeper.health.HealthCapability;
 import terrails.statskeeper.health.HealthHelper;
-import terrails.statskeeper.health.PlayerHealthManager;
 
 import java.util.Map;
 
@@ -29,22 +28,18 @@ public class PlayerHealthHandler {
             return;
         }
 
-        HealthManager.getInstance(event.getPlayer()).ifPresent(health -> {
-            PlayerHealthManager manager = (PlayerHealthManager) health;
-            manager.setPlayer((EntityPlayerMP) event.getPlayer());
-            manager.update();
-        });
+        HealthManager.getInstance(event.getPlayer()).ifPresent(HealthManager::update);
     }
 
     @SubscribeEvent
-    public void playerRespawn(PlayerRespawnEvent event) {
+    public void playerClone(PlayerEvent.Clone event) {
         if (!SKHealthConfig.ENABLED) {
             return;
         }
 
-        HealthManager.getInstance(event.getPlayer()).ifPresent(health -> {
+        HealthManager.getInstance(event.getEntityPlayer()).ifPresent(health -> {
 
-            NBTTagCompound compound = event.getPlayer().writeWithoutTypeId(new NBTTagCompound());
+            NBTTagCompound compound = event.getOriginal().writeWithoutTypeId(new NBTTagCompound());
             if (compound.contains("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
                 health.deserialize(compound.getCompound("ForgeCaps").getCompound(HealthCapability.NAME.toString()));
                 health.setHealth(health.getHealth());
@@ -55,12 +50,12 @@ public class PlayerHealthHandler {
                 return;
             }
 
-            if (!event.isEndConquered() && SKHealthConfig.HEALTH_DECREASE > 0 && health.isHealthRemovable()) {
+            if (event.isWasDeath() && SKHealthConfig.HEALTH_DECREASE > 0 && health.isHealthRemovable()) {
                 int prevHealth = health.getHealth();
                 health.addHealth(-SKHealthConfig.HEALTH_DECREASE);
                 double removedAmount = health.getHealth() - prevHealth;
                 if (SKHealthConfig.HEALTH_MESSAGE && removedAmount > 0) {
-                    HealthHelper.playerMessage(event.getPlayer(), "health.statskeeper.death_remove", removedAmount);
+                    HealthHelper.playerMessage(event.getEntityPlayer(), "health.statskeeper.death_remove", removedAmount);
                 }
             }
 

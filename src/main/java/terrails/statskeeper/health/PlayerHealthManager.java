@@ -3,16 +3,13 @@ package terrails.statskeeper.health;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
-import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.HealthManager;
 import terrails.statskeeper.config.SKHealthConfig;
 
 public class PlayerHealthManager implements HealthManager {
 
-    /** PlayerEntity that is bound to this manager */
+    /** PlayerEntity that is bound to this manager, which gets set in PlayerLoggedInEvent*/
     private EntityPlayerMP playerEntity;
-    /** Base value of the MAX_HEALTH attribute */
-    private int baseValue;
 
     /** The amount of health the player has */
     private int amount = 0;
@@ -27,16 +24,9 @@ public class PlayerHealthManager implements HealthManager {
     /** The lowest amount of health a player can have */
     private int min = 0;
 
-    public void setPlayer(EntityPlayerMP player) {
-        if (this.playerEntity == null) {
-            this.playerEntity = player;
-            this.baseValue = (int) HealthHelper.getAttribute(player).getBaseValue();
-        }
-    }
-
     @Override
     public void update() {
-        if (!this.playerEntity.isAlive() || !SKHealthConfig.ENABLED) {
+        if (!this.playerEntity.isAlive() || this.playerEntity.isCreative() || !SKHealthConfig.ENABLED) {
             return;
         }
 
@@ -73,6 +63,10 @@ public class PlayerHealthManager implements HealthManager {
 
     @Override
     public boolean setHealth(int amount) {
+        if (!this.playerEntity.isAlive() || this.playerEntity.isCreative() || !SKHealthConfig.ENABLED) {
+            return false;
+        }
+
         amount = MathHelper.clamp(amount, this.min, this.max);
         HealthHelper.addModifier(this.playerEntity, amount);
 
@@ -147,25 +141,29 @@ public class PlayerHealthManager implements HealthManager {
     }
 
     @Override
-    public void serialize(NBTTagCompound compound) {
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.putInt("sk:additional_health", this.amount - this.baseValue);
+    public HealthManager with(EntityPlayerMP player) {
+        if (this.playerEntity == null) {
+            this.playerEntity = player;
+        }
+        return this;
+    }
+
+    @Override
+    public void serialize(NBTTagCompound tag) {
+        tag.putInt("sk:additional_health", this.amount - 20);
         tag.putInt("sk:max_health", this.max);
         tag.putInt("sk:min_health", this.min);
         tag.putInt("sk:starting_health", this.start);
         tag.putInt("sk:health_threshold", this.threshold);
-        compound.put(StatsKeeper.MOD_ID, tag);
     }
     @Override
-    public void deserialize(NBTTagCompound compound) {
-        NBTTagCompound tag = compound.contains(StatsKeeper.MOD_ID) ? compound.getCompound(StatsKeeper.MOD_ID) : compound;
-
+    public void deserialize(NBTTagCompound tag) {
         if (tag.contains("sk:starting_health")) {
             this.start = tag.getInt("sk:starting_health");
         }
 
         if (tag.contains("sk:additional_health")) {
-            this.amount = tag.getInt("sk:additional_health") + this.baseValue;
+            this.amount = tag.getInt("sk:additional_health") + 20;
         }
 
         if (tag.contains("sk:max_health")) {
@@ -178,12 +176,6 @@ public class PlayerHealthManager implements HealthManager {
 
         if (tag.contains("sk:health_threshold")) {
             this.threshold = tag.getInt("sk:health_threshold");
-        }
-
-        // Compatibility for older versions
-        if (tag.contains("sk:is_min_start")) {
-            boolean min_start = tag.getBoolean("sk:is_min_start");
-            this.start = min_start ? this.min : this.max;
         }
     }
 }
