@@ -2,11 +2,9 @@ package terrails.statskeeper.config;
 
 import com.google.common.collect.Lists;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
-import terrails.statskeeper.StatsKeeper;
+import net.minecraft.util.Tuple;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 public class SKHealthConfig {
 
@@ -19,7 +17,7 @@ public class SKHealthConfig {
     public static int HEALTH_DECREASE;
     public static int STARTING_HEALTH;
 
-    public static Map<ResourceLocation, Integer> REGENERATIVE_ITEMS;
+    public static Map<ResourceLocation, Tuple<Integer, Boolean>> REGENERATIVE_ITEMS;
     public static NavigableSet<Integer> HEALTH_THRESHOLDS;
 
     static void init() {
@@ -57,7 +55,7 @@ public class SKHealthConfig {
         ConfigHandler.ON_CHANGE_RESET = SKConfig.BUILDER
                 .comment("Config options which should be considered for the reset of health. All available are used by default")
                 .worldRestart()
-                .defineList("configChangeReset", defaults, o -> o != null && String.class.isAssignableFrom(o.getClass()) && defaults.contains(o));
+                .defineList("configChangeReset", defaults, o -> o != null && String.class.isAssignableFrom(o.getClass()) && defaults.contains(o.toString().toUpperCase()));
 
         ConfigHandler.HEALTH_MESSAGE = SKConfig.BUILDER
                 .comment("Show a message when a threshold is reached and when health is gained or lost")
@@ -72,39 +70,11 @@ public class SKHealthConfig {
 
         ConfigHandler.REGENERATIVE_ITEMS = SKConfig.BUILDER
                 .comment("Items that increase health when used. Use a equal sign to define how much health is gained or lost.\n" +
-                        "e.g. 'minecraft:apple = 1', the health gets increase by 0.5 hearts")
+                        "e.g. 'minecraft:apple = 1', the health gets increase by 0.5 hearts.\n" +
+                        "Appending a ':' after the number will make the item which decreases health bypass thresholds")
                 .worldRestart()
-                .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), new RegenerativeItems());
+                .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), o -> o != null && String.class.isAssignableFrom(o.getClass()));
 
         SKConfig.BUILDER.pop(2);
-    }
-
-    private static class RegenerativeItems implements Predicate<Object> {
-
-        @Override
-        public boolean test(Object o) {
-            String string = (String) o;
-            string = string.replaceAll("[\\s+]", "");
-
-            if (!string.contains("=")) {
-                StatsKeeper.LOGGER.error("Regenerative item '{}' is missing gained health amount. Removing...", o);
-                return false;
-            }
-
-            String name = string.substring(0, string.indexOf("="));
-            int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1));
-
-            if (!ForgeRegistries.ITEMS.containsKey(new ResourceLocation(name))) {
-                StatsKeeper.LOGGER.warn("Regenerative Item '{}' could not be found in the item registry. Removing...", name);
-                return false;
-            }
-
-            if (amount == 0) {
-                StatsKeeper.LOGGER.error("Regenerative item '{}' cannot have gained/lost amount of 0. Removing...", name);
-                return false;
-            }
-
-            return true;
-        }
     }
 }

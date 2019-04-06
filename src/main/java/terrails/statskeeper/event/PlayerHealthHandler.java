@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
@@ -80,14 +81,14 @@ public class PlayerHealthHandler {
                 return;
             }
 
-            for (Map.Entry<ResourceLocation, Integer> entry : SKHealthConfig.REGENERATIVE_ITEMS.entrySet()) {
+            for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : SKHealthConfig.REGENERATIVE_ITEMS.entrySet()) {
 
                 Item item = stack.getItem();
                 if (item.getRegistryName() == null || !item.getRegistryName().equals(entry.getKey())) {
                     continue;
                 }
 
-                if (health.addHealth(entry.getValue(), false)) {
+                if (health.addHealth(entry.getValue().getA(), !entry.getValue().getB())) {
                     stack.shrink(1);
                     return;
                 }
@@ -103,14 +104,14 @@ public class PlayerHealthHandler {
             return;
         }
 
-        for (Map.Entry<ResourceLocation, Integer> entry : SKHealthConfig.REGENERATIVE_ITEMS.entrySet()) {
+        for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : SKHealthConfig.REGENERATIVE_ITEMS.entrySet()) {
 
             Item item = event.getItem().getItem();
             if (item.getRegistryName() == null || !item.getRegistryName().equals(entry.getKey())) {
                 continue;
             }
 
-            HealthManager.getInstance((EntityPlayer) event.getEntity()).ifPresent(health -> health.addHealth(entry.getValue(), false));
+            HealthManager.getInstance((EntityPlayer) event.getEntity()).ifPresent(health -> health.addHealth(entry.getValue().getA(), !entry.getValue().getB()));
             break;
         }
     }

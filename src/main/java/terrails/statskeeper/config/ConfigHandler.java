@@ -2,7 +2,9 @@ package terrails.statskeeper.config;
 
 import com.google.common.collect.ImmutableSortedSet;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.registries.ForgeRegistries;
 import terrails.statskeeper.StatsKeeper;
 
 import java.util.*;
@@ -66,9 +68,27 @@ class ConfigHandler {
             string = string.replaceAll("[\\s+]", "");
 
             String name = string.substring(0, string.indexOf("="));
-            Integer amount = Integer.parseInt(string.substring(string.indexOf("=") + 1));
 
-            SKHealthConfig.REGENERATIVE_ITEMS.put(new ResourceLocation(name), amount);
+            if (!ForgeRegistries.ITEMS.containsKey(new ResourceLocation(name))) {
+                StatsKeeper.LOGGER.error("Regenerative Item '{}' could not be found in the item registry. Skipping...", name);
+                continue;
+            }
+
+            int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1, (string.endsWith(":") ? string.lastIndexOf(":") : string.length())));
+
+            if (amount == 0) {
+                StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot have health set to 0. Skipping...", name);
+                continue;
+            }
+
+            boolean bypass = string.endsWith(":");
+
+            if (bypass && amount > 0) {
+                StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot bypass thresholds when it gains health. Skipping...", name);
+                continue;
+            }
+
+            SKHealthConfig.REGENERATIVE_ITEMS.put(new ResourceLocation(name), new Tuple<>(amount, bypass));
         }
 
         switch (STARTING_HEALTH.get()) {
