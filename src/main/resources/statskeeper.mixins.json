@@ -11,6 +11,9 @@
     "PlayerManagerMixin",
     "ServerPlayNetworkHandlerMixin"
   ],
+  "client": [
+    "MinecraftClientMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

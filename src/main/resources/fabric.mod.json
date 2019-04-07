@@ -1,17 +1,31 @@
 {
+  "schemaVersion": 1,
   "id": "statskeeper",
+  "version": "${version}",
+
   "name": "Stats Keeper",
   "description": "Configurator for stats!",
-  "version": "${version}",
-  "side": "universal",
-  "initializers": [
-    "terrails.statskeeper.StatsKeeper"
+  "authors": [
+    "Terrails"
   ],
-  "requires": {
-    "fabric": "*"
+  "contact": {
+    "sources": "https://github.com/Terrails/StatsKeeper/"
   },
-  "mixins": {
-    "common": "statskeeper.common.json",
-    "client": "statskeeper.client.json"
+
+  "license": "Apache-2.0",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "terrails.statskeeper.StatsKeeper"
+    ]
+  },
+  "mixins": [
+    "statskeeper.mixins.json"
+  ],
+
+  "requires": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
   }
 }
