@@ -55,8 +55,7 @@ public class LivingEntityMixin implements IEffectCure {
         }
     }
 
-    @Inject(method = "method_6040()V", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/entity/LivingEntity;spawnEatingParticlesAndPlayEatingSoundOrPlayDrinkingSound(Lnet/minecraft/item/ItemStack;I)V"))
+    @Inject(method = "method_6040()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;spawnConsumptionEffects(Lnet/minecraft/item/ItemStack;I)V"))
     private void itemUseFinished(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         //noinspection ConstantConditions
