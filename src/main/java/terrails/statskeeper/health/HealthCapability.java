@@ -1,10 +1,10 @@
 package terrails.statskeeper.health;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -26,7 +26,7 @@ public class HealthCapability {
 
     @SubscribeEvent
     public void attach(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof EntityPlayer) {
+        if (event.getObject() instanceof PlayerEntity) {
             event.addCapability(NAME, new CapabilitySerializable<>(SKCapabilities.HEALTH_CAPABILITY));
         }
     }
@@ -36,20 +36,20 @@ public class HealthCapability {
         CapabilityManager.INSTANCE.register(HealthManager.class, new Capability.IStorage<HealthManager>() {
 
             @Override
-            public INBTBase writeNBT(Capability<HealthManager> capability, HealthManager instance, EnumFacing side) {
-                NBTTagCompound compound = new NBTTagCompound();
+            public INBT writeNBT(Capability<HealthManager> capability, HealthManager instance, Direction side) {
+                CompoundNBT compound = new CompoundNBT();
                 instance.serialize(compound);
                 return compound;
             }
             @Override
-            public void readNBT(Capability<HealthManager> capability, HealthManager instance, EnumFacing side, INBTBase nbt) {
-                NBTTagCompound compound = (NBTTagCompound) nbt;
+            public void readNBT(Capability<HealthManager> capability, HealthManager instance, Direction side, INBT nbt) {
+                CompoundNBT compound = (CompoundNBT) nbt;
                 instance.deserialize(compound);
             }
         }, PlayerHealthManager::new);
     }
 
-    private class CapabilitySerializable<C> implements ICapabilitySerializable<INBTBase> {
+    private class CapabilitySerializable<C> implements ICapabilitySerializable<INBT> {
 
         private final Capability<C> capability;
         private final C instance;
@@ -61,17 +61,17 @@ public class HealthCapability {
 
         @Nonnull
         @Override
-        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing side) {
+        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side) {
             return this.capability.orEmpty(capability, LazyOptional.of(() -> this.instance));
         }
 
         @Override
-        public INBTBase serializeNBT() {
+        public INBT serializeNBT() {
             return this.capability.writeNBT(this.instance, null);
         }
 
         @Override
-        public void deserializeNBT(INBTBase nbt) {
+        public void deserializeNBT(INBT nbt) {
             this.capability.readNBT(this.instance, null, nbt);
         }
     }

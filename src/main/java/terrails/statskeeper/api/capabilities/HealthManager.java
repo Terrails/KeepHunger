@@ -1,25 +1,25 @@
 package terrails.statskeeper.api.capabilities;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.LazyOptional;
 
 public interface HealthManager {
 
-    static LazyOptional<HealthManager> getInstance(EntityPlayer player) {
+    static LazyOptional<HealthManager> getInstance(PlayerEntity player) {
         LazyOptional<HealthManager> optional = player.getCapability(SKCapabilities.HEALTH_CAPABILITY);
-        optional.ifPresent(health -> health.with((EntityPlayerMP) player));
+        optional.ifPresent(health -> health.with((ServerPlayerEntity) player));
         return optional;
     }
 
     /**
-     * Used internally, make sure to use the {@link #getInstance(EntityPlayer)}
+     * Used internally, make sure to use the {@link #getInstance(PlayerEntity)}
      * method since it sets the player each time its accessed
      * @param player which to set the manager to
      * @return the manager with the player
      */
-    HealthManager with(EntityPlayerMP player);
+    HealthManager with(ServerPlayerEntity player);
 
     /**
      * @return the current amount of health the player has.
@@ -88,11 +88,11 @@ public interface HealthManager {
      * Serializes the data to the given NBTTagCompound
      * @param compound the tag to which the data will be saved
      */
-    void serialize(NBTTagCompound compound);
+    void serialize(CompoundNBT compound);
 
     /**
      * Reads the data from the given NBTTagCompound
      * @param compound the tag from which the data will be read
      */
-    void deserialize(NBTTagCompound compound);
+    void deserialize(CompoundNBT compound);
 }

@@ -1,6 +1,6 @@
 package terrails.statskeeper;
 
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effect;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -15,11 +15,11 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import terrails.statskeeper.api.SKPotions;
+import terrails.statskeeper.api.SKEffects;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.health.HealthCapability;
 import terrails.statskeeper.event.*;
-import terrails.statskeeper.potion.PotionNoAppetite;
+import terrails.statskeeper.effect.NoAppetiteEffect;
 
 import java.util.UUID;
 
@@ -49,8 +49,8 @@ public class StatsKeeper {
     }
 
     @SubscribeEvent
-    public static void registerPotions(final RegistryEvent.Register<Potion> event) {
-        SKPotions.NO_APPETITE = new PotionNoAppetite();
-        event.getRegistry().register(SKPotions.NO_APPETITE);
+    public static void registerEffects(final RegistryEvent.Register<Effect> event) {
+        SKEffects.NO_APPETITE = new NoAppetiteEffect();
+        event.getRegistry().register(SKEffects.NO_APPETITE);
     }
 }

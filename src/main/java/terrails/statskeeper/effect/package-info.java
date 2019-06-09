@@ -1,5 +1,5 @@
 @MethodsReturnNonnullByDefault
-package terrails.statskeeper.potion;
+package terrails.statskeeper.effect;
 
 import mcp.MethodsReturnNonnullByDefault;
 

@@ -1,7 +1,7 @@
 package terrails.statskeeper.health;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 import terrails.statskeeper.api.capabilities.HealthManager;
 import terrails.statskeeper.config.SKHealthConfig;
@@ -9,7 +9,7 @@ import terrails.statskeeper.config.SKHealthConfig;
 public class PlayerHealthManager implements HealthManager {
 
     /** PlayerEntity that is bound to this manager, which gets set in PlayerLoggedInEvent*/
-    private EntityPlayerMP playerEntity;
+    private ServerPlayerEntity playerEntity;
 
     /** The amount of health the player has */
     private int amount = 0;
@@ -141,7 +141,7 @@ public class PlayerHealthManager implements HealthManager {
     }
 
     @Override
-    public HealthManager with(EntityPlayerMP player) {
+    public HealthManager with(ServerPlayerEntity player) {
         if (this.playerEntity == null) {
             this.playerEntity = player;
         }
@@ -149,7 +149,7 @@ public class PlayerHealthManager implements HealthManager {
     }
 
     @Override
-    public void serialize(NBTTagCompound tag) {
+    public void serialize(CompoundNBT tag) {
         tag.putInt("sk:additional_health", this.amount - 20);
         tag.putInt("sk:max_health", this.max);
         tag.putInt("sk:min_health", this.min);
@@ -157,7 +157,7 @@ public class PlayerHealthManager implements HealthManager {
         tag.putInt("sk:health_threshold", this.threshold);
     }
     @Override
-    public void deserialize(NBTTagCompound tag) {
+    public void deserialize(CompoundNBT tag) {
         if (tag.contains("sk:starting_health")) {
             this.start = tag.getInt("sk:starting_health");
         }

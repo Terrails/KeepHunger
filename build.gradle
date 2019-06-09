@@ -10,12 +10,12 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-def minecraft_version = "1.13.2"
-def forge_version = "25.0.108"
-def mappings_version = ["stable", "45-1.13.1"]
+def minecraft_version = "1.14.2"
+def forge_version = "26.0.12"
+def mappings_version = ["stable", "51-1.14.1"]
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
-version = "4.0.0"
+version = "4.0.1"
 group = "terrails.statskeeper"
 
 minecraft {

@@ -1,10 +1,10 @@
 package terrails.statskeeper.event;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCake;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.block.CakeBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Food;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.FoodStats;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -12,21 +12,21 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import terrails.statskeeper.api.SKPotions;
+import terrails.statskeeper.api.SKEffects;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.config.SKHungerConfig;
 
 public class BasicStatHandler {
 
     @SubscribeEvent
-    public static void playerClone(PlayerEvent.Clone event) {
+    public void playerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
-            EntityPlayer player = event.getEntityPlayer();
-            EntityPlayer oldPlayer = event.getOriginal();
+            PlayerEntity player = event.getEntityPlayer();
+            PlayerEntity oldPlayer = event.getOriginal();
 
             boolean keepInventory = player.getEntityWorld().getGameRules().getBoolean("keepInventory");
             if (SKConfig.KEEP_EXPERIENCE && !keepInventory) {
-                player.addExperienceLevel(oldPlayer.experienceLevel);
+                player.addExperienceLevel(oldPlayer.field_71068_ca);
             }
 
             if (SKHungerConfig.KEEP_HUNGER) {
@@ -47,39 +47,45 @@ public class BasicStatHandler {
 
     @SubscribeEvent
     public void playerRespawn(PlayerRespawnEvent event) {
-        EntityPlayer player = event.getPlayer();
+        PlayerEntity player = event.getPlayer();
         if (SKHungerConfig.NO_APPETITE_TIME > 0 && !player.isCreative()) {
-            player.addPotionEffect(new PotionEffect(SKPotions.NO_APPETITE, SKHungerConfig.NO_APPETITE_TIME * 20, 0, false, false, true));
+            player.addPotionEffect(new EffectInstance(SKEffects.NO_APPETITE, SKHungerConfig.NO_APPETITE_TIME * 20, 0, false, false, true));
         }
     }
 
     @SubscribeEvent
     public void itemInteract(PlayerInteractEvent.RightClickItem event) {
-        if (!event.getEntityPlayer().isPotionActive(SKPotions.NO_APPETITE)) {
+        if (!event.getEntityPlayer().isPotionActive(SKEffects.NO_APPETITE)) {
             return;
         }
 
-        EnumAction action = event.getItemStack().getUseAction();
-        if (action == EnumAction.DRINK || action == EnumAction.EAT) {
+        Food food = event.getEntityPlayer().getHeldItemMainhand().getItem().func_219967_s();
+        if (food != null && event.getEntityPlayer().canEat(food.func_221468_d())) {
+            event.setCanceled(true);
+            return;
+        }
+
+        food = event.getEntityPlayer().getHeldItemOffhand().getItem().func_219967_s();
+        if (food != null && event.getEntityPlayer().canEat(food.func_221468_d())) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public void blockInteract(PlayerInteractEvent.RightClickBlock event) {
-        if (!event.getEntityPlayer().isPotionActive(SKPotions.NO_APPETITE)) {
+        if (!event.getEntityPlayer().isPotionActive(SKEffects.NO_APPETITE)) {
             return;
         }
 
         Block block = event.getWorld().getBlockState(event.getPos()).getBlock();
-        if (block instanceof BlockCake) {
+        if (block instanceof CakeBlock) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public void experienceDrop(LivingExperienceDropEvent event) {
-        if (!SKConfig.DROP_EXPERIENCE && event.getEntity() instanceof EntityPlayer) {
+        if (!SKConfig.DROP_EXPERIENCE && event.getEntity() instanceof PlayerEntity) {
             event.setCanceled(true);
         }
     }

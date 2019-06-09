@@ -1,9 +1,10 @@
 package terrails.statskeeper.event;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.common.util.Constants;
@@ -40,7 +41,7 @@ public class PlayerHealthHandler {
 
         HealthManager.getInstance(event.getEntityPlayer()).ifPresent(health -> {
 
-            NBTTagCompound compound = event.getOriginal().writeWithoutTypeId(new NBTTagCompound());
+            CompoundNBT compound = event.getOriginal().writeWithoutTypeId(new CompoundNBT());
             if (compound.contains("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
                 health.deserialize(compound.getCompound("ForgeCaps").getCompound(HealthCapability.NAME.toString()));
                 health.setHealth(health.getHealth());
@@ -65,7 +66,7 @@ public class PlayerHealthHandler {
 
     @SubscribeEvent
     public void itemInteract(PlayerInteractEvent.RightClickItem event) {
-        if (!SKHealthConfig.ENABLED || event.getWorld().isRemote)
+        if (!SKHealthConfig.ENABLED || event.getWorld().isRemote())
             return;
 
         LazyOptional<HealthManager> optional = HealthManager.getInstance(event.getEntityPlayer());
@@ -73,11 +74,13 @@ public class PlayerHealthHandler {
         optional.ifPresent(health -> {
 
             ItemStack stack = event.getEntityPlayer().getHeldItem(event.getHand());
-            if (stack.getItem() instanceof ItemFood && event.getEntityPlayer().canEat(HealthHelper.isFoodAlwaysEdible((ItemFood) stack.getItem()))) {
+            Food food = stack.getItem().func_219967_s();
+
+            if (food != null && event.getEntityPlayer().canEat(food.func_221468_d())) {
                 return;
             }
 
-            if (stack.getUseAction() == EnumAction.DRINK) {
+            if (stack.getUseAction() == UseAction.DRINK) {
                 return;
             }
 
@@ -100,7 +103,7 @@ public class PlayerHealthHandler {
 
     @SubscribeEvent
     public void itemInteractFinished(LivingEntityUseItemEvent.Finish event) {
-        if (!SKHealthConfig.ENABLED || !(event.getEntity() instanceof EntityPlayerMP)) {
+        if (!SKHealthConfig.ENABLED || !(event.getEntity() instanceof ServerPlayerEntity)) {
             return;
         }
 
@@ -111,7 +114,7 @@ public class PlayerHealthHandler {
                 continue;
             }
 
-            HealthManager.getInstance((EntityPlayer) event.getEntity()).ifPresent(health -> health.addHealth(entry.getValue().getA(), !entry.getValue().getB()));
+            HealthManager.getInstance((PlayerEntity) event.getEntity()).ifPresent(health -> health.addHealth(entry.getValue().getA(), !entry.getValue().getB()));
             break;
         }
     }
