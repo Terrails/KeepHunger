@@ -19,7 +19,7 @@ import terrails.statskeeper.config.SKHungerConfig;
 public class BasicStatHandler {
 
     @SubscribeEvent
-    public static void playerClone(PlayerEvent.Clone event) {
+    public void playerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
             EntityPlayer player = event.getEntityPlayer();
             EntityPlayer oldPlayer = event.getOriginal();
