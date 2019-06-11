@@ -29,26 +29,22 @@ public class ServerPlayerEntityMixin implements HealthManager.Accessor {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void constructor(CallbackInfo info) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        this.healthManager = SKHealthConfig.enabled ? new PlayerHealthManager(player) : null;
+        this.healthManager = new PlayerHealthManager(player);
     }
 
     @Override
     public Optional<HealthManager> getHealthManager() {
-        return Optional.ofNullable(this.healthManager);
+        return Optional.ofNullable(SKHealthConfig.enabled ? this.healthManager : null);
     }
 
     @Inject(method = "readCustomDataFromTag", at = @At("RETURN"))
     private void readCustomDataFromTag(CompoundTag tag, CallbackInfo info) {
-        if (this.healthManager != null) {
-            this.healthManager.deserialize(tag);
-        }
+        this.healthManager.deserialize(tag);
     }
 
     @Inject(method = "writeCustomDataToTag", at = @At("RETURN"))
     private void writeCustomDataToTag(CompoundTag tag, CallbackInfo info) {
-        if (this.healthManager != null) {
-            this.healthManager.serialize(tag);
-        }
+        this.healthManager.serialize(tag);
     }
 
     @Inject(method = "copyFrom(Lnet/minecraft/server/network/ServerPlayerEntity;Z)V", at = @At("RETURN"))

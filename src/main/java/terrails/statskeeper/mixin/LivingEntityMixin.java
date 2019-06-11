@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.effect.IEffectCure;
-import terrails.statskeeper.api.effect.SKPotions;
+import terrails.statskeeper.api.effect.SKEffects;
 import terrails.statskeeper.api.event.PlayerUseFinishedCallback;
 
 import java.util.Iterator;
@@ -46,7 +46,7 @@ public class LivingEntityMixin implements IEffectCure {
         while (iterator_1.hasNext()) {
             StatusEffectInstance effect = iterator_1.next();
 
-            if (effect.getEffectType() == SKPotions.NO_APPETITE) {
+            if (effect.getEffectType() == SKEffects.NO_APPETITE) {
                 continue;
             }
 

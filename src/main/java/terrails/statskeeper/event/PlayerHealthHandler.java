@@ -72,7 +72,7 @@ public class PlayerHealthHandler {
         }
 
         ItemStack stack = player.getStackInHand(hand);
-        if (stack.getItem().getFoodSetting() != null && player.canConsume(stack.getItem().getFoodSetting().isAlwaysEdible())) {
+        if (stack.getItem().getFoodComponent() != null && player.canConsume(stack.getItem().getFoodComponent().isAlwaysEdible())) {
             return ActionResult.PASS;
         }
 
@@ -87,7 +87,7 @@ public class PlayerHealthHandler {
             }
 
             if (optional.get().addHealth(healthItem.getHealthAmount(), !healthItem.doesBypassThreshold())) {
-                stack.subtractAmount(1);
+                stack.decrement(1);
                 return ActionResult.SUCCESS;
             }
 

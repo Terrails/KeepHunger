@@ -8,7 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import terrails.statskeeper.api.event.*;
-import terrails.statskeeper.api.effect.SKPotions;
+import terrails.statskeeper.api.effect.SKEffects;
 import terrails.statskeeper.config.SKConfig;
 import terrails.statskeeper.effect.NoAppetiteEffect;
 import terrails.statskeeper.event.BaseStatHandler;
@@ -23,7 +23,7 @@ public class StatsKeeper implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        SKPotions.NO_APPETITE = Registry.register(Registry.STATUS_EFFECT, new Identifier(StatsKeeper.MOD_ID, "no_appetite"), new NoAppetiteEffect());
+        SKEffects.NO_APPETITE = Registry.register(Registry.STATUS_EFFECT, new Identifier(StatsKeeper.MOD_ID, "no_appetite"), new NoAppetiteEffect());
         StatsKeeper.initializeEvents();
     }
 
