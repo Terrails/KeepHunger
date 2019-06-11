@@ -5,7 +5,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.text.TranslatableText;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.config.SKHealthConfig;
 
@@ -48,7 +48,7 @@ public class HealthHelper {
     public static void playerMessage(PlayerEntity player, String key, double health) {
         if (health == 0) return;
         double messageAmount = health / 2.0;
-        TranslatableComponent component = messageAmount % 1 != 0 ? new TranslatableComponent(key, messageAmount) : new TranslatableComponent(key, (int) messageAmount);
+        TranslatableText component = messageAmount % 1 != 0 ? new TranslatableText(key, messageAmount) : new TranslatableText(key, (int) messageAmount);
         player.addChatMessage(component, true);
     }
 }

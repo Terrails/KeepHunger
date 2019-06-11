@@ -9,6 +9,7 @@ import net.minecraft.item.FoodComponent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import terrails.statskeeper.api.event.PlayerCopyCallback;
 import terrails.statskeeper.api.event.PlayerRespawnCallback;
@@ -22,7 +23,7 @@ public class BaseStatHandler {
     public static final PlayerCopyCallback PLAYER_COPY = (PlayerEntity player, PlayerEntity oldPlayer, boolean isEnd) -> {
         if (!isEnd) {
 
-            boolean checkGameRule = player.getEntityWorld().getGameRules().getBoolean("keepInventory");
+            boolean checkGameRule = player.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
             if (SKConfig.keep_experience && !checkGameRule) {
                 player.addExperience(oldPlayer.experienceLevel);
             }
