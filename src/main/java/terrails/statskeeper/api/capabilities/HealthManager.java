@@ -1,25 +1,19 @@
 package terrails.statskeeper.api.capabilities;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.common.util.LazyOptional;
 
+import java.util.Objects;
+import java.util.function.BiConsumer;
+
 public interface HealthManager {
 
-    static LazyOptional<HealthManager> getInstance(PlayerEntity player) {
+    static void getInstance(ServerPlayerEntity player, BiConsumer<? super HealthManager, ServerPlayerEntity> consumer) {
+        Objects.requireNonNull(consumer);
         LazyOptional<HealthManager> optional = player.getCapability(SKCapabilities.HEALTH_CAPABILITY);
-        optional.ifPresent(health -> health.with((ServerPlayerEntity) player));
-        return optional;
+        optional.ifPresent(manager -> consumer.accept(manager, player));
     }
-
-    /**
-     * Used internally, make sure to use the {@link #getInstance(PlayerEntity)}
-     * method since it sets the player each time its accessed
-     * @param player which to set the manager to
-     * @return the manager with the player
-     */
-    HealthManager with(ServerPlayerEntity player);
 
     /**
      * @return the current amount of health the player has.
@@ -30,9 +24,9 @@ public interface HealthManager {
 
     /**
      * @return the current health threshold the player achieved.
-     * If value < 0, the health is not going to be decreased on death
+     * If value < 0, health is not going to be decreased on death
      * If value = 0, has not been set
-     * If value > 0, the health is not going to go below this value
+     * If value > 0, health is not going to go below this value
      */
     int getThreshold();
 
@@ -55,14 +49,14 @@ public interface HealthManager {
      * @param amount the amount of health
      * @return success
      */
-    boolean setHealth(int amount);
+    boolean setHealth(ServerPlayerEntity playerEntity, int amount);
 
     /**
      * Increases/Decreases players health
      * @param amount the amount of health to increase (+) or decrease (-)
      * @return success
      */
-    boolean addHealth(int amount);
+    boolean addHealth(ServerPlayerEntity playerEntity, int amount);
 
     /**
      * Increases/Decreases players health
@@ -70,19 +64,19 @@ public interface HealthManager {
      * @param threshold should the method care about the threshold when decreasing
      * @return success
      */
-    boolean addHealth(int amount, boolean threshold);
+    boolean addHealth(ServerPlayerEntity playerEntity, int amount, boolean threshold);
 
     /**
      * Runs the default update method which checks if the current
      * health values are in range, checks the threshold and saves
      * data to the player file if it has been changed.
      */
-    void update();
+    void update(ServerPlayerEntity playerEntity);
 
     /**
      * Resets the whole manager to default values
      */
-    void reset();
+    void reset(ServerPlayerEntity playerEntity);
 
     /**
      * Serializes the data to the given NBTTagCompound

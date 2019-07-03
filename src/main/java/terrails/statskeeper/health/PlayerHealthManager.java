@@ -8,9 +8,6 @@ import terrails.statskeeper.config.SKHealthConfig;
 
 public class PlayerHealthManager implements HealthManager {
 
-    /** PlayerEntity that is bound to this manager, which gets set in PlayerLoggedInEvent*/
-    private ServerPlayerEntity playerEntity;
-
     /** The amount of health the player has */
     private int amount = 0;
     /** Current health "threshold", can be a negative
@@ -25,20 +22,20 @@ public class PlayerHealthManager implements HealthManager {
     private int min = 0;
 
     @Override
-    public void update() {
-        if (!this.playerEntity.isAlive() || this.playerEntity.isCreative() || !SKHealthConfig.ENABLED) {
+    public void update(ServerPlayerEntity playerEntity) {
+        if (!playerEntity.isAlive() || playerEntity.isCreative() || !SKHealthConfig.ENABLED) {
             return;
         }
 
         if (HealthHelper.hasConfigChanged(this.min, this.max, this.start)) {
-            this.reset();
+            this.reset(playerEntity);
             return;
         }
 
         int prevThreshold = this.threshold;
         int prevHealthAmount = this.amount;
 
-        if (!HealthHelper.hasModifier(this.playerEntity)) {
+        if (!HealthHelper.hasModifier(playerEntity)) {
             this.amount = this.start;
         }
 
@@ -53,27 +50,27 @@ public class PlayerHealthManager implements HealthManager {
         }
 
         if (prevHealthAmount != this.amount) {
-            this.setHealth(this.amount);
+            this.setHealth(playerEntity, this.amount);
         }
 
         if (prevThreshold != this.threshold && prevThreshold != 0 && this.threshold > 0) {
-            HealthHelper.playerMessage(this.playerEntity, "health.statskeeper.threshold", Math.abs(this.threshold));
+            HealthHelper.playerMessage(playerEntity, "health.statskeeper.threshold", Math.abs(this.threshold));
         }
     }
 
     @Override
-    public boolean setHealth(int amount) {
-        if (!this.playerEntity.isAlive() || this.playerEntity.isCreative() || !SKHealthConfig.ENABLED) {
+    public boolean setHealth(ServerPlayerEntity playerEntity, int amount) {
+        if (!playerEntity.isAlive() || playerEntity.isCreative() || !SKHealthConfig.ENABLED) {
             return false;
         }
 
         amount = MathHelper.clamp(amount, this.min, this.max);
-        HealthHelper.addModifier(this.playerEntity, amount);
+        HealthHelper.addModifier(playerEntity, amount);
 
         if (this.amount != amount) {
             this.amount = amount;
-            this.playerEntity.setHealth(amount);
-            this.update();
+            playerEntity.setHealth(amount);
+            this.update(playerEntity);
             return true;
         }
 
@@ -81,7 +78,7 @@ public class PlayerHealthManager implements HealthManager {
     }
 
     @Override
-    public boolean addHealth(int amount, boolean threshold) {
+    public boolean addHealth(ServerPlayerEntity playerEntity, int amount, boolean threshold) {
         int prevThreshold = this.threshold;
         int prevHealth = this.amount;
         amount = MathHelper.clamp(this.amount + amount, this.min, this.max);
@@ -91,31 +88,31 @@ public class PlayerHealthManager implements HealthManager {
             return false;
         }
 
-        boolean ret = this.setHealth(amount);
+        boolean ret = this.setHealth(playerEntity, amount);
 
         // In case that the threshold value changed, don't overwrite the message it sent
         if (ret && prevThreshold == this.threshold) {
             String key = (this.amount - prevHealth) > 0 ? "health.statskeeper.item_add" : "health.statskeeper.item_lose";
-            HealthHelper.playerMessage(this.playerEntity, key, Math.abs((this.amount - prevHealth)));
+            HealthHelper.playerMessage(playerEntity, key, Math.abs((this.amount - prevHealth)));
         }
 
         return ret;
     }
 
     @Override
-    public boolean addHealth(int amount) {
-        return this.addHealth(amount, true);
+    public boolean addHealth(ServerPlayerEntity playerEntity, int amount) {
+        return this.addHealth(playerEntity, amount, true);
     }
 
     @Override
-    public void reset() {
+    public void reset(ServerPlayerEntity playerEntity) {
         this.threshold = 0;
         this.start = SKHealthConfig.STARTING_HEALTH;
         this.max = SKHealthConfig.MAX_HEALTH;
         this.min = SKHealthConfig.MIN_HEALTH;
         this.amount = this.start;
-        this.setHealth(this.start);
-        this.playerEntity.setHealth(playerEntity.getMaxHealth());
+        this.setHealth(playerEntity, this.start);
+        playerEntity.setHealth(playerEntity.getMaxHealth());
     }
 
     @Override
@@ -138,14 +135,6 @@ public class PlayerHealthManager implements HealthManager {
     public boolean isHealthRemovable() {
         int min = Math.max(this.min, Math.abs(this.threshold));
         return this.min > 0 && this.amount > min;
-    }
-
-    @Override
-    public HealthManager with(ServerPlayerEntity player) {
-        if (this.playerEntity == null) {
-            this.playerEntity = player;
-        }
-        return this;
     }
 
     @Override

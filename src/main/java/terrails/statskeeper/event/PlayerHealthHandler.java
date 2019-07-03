@@ -1,14 +1,11 @@
 package terrails.statskeeper.event;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,7 +27,7 @@ public class PlayerHealthHandler {
             return;
         }
 
-        HealthManager.getInstance(event.getPlayer()).ifPresent(HealthManager::update);
+        HealthManager.getInstance((ServerPlayerEntity) event.getPlayer(), HealthManager::update);
     }
 
     @SubscribeEvent
@@ -39,28 +36,27 @@ public class PlayerHealthHandler {
             return;
         }
 
-        HealthManager.getInstance(event.getEntityPlayer()).ifPresent(health -> {
+        HealthManager.getInstance((ServerPlayerEntity) event.getEntityPlayer(), (manager, player) -> {
 
             CompoundNBT compound = event.getOriginal().writeWithoutTypeId(new CompoundNBT());
             if (compound.contains("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
-                health.deserialize(compound.getCompound("ForgeCaps").getCompound(HealthCapability.NAME.toString()));
-                health.setHealth(health.getHealth());
+                manager.deserialize(compound.getCompound("ForgeCaps").getCompound(HealthCapability.NAME.toString()));
+                manager.setHealth(player, manager.getHealth());
             }
 
             if (SKHealthConfig.STARTING_HEALTH == SKHealthConfig.MAX_HEALTH && SKHealthConfig.MIN_HEALTH <= 0) {
-                health.update();
+                manager.update(player);
                 return;
             }
 
-            if (event.isWasDeath() && SKHealthConfig.HEALTH_DECREASE > 0 && health.isHealthRemovable()) {
-                int prevHealth = health.getHealth();
-                health.addHealth(-SKHealthConfig.HEALTH_DECREASE);
-                double removedAmount = health.getHealth() - prevHealth;
+            if (event.isWasDeath() && SKHealthConfig.HEALTH_DECREASE > 0 && manager.isHealthRemovable()) {
+                int prevHealth = manager.getHealth();
+                manager.addHealth(player, -SKHealthConfig.HEALTH_DECREASE);
+                double removedAmount = manager.getHealth() - prevHealth;
                 if (SKHealthConfig.HEALTH_MESSAGE && removedAmount > 0) {
                     HealthHelper.playerMessage(event.getEntityPlayer(), "health.statskeeper.death_remove", removedAmount);
                 }
             }
-
         });
     }
 
@@ -69,14 +65,12 @@ public class PlayerHealthHandler {
         if (!SKHealthConfig.ENABLED || event.getWorld().isRemote())
             return;
 
-        LazyOptional<HealthManager> optional = HealthManager.getInstance(event.getEntityPlayer());
-
-        optional.ifPresent(health -> {
+        HealthManager.getInstance((ServerPlayerEntity) event.getEntityPlayer(), (manager, player) -> {
 
             ItemStack stack = event.getEntityPlayer().getHeldItem(event.getHand());
-            Food food = stack.getItem().func_219967_s();
+            Food food = stack.getItem().getFood();
 
-            if (food != null && event.getEntityPlayer().canEat(food.func_221468_d())) {
+            if (food != null && event.getEntityPlayer().canEat(food.canEatWhenFull())) {
                 return;
             }
 
@@ -91,7 +85,7 @@ public class PlayerHealthHandler {
                     continue;
                 }
 
-                if (health.addHealth(entry.getValue().getA(), !entry.getValue().getB())) {
+                if (manager.addHealth(player, entry.getValue().getA(), !entry.getValue().getB())) {
                     stack.shrink(1);
                     return;
                 }
@@ -114,7 +108,7 @@ public class PlayerHealthHandler {
                 continue;
             }
 
-            HealthManager.getInstance((PlayerEntity) event.getEntity()).ifPresent(health -> health.addHealth(entry.getValue().getA(), !entry.getValue().getB()));
+            HealthManager.getInstance((ServerPlayerEntity) event.getEntity(), (manager, player) -> manager.addHealth(player, entry.getValue().getA(), !entry.getValue().getB()));
             break;
         }
     }
