@@ -30,7 +30,7 @@ public class HealthHelper {
     }
 
     public static IAttributeInstance getAttribute(PlayerEntity player) {
-        return player.getAttribute(SharedMonsterAttributes.field_111267_a);
+        return player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
     }
     public static void addModifier(PlayerEntity player, int amount) {
         IAttributeInstance attribute = HealthHelper.getAttribute(player);

@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Food;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.FoodStats;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -24,9 +25,9 @@ public class BasicStatHandler {
             PlayerEntity player = event.getEntityPlayer();
             PlayerEntity oldPlayer = event.getOriginal();
 
-            boolean keepInventory = player.getEntityWorld().getGameRules().getBoolean("keepInventory");
+            boolean keepInventory = player.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
             if (SKConfig.KEEP_EXPERIENCE && !keepInventory) {
-                player.addExperienceLevel(oldPlayer.field_71068_ca);
+                player.addExperienceLevel(oldPlayer.experienceLevel);
             }
 
             if (SKHungerConfig.KEEP_HUNGER) {
@@ -59,14 +60,14 @@ public class BasicStatHandler {
             return;
         }
 
-        Food food = event.getEntityPlayer().getHeldItemMainhand().getItem().func_219967_s();
-        if (food != null && event.getEntityPlayer().canEat(food.func_221468_d())) {
+        Food food = event.getEntityPlayer().getHeldItemMainhand().getItem().getFood();
+        if (food != null && event.getEntityPlayer().canEat(food.canEatWhenFull())) {
             event.setCanceled(true);
             return;
         }
 
-        food = event.getEntityPlayer().getHeldItemOffhand().getItem().func_219967_s();
-        if (food != null && event.getEntityPlayer().canEat(food.func_221468_d())) {
+        food = event.getEntityPlayer().getHeldItemOffhand().getItem().getFood();
+        if (food != null && event.getEntityPlayer().canEat(food.canEatWhenFull())) {
             event.setCanceled(true);
         }
     }
