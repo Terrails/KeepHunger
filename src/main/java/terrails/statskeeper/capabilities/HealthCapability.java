@@ -1,4 +1,4 @@
-package terrails.statskeeper.health;
+package terrails.statskeeper.capabilities;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.HealthManager;
 import terrails.statskeeper.api.capabilities.SKCapabilities;
+import terrails.statskeeper.feature.HealthFeature;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,7 +47,8 @@ public class HealthCapability {
                 CompoundNBT compound = (CompoundNBT) nbt;
                 instance.deserialize(compound);
             }
-        }, PlayerHealthManager::new);
+        }, () -> HealthFeature.INSTANCE.new Handler());
+
     }
 
     private class CapabilitySerializable<C> implements ICapabilitySerializable<INBT> {

@@ -1,4 +1,4 @@
-package terrails.statskeeper.health;
+package terrails.statskeeper.helper;
 
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -6,28 +6,8 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 import terrails.statskeeper.StatsKeeper;
-import terrails.statskeeper.config.SKHealthConfig;
 
 public class HealthHelper {
-
-    static boolean hasConfigChanged(int minHealth, int maxHealth, int startingHealth) {
-        for (String string : SKHealthConfig.ON_CHANGE_RESET) {
-            string = string.toUpperCase();
-
-            if (string.equals("MIN_HEALTH") && SKHealthConfig.MIN_HEALTH != minHealth) {
-                return true;
-            }
-
-            if (string.equals("MAX_HEALTH") && SKHealthConfig.MAX_HEALTH != maxHealth) {
-                return true;
-            }
-
-            if (string.equals("STARTING_HEALTH") && SKHealthConfig.STARTING_HEALTH != startingHealth) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public static IAttributeInstance getAttribute(PlayerEntity player) {
         return player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
