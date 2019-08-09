@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 
 public class HealthCapability {
 
-    public static final ResourceLocation NAME = new ResourceLocation(StatsKeeper.MOD_ID, "health");
+    private static final ResourceLocation NAME = new ResourceLocation(StatsKeeper.MOD_ID, "health");
 
     @SubscribeEvent
     public void attach(AttachCapabilitiesEvent<Entity> event) {
@@ -47,11 +47,11 @@ public class HealthCapability {
                 CompoundNBT compound = (CompoundNBT) nbt;
                 instance.deserialize(compound);
             }
-        }, () -> HealthFeature.INSTANCE.new Handler());
+        }, HealthFeature.Handler::new);
 
     }
 
-    private class CapabilitySerializable<C> implements ICapabilitySerializable<INBT> {
+    private static class CapabilitySerializable<C> implements ICapabilitySerializable<INBT> {
 
         private final Capability<C> capability;
         private final C instance;

@@ -9,37 +9,33 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.capabilities.HealthManager;
-import terrails.statskeeper.capabilities.HealthCapability;
 import terrails.statskeeper.helper.HealthHelper;
 
 import java.util.*;
 
 public class HealthFeature extends Feature {
 
-    public static final HealthFeature INSTANCE = new HealthFeature();
+    private static ForgeConfigSpec.BooleanValue enabled;
+    private static ForgeConfigSpec.BooleanValue message;
+    private static ForgeConfigSpec.ConfigValue<List<? extends String>> on_change_reset;
 
-    private ForgeConfigSpec.BooleanValue enabled;
-    private ForgeConfigSpec.BooleanValue message;
-    private ForgeConfigSpec.ConfigValue<List<? extends String>> on_change_reset;
+    private static ForgeConfigSpec.IntValue max_health;
+    private static ForgeConfigSpec.IntValue min_health;
+    private static ForgeConfigSpec.IntValue health_decrease;
+    private static int starting_health;
 
-    private ForgeConfigSpec.IntValue max_health;
-    private ForgeConfigSpec.IntValue min_health;
-    private ForgeConfigSpec.IntValue health_decrease;
-    private int starting_health;
+    /** Map<RegistryName, Tuple<Health Amount, Bypasses Threshold>> */
+    private static Map<ResourceLocation, Tuple<Integer, Boolean>> items;
+    private static NavigableSet<Integer> thresholds;
 
-    private Map<ResourceLocation, Tuple<Integer, Boolean>> items;
-    private NavigableSet<Integer> thresholds;
-
-    public class Handler implements HealthManager {
+    public static class Handler implements HealthManager {
 
         /** The amount of health the player has */
         private int amount = 0;
@@ -222,8 +218,8 @@ public class HealthFeature extends Feature {
     }
 
     @SubscribeEvent
-    public void join(PlayerLoggedInEvent event) {
-        if (!this.enabled.get()) {
+    public void join(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!enabled.get()) {
             HealthHelper.removeModifier(event.getPlayer());
             return;
         }
@@ -233,30 +229,39 @@ public class HealthFeature extends Feature {
 
     @SubscribeEvent
     public void clone(PlayerEvent.Clone event) {
-        if (!this.enabled.get()) {
+        if (!enabled.get()) {
             return;
         }
 
-        HealthManager.getInstance((ServerPlayerEntity) event.getEntityPlayer(), (manager, player) -> {
+        HealthManager.getInstance((ServerPlayerEntity) event.getPlayer(), (manager, player) -> {
 
+            /*
             CompoundNBT compound = event.getOriginal().writeWithoutTypeId(new CompoundNBT());
             if (compound.contains("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
                 manager.deserialize(compound.getCompound("ForgeCaps").getCompound(HealthCapability.NAME.toString()));
                 manager.setHealth(player, manager.getHealth());
             }
+            */
 
-            if (this.starting_health == this.max_health.get() && this.min_health.get() <= 0) {
+            HealthManager.getInstance((ServerPlayerEntity) event.getOriginal(), (ogManager, ogPlayer) -> {
+                CompoundNBT nbt = new CompoundNBT();
+                ogManager.serialize(nbt);
+                manager.deserialize(nbt);
+                manager.setHealth(player, manager.getHealth());
+            });
+
+            if (starting_health == max_health.get() && min_health.get() <= 0) {
                 manager.update(player);
                 return;
             }
 
-            int decrease = this.health_decrease.get();
+            int decrease = health_decrease.get();
             if (event.isWasDeath() && decrease > 0 && manager.isHealthRemovable()) {
                 int prevHealth = manager.getHealth();
                 manager.addHealth(player, -decrease);
                 double removedAmount = manager.getHealth() - prevHealth;
-                if (this.message.get() && removedAmount > 0) {
-                    HealthHelper.playerMessage(event.getEntityPlayer(), "health.statskeeper.death_remove", removedAmount);
+                if (message.get() && removedAmount > 0) {
+                    HealthHelper.playerMessage(event.getPlayer(), "health.statskeeper.death_remove", removedAmount);
                 }
             }
         });
@@ -264,15 +269,15 @@ public class HealthFeature extends Feature {
 
     @SubscribeEvent
     public void itemInteract(PlayerInteractEvent.RightClickItem event) {
-        if (!this.enabled.get() || event.getWorld().isRemote())
+        if (!enabled.get() || event.getWorld().isRemote())
             return;
 
-        HealthManager.getInstance((ServerPlayerEntity) event.getEntityPlayer(), (manager, player) -> {
+        HealthManager.getInstance((ServerPlayerEntity) event.getPlayer(), (manager, player) -> {
 
-            ItemStack stack = event.getEntityPlayer().getHeldItem(event.getHand());
+            ItemStack stack = event.getPlayer().getHeldItem(event.getHand());
             Food food = stack.getItem().getFood();
 
-            if (food != null && event.getEntityPlayer().canEat(food.canEatWhenFull())) {
+            if (food != null && event.getPlayer().canEat(food.canEatWhenFull())) {
                 return;
             }
 
@@ -299,11 +304,11 @@ public class HealthFeature extends Feature {
 
     @SubscribeEvent
     public void itemInteractFinished(LivingEntityUseItemEvent.Finish event) {
-        if (!this.enabled.get() || !(event.getEntity() instanceof ServerPlayerEntity)) {
+        if (!enabled.get() || !(event.getEntity() instanceof ServerPlayerEntity)) {
             return;
         }
 
-        for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : this.items.entrySet()) {
+        for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : items.entrySet()) {
 
             Item item = event.getItem().getItem();
             if (item.getRegistryName() == null || !item.getRegistryName().equals(entry.getKey())) {
@@ -349,19 +354,19 @@ public class HealthFeature extends Feature {
         runnables.add(() -> {
             switch (startingValue.get()) {
                 case "MIN":
-                    this.starting_health = min_health.get();
+                    starting_health = min_health.get();
                     break;
                 case "MAX":
-                    this.starting_health = max_health.get();
+                    starting_health = max_health.get();
                     break;
                 default:
                     int i = Integer.parseInt(startingValue.get().replaceAll("[^0-9]", ""));
                     if (i > max_health.get() || i < min_health.get()) {
                         StatsKeeper.LOGGER.error("Starting health '{}' is out of bounds! Using default value...", i);
-                        this.starting_health = min_health.get();
+                        starting_health = min_health.get();
                         break;
                     }
-                    this.starting_health = i;
+                    starting_health = i;
                     break;
             }
         });
@@ -387,7 +392,7 @@ public class HealthFeature extends Feature {
                 .worldRestart()
                 .defineList("healthThresholds", Lists.newArrayList(-8, 16), o -> o != null && Integer.class.isAssignableFrom(o.getClass()));
 
-        runnables.add(() -> this.thresholds = ImmutableSortedSet.copyOf(thresholdsValue.get()));
+        runnables.add(() -> thresholds = ImmutableSortedSet.copyOf(thresholdsValue.get()));
 
 
         ForgeConfigSpec.ConfigValue<List<? extends String>> itemsValue = builder
@@ -398,7 +403,7 @@ public class HealthFeature extends Feature {
                 .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), o -> o != null && String.class.isAssignableFrom(o.getClass()));
 
         runnables.add(() -> {
-            this.items = new HashMap<>();
+            items = new HashMap<>();
             for (String string : itemsValue.get()) {
                 string = string.replaceAll("[\\s+]", "");
 
@@ -423,7 +428,7 @@ public class HealthFeature extends Feature {
                     continue;
                 }
 
-                this.items.put(new ResourceLocation(name), new Tuple<>(amount, bypass));
+                items.put(new ResourceLocation(name), new Tuple<>(amount, bypass));
             }
         });
 

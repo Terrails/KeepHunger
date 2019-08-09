@@ -37,9 +37,9 @@ public class StatsKeeper {
 
     private static final ForgeConfigSpec CONFIG_SPEC;
     private static final Feature[] FEATURES = {
-            ExperienceFeature.INSTANCE,
-            HungerFeature.INSTANCE,
-            HealthFeature.INSTANCE
+            new ExperienceFeature(),
+            new HungerFeature(),
+            new HealthFeature()
     };
 
     public StatsKeeper() {

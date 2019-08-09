@@ -14,6 +14,9 @@ public abstract class Feature {
 
     public abstract void setupConfig(final ForgeConfigSpec.Builder builder);
 
+    /**
+     * @return if a certain mod is loaded or something
+     */
     public boolean canLoad() {
         return true;
     }

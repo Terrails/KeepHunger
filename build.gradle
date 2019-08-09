@@ -10,12 +10,12 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-def minecraft_version = "1.14.3"
-def forge_version = "27.0.57"
-def mappings_version = ["snapshot", "20190717-1.14.3"]
+def minecraft_version = "1.14.4"
+def forge_version = "28.0.45"
+def mappings_version = ["snapshot", "20190807-1.14.3"]
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
-version = "4.2.3"
+version = "4.2.4"
 group = "terrails.statskeeper"
 
 minecraft {
@@ -23,15 +23,25 @@ minecraft {
 
     runs {
         client {
-            workingDirectory project.file("run")
-            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
-            property "forge.logging.console.level", "debug"
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                statskeeper {
+                    source sourceSets.main
+                }
+            }
         }
 
         server {
-            workingDirectory project.file("run")
-            property "forge.logging.markers", "SCAN,REGISTRIES,REGISTRYDUMP"
-            property "forge.logging.console.level", "debug"
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                statskeeper {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
