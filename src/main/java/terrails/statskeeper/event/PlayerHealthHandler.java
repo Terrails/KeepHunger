@@ -4,9 +4,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.UseAction;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import terrails.statskeeper.api.data.HealthManager;
 import terrails.statskeeper.api.event.PlayerCopyCallback;
@@ -60,24 +58,24 @@ public class PlayerHealthHandler {
 
     public static UseItemCallback ITEM_INTERACT = (PlayerEntity player, World world, Hand hand) -> {
         if (player.isSpectator() || world.isClient)
-            return ActionResult.PASS;
+            return TypedActionResult.pass(ItemStack.EMPTY);
 
         if (!SKHealthConfig.enabled) {
-            return ActionResult.PASS;
+            return TypedActionResult.pass(ItemStack.EMPTY);
         }
 
         Optional<HealthManager> optional = HealthManager.getInstance(player);
         if (!optional.isPresent()) {
-            return ActionResult.PASS;
+            return TypedActionResult.pass(ItemStack.EMPTY);
         }
 
         ItemStack stack = player.getStackInHand(hand);
         if (stack.getItem().getFoodComponent() != null && player.canConsume(stack.getItem().getFoodComponent().isAlwaysEdible())) {
-            return ActionResult.PASS;
+            return TypedActionResult.pass(ItemStack.EMPTY);
         }
 
         if (stack.getUseAction() == UseAction.DRINK) {
-            return ActionResult.PASS;
+            return TypedActionResult.pass(ItemStack.EMPTY);
         }
 
         for (SKHealthConfig.HealthItem healthItem : SKHealthConfig.health_items) {
@@ -88,12 +86,12 @@ public class PlayerHealthHandler {
 
             if (optional.get().addHealth(healthItem.getHealthAmount(), !healthItem.doesBypassThreshold())) {
                 stack.decrement(1);
-                return ActionResult.SUCCESS;
+                return TypedActionResult.success(stack);
             }
 
             break;
         }
-        return ActionResult.PASS;
+        return TypedActionResult.pass(ItemStack.EMPTY);
     };
 
     public static PlayerUseFinishedCallback ITEM_USE_FINISHED = (PlayerEntity player, ItemStack stack) -> {

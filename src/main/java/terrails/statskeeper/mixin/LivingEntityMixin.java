@@ -33,7 +33,7 @@ public class LivingEntityMixin implements IEffectCure {
 
     @Shadow protected ItemStack activeItemStack;
     @Shadow private @Final Map<StatusEffect, StatusEffectInstance> activeStatusEffects;
-    @Shadow protected void method_6129(StatusEffectInstance statusEffectInstance_1) {}
+    @Shadow protected void onStatusEffectRemoved(StatusEffectInstance statusEffectInstance_1) {}
 
     @Override
     public void clearPlayerStatusEffects(ItemStack stack) {
@@ -50,12 +50,12 @@ public class LivingEntityMixin implements IEffectCure {
                 continue;
             }
 
-            this.method_6129(effect);
+            this.onStatusEffectRemoved(effect);
             iterator_1.remove();
         }
     }
 
-    @Inject(method = "method_6040()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;spawnConsumptionEffects(Lnet/minecraft/item/ItemStack;I)V"))
+    @Inject(method = "consumeItem()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;spawnConsumptionEffects(Lnet/minecraft/item/ItemStack;I)V"))
     private void itemUseFinished(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         //noinspection ConstantConditions

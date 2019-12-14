@@ -6,8 +6,10 @@ import net.minecraft.block.CakeBlock;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.FoodComponent;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -43,7 +45,7 @@ public class BaseStatHandler {
 
     public static final PlayerRespawnCallback PLAYER_RESPAWN = (PlayerEntity player, boolean isEnd) -> {
         if (!isEnd && !player.isCreative() && SKHungerConfig.no_appetite_time > 0) {
-            player.addPotionEffect(new StatusEffectInstance(SKEffects.NO_APPETITE, SKHungerConfig.no_appetite_time * 20, 0, false, false, true));
+            player.addStatusEffect(new StatusEffectInstance(SKEffects.NO_APPETITE, SKHungerConfig.no_appetite_time * 20, 0, false, false, true));
         }
     };
 
@@ -57,18 +59,19 @@ public class BaseStatHandler {
     };
 
     public static final UseItemCallback ITEM_INTERACT = (PlayerEntity player, World world, Hand hand) -> {
-        if (player.isSpectator() || !player.hasStatusEffect(SKEffects.NO_APPETITE)) return ActionResult.PASS;
+        if (player.isSpectator() || !player.hasStatusEffect(SKEffects.NO_APPETITE)) return TypedActionResult.pass(ItemStack.EMPTY);
 
-        FoodComponent setting = player.getMainHandStack().getItem().getFoodComponent();
+        ItemStack stack = player.getMainHandStack();
+        FoodComponent setting = stack.getItem().getFoodComponent();
         if (setting != null && player.canConsume(setting.isAlwaysEdible())) {
-            return ActionResult.FAIL;
+            return TypedActionResult.fail(stack);
+        }
+        stack = player.getOffHandStack();
+        setting = stack.getItem().getFoodComponent();
+        if (setting != null && player.canConsume(setting.isAlwaysEdible())) {
+            return TypedActionResult.fail(stack);
         }
 
-        setting = player.getOffHandStack().getItem().getFoodComponent();
-        if (setting != null && player.canConsume(setting.isAlwaysEdible())) {
-            return ActionResult.FAIL;
-        }
-
-        return ActionResult.PASS;
+        return TypedActionResult.pass(ItemStack.EMPTY);
     };
 }

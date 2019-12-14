@@ -10,7 +10,7 @@ import terrails.statskeeper.config.SKConfig;
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
 
-    @Inject(method = "init", at = @At("TAIL"))
+    @Inject(method = "run", at = @At("TAIL"))
     private void init(CallbackInfo info) {
         SKConfig.initialize();
     }

@@ -7,7 +7,6 @@ import net.minecraft.util.math.MathHelper;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.data.HealthManager;
 import terrails.statskeeper.config.SKHealthConfig;
-import terrails.statskeeper.mixin.PlayerManagerAccessor;
 
 public class PlayerHealthManager implements HealthManager {
 
@@ -70,11 +69,11 @@ public class PlayerHealthManager implements HealthManager {
             HealthHelper.playerMessage(this.playerEntity, "health.statskeeper.threshold", Math.abs(this.threshold));
         }
 
-        if (prevHealthAmount != this.amount || prevThreshold != this.threshold) {
-            ServerWorld serverWorld = (ServerWorld) this.playerEntity.getEntityWorld();
-            PlayerManagerAccessor playerManager = (PlayerManagerAccessor) serverWorld.getServer().getPlayerManager();
-            playerManager.saveDataForPlayer(this.playerEntity);
-        }
+//        if (prevHealthAmount != this.amount || prevThreshold != this.threshold) {
+//            ServerWorld serverWorld = (ServerWorld) this.playerEntity.getEntityWorld();
+//            PlayerManagerAccessor playerManager = (PlayerManagerAccessor) serverWorld.getServer().getPlayerManager();
+//            playerManager.saveDataForPlayer(this.playerEntity);
+//        }
     }
 
     @Override
@@ -127,7 +126,7 @@ public class PlayerHealthManager implements HealthManager {
         this.min = SKHealthConfig.min_health;
         this.amount = this.start;
         this.setHealth(this.start);
-        this.playerEntity.setHealth(playerEntity.getHealthMaximum());
+        this.playerEntity.setHealth(playerEntity.getMaximumHealth());
     }
 
     @Override
@@ -164,30 +163,30 @@ public class PlayerHealthManager implements HealthManager {
     }
     @Override
     public void deserialize(CompoundTag compound) {
-        CompoundTag tag = compound.containsKey(StatsKeeper.MOD_ID) ? compound.getCompound(StatsKeeper.MOD_ID) : compound;
+        CompoundTag tag = compound.contains(StatsKeeper.MOD_ID) ? compound.getCompound(StatsKeeper.MOD_ID) : compound;
 
-        if (tag.containsKey("sk:starting_health")) {
+        if (tag.contains("sk:starting_health")) {
             this.start = tag.getInt("sk:starting_health");
         }
 
-        if (tag.containsKey("sk:additional_health")) {
+        if (tag.contains("sk:additional_health")) {
             this.amount = tag.getInt("sk:additional_health") + this.baseValue;
         }
 
-        if (tag.containsKey("sk:max_health")) {
+        if (tag.contains("sk:max_health")) {
             this.max = tag.getInt("sk:max_health");
         }
 
-        if (tag.containsKey("sk:min_health")) {
+        if (tag.contains("sk:min_health")) {
             this.min = tag.getInt("sk:min_health");
         }
 
-        if (tag.containsKey("sk:health_threshold")) {
+        if (tag.contains("sk:health_threshold")) {
             this.threshold = tag.getInt("sk:health_threshold");
         }
 
         // Compatibility for older versions
-        if (tag.containsKey("sk:is_min_start")) {
+        if (tag.contains("sk:is_min_start")) {
             boolean min_start = tag.getBoolean("sk:is_min_start");
             this.start = min_start ? this.min : this.max;
         }
