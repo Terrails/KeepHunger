@@ -2,12 +2,10 @@ package terrails.statskeeper.health;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.MathHelper;
 import terrails.statskeeper.StatsKeeper;
 import terrails.statskeeper.api.data.HealthManager;
 import terrails.statskeeper.config.SKHealthConfig;
-import terrails.statskeeper.mixin.PlayerManagerAccessor;
 
 public class PlayerHealthManager implements HealthManager {
 
@@ -70,11 +68,11 @@ public class PlayerHealthManager implements HealthManager {
             HealthHelper.playerMessage(this.playerEntity, "health.statskeeper.threshold", Math.abs(this.threshold));
         }
 
-        if (prevHealthAmount != this.amount || prevThreshold != this.threshold) {
-            ServerWorld serverWorld = (ServerWorld) this.playerEntity.getEntityWorld();
-            PlayerManagerAccessor playerManager = (PlayerManagerAccessor) serverWorld.getServer().getPlayerManager();
-            playerManager.saveDataForPlayer(this.playerEntity);
-        }
+//        if (prevHealthAmount != this.amount || prevThreshold != this.threshold) {
+//            ServerWorld serverWorld = (ServerWorld) this.playerEntity.getEntityWorld();
+//            PlayerManagerAccessor playerManager = (PlayerManagerAccessor) serverWorld.getServer().getPlayerManager();
+//            playerManager.saveDataForPlayer(this.playerEntity);
+//        }
     }
 
     @Override
