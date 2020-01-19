@@ -10,9 +10,9 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-def minecraft_version = "1.14.4"
-def forge_version = "28.0.45"
-def mappings_version = ["snapshot", "20190807-1.14.3"]
+def minecraft_version = "1.15.1"
+def forge_version = "30.0.41"
+def mappings_version = ["snapshot", "20200119-1.14.3"]
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
 version = "4.2.4"
