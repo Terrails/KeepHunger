@@ -11,12 +11,12 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 
 def minecraft_version = "1.15.2"
-def forge_version = "31.1.25"
+def forge_version = "31.1.27"
 def mappings_version = ["snapshot", "20200225-1.15.1"]
 
-archivesBaseName = "StatsKeeper-${minecraft_version}"
-version = "4.2.4"
+version = "4.2.5"
 group = "terrails.statskeeper"
+archivesBaseName = "StatsKeeper-${minecraft_version}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -49,6 +49,14 @@ minecraft {
         }
     }
 }
+
+/*
+repositories {
+    flatDir {
+        dirs "includedMods/"
+    }
+}
+*/
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
