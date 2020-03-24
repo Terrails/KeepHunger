@@ -86,7 +86,16 @@ public class StatsKeeper {
     }
 
     @SubscribeEvent
-    public static void configLoading(final ModConfig.ModConfigEvent event) {
+    public static void configLoading(final ModConfig.Loading event) {
+        if (!event.getConfig().getModId().equals(StatsKeeper.MOD_ID))
+            return;
+
+        Arrays.stream(FEATURES).filter(Feature::canLoad).forEach(Feature::configLoad);
+        StatsKeeper.LOGGER.debug("Loaded {} config file {}", StatsKeeper.MOD_ID, event.getConfig().getFileName());
+    }
+
+    @SubscribeEvent
+    public static void configLoading(final ModConfig.Reloading event) {
         if (!event.getConfig().getModId().equals(StatsKeeper.MOD_ID))
             return;
 
