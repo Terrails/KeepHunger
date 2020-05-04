@@ -21,6 +21,5 @@ build
 eclipse
 run
 
-# custom
-*.ps1
-*.lnk
+# Files from Forge MDK
+forge*changelog.txt
