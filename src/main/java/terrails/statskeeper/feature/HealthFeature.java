@@ -97,8 +97,8 @@ public class HealthFeature extends Feature {
             HealthHelper.addModifier(playerEntity, amount);
 
             if (this.amount != amount) {
+                playerEntity.setHealth(playerEntity.getHealth() + Math.max(amount - this.amount, 0));
                 this.amount = amount;
-                playerEntity.setHealth(amount);
                 this.update(playerEntity);
                 return true;
             }
@@ -141,7 +141,6 @@ public class HealthFeature extends Feature {
             this.min = min_health.get();
             this.amount = this.start;
             this.setHealth(playerEntity, this.start);
-            playerEntity.setHealth(playerEntity.getMaxHealth());
         }
 
         @Override
