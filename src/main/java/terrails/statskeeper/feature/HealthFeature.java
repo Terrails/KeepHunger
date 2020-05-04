@@ -52,7 +52,7 @@ public class HealthFeature extends Feature {
 
         @Override
         public void update(ServerPlayerEntity playerEntity) {
-            if (!playerEntity.isAlive() || playerEntity.isCreative() || !enabled.get()) {
+            if (!playerEntity.isAlive() /* || playerEntity.isCreative() */ || !enabled.get()) {
                 return;
             }
 
@@ -89,7 +89,7 @@ public class HealthFeature extends Feature {
 
         @Override
         public boolean setHealth(ServerPlayerEntity playerEntity, int amount) {
-            if (!playerEntity.isAlive() || playerEntity.isCreative() || !enabled.get()) {
+            if (!playerEntity.isAlive() /* || playerEntity.isCreative() */ || !enabled.get()) {
                 return false;
             }
 
@@ -256,7 +256,7 @@ public class HealthFeature extends Feature {
             }
 
             int decrease = health_decrease.get();
-            if (event.isWasDeath() && decrease > 0 && manager.isHealthRemovable()) {
+            if (event.isWasDeath() && !event.getOriginal().isCreative() && decrease > 0 && manager.isHealthRemovable()) {
                 int prevHealth = manager.getHealth();
                 manager.addHealth(player, -decrease);
                 double removedAmount = manager.getHealth() - prevHealth;
@@ -269,7 +269,7 @@ public class HealthFeature extends Feature {
 
     @SubscribeEvent
     public void itemInteract(PlayerInteractEvent.RightClickItem event) {
-        if (!enabled.get() || event.getWorld().isRemote())
+        if (!enabled.get() || event.getWorld().isRemote() || event.getPlayer().isCreative())
             return;
 
         HealthManager.getInstance((ServerPlayerEntity) event.getPlayer(), (manager, player) -> {
@@ -304,7 +304,7 @@ public class HealthFeature extends Feature {
 
     @SubscribeEvent
     public void itemInteractFinished(LivingEntityUseItemEvent.Finish event) {
-        if (!enabled.get() || !(event.getEntity() instanceof ServerPlayerEntity)) {
+        if (!enabled.get() || !(event.getEntity() instanceof ServerPlayerEntity) || ((ServerPlayerEntity) event.getEntity()).isCreative()) {
             return;
         }
 
