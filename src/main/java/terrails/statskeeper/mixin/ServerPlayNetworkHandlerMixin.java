@@ -16,7 +16,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onClientStatus",
             at = @At(value = "INVOKE_ASSIGN",
-                    target = "net/minecraft/server/PlayerManager.respawnPlayer(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/dimension/DimensionType;Z)Lnet/minecraft/server/network/ServerPlayerEntity;",
+                    target = "Lnet/minecraft/server/PlayerManager;respawnPlayer(Lnet/minecraft/server/network/ServerPlayerEntity;Z)Lnet/minecraft/server/network/ServerPlayerEntity;",
                     ordinal = 0, shift = At.Shift.AFTER))
     private void onPlayerRespawnEnd(CallbackInfo info) {
         PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(this.player, true);
@@ -24,7 +24,7 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(method = "onClientStatus",
             at = @At(value = "INVOKE_ASSIGN",
-                    target = "net/minecraft/server/PlayerManager.respawnPlayer(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/world/dimension/DimensionType;Z)Lnet/minecraft/server/network/ServerPlayerEntity;",
+                    target = "Lnet/minecraft/server/PlayerManager;respawnPlayer(Lnet/minecraft/server/network/ServerPlayerEntity;Z)Lnet/minecraft/server/network/ServerPlayerEntity;",
                     ordinal = 1, shift = At.Shift.AFTER))
     private void onPlayerRespawn(CallbackInfo info) {
         PlayerRespawnCallback.EVENT.invoker().onPlayerRespawn(this.player, false);

@@ -126,7 +126,7 @@ public class PlayerHealthManager implements HealthManager {
         this.min = SKHealthConfig.min_health;
         this.amount = this.start;
         this.setHealth(this.start);
-        this.playerEntity.setHealth(playerEntity.getMaximumHealth());
+        this.playerEntity.setHealth(playerEntity.getMaxHealth());
     }
 
     @Override

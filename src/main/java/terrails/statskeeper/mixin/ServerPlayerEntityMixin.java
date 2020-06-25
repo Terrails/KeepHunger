@@ -1,13 +1,13 @@
 package terrails.statskeeper.mixin;
 
-import net.minecraft.client.network.packet.EntityAttributesS2CPacket;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.EntityAttributesS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.server.world.ServerWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -54,10 +54,9 @@ public class ServerPlayerEntityMixin implements HealthManager.Accessor {
     }
 
     @Inject(method = "changeDimension", at = @At("RETURN"))
-    private void changeDimension(DimensionType dimensionType, CallbackInfoReturnable<Entity> info) {
+    private void changeDimension(ServerWorld destination, CallbackInfoReturnable<Entity> info) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.MAX_HEALTH);
-        Packet packet = new EntityAttributesS2CPacket(player.getEntityId(), Collections.singleton(attribute));
-        player.networkHandler.sendPacket(packet);
+        EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        player.networkHandler.sendPacket(new EntityAttributesS2CPacket(player.getEntityId(), Collections.singleton(attribute)));
     }
 }
