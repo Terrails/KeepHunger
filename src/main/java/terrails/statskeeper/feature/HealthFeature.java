@@ -351,22 +351,29 @@ public class HealthFeature extends Feature {
                 .define("startingHealthAmount", "MIN");
 
         runnables.add(() -> {
-            switch (startingValue.get()) {
-                case "MIN":
-                    starting_health = min_health.get();
-                    break;
-                case "MAX":
+            String string = startingValue.get().toUpperCase();
+            if (string.equals("MIN")) {
+                if (min_health.get() == 0) {
+                    StatsKeeper.LOGGER.error("'startingHealthAmount' cannot be set to '{}' while 'minHealthAmount' is set to 0.", string);
+                    StatsKeeper.LOGGER.error("Using 'maxHealthAmount' as an alternative! Things will not behave as expected.");
                     starting_health = max_health.get();
-                    break;
-                default:
-                    int i = Integer.parseInt(startingValue.get().replaceAll("[^0-9]", ""));
-                    if (i > max_health.get() || i < min_health.get()) {
-                        StatsKeeper.LOGGER.error("Starting health '{}' is out of bounds! Using default value...", i);
+                } else starting_health = min_health.get();
+            } else if (string.equals("MAX")) {
+                starting_health = max_health.get();
+            } else {
+                int i = Integer.parseInt(string.replaceAll("[^0-9]", ""));
+                if (i > max_health.get() || i < min_health.get()) {
+                    StatsKeeper.LOGGER.error("'startingHealthAmount' '{}' is out of bounds!", i);
+                    if (min_health.get() == 0) {
+                        StatsKeeper.LOGGER.error("Using 'maxHealthAmount' as an alternative! Things will not behave as expected.");
+                        starting_health = max_health.get();
+                    } else {
+                        StatsKeeper.LOGGER.error("Using 'minHealthAmount' as an alternative! Things will not behave as expected.");
                         starting_health = min_health.get();
-                        break;
                     }
-                    starting_health = i;
-                    break;
+                    return;
+                }
+                starting_health = i;
             }
         });
 
@@ -395,7 +402,7 @@ public class HealthFeature extends Feature {
 
 
         ForgeConfigSpec.ConfigValue<List<? extends String>> itemsValue = builder
-                .comment("Items that increase health when used. Use a equal sign to define how much health is gained or lost.\n" +
+                .comment("Items that increase/decrease health when used. Use a equal sign to define how much health is gained or lost.\n" +
                         "e.g. 'minecraft:apple = 1', the health gets increased by 0.5 hearts.\n" +
                         "Appending a ':' after the number will make the item which decreases health bypass thresholds")
                 .worldRestart()
@@ -413,7 +420,7 @@ public class HealthFeature extends Feature {
                     continue;
                 }
 
-                int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1, (string.endsWith(":") ? string.lastIndexOf(":") : string.length())));
+                int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1, (string.endsWith(":") ? string.lastIndexOf(":") : string.length())).trim());
 
                 if (amount == 0) {
                     StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot have health set to 0. Skipping...", name);

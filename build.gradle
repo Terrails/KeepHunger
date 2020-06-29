@@ -14,7 +14,7 @@ def minecraft_version = "1.16.1"
 def forge_version = "32.0.24"
 def mappings_version = ["snapshot", "20200514-1.16"]
 
-version = "5.2.8"
+version = "5.2.9"
 group = "terrails.statskeeper"
 archivesBaseName = "StatsKeeper-${minecraft_version}"
 
