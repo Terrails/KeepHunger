@@ -14,12 +14,12 @@ public class ExperienceFeature extends Feature {
 
     @SubscribeEvent
     public void clone(PlayerEvent.Clone event) {
-        if (event.isWasDeath()) {
+        if (event.isWasDeath() && keep.get()) {
             PlayerEntity player = event.getPlayer();
             PlayerEntity oldPlayer = event.getOriginal();
 
             boolean keepInventory = player.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
-            if (keep.get() && !keepInventory) {
+            if (!keepInventory) {
                 player.experienceLevel = oldPlayer.experienceLevel;
                 player.experienceTotal = oldPlayer.experienceTotal;
                 player.experience = oldPlayer.experience;
