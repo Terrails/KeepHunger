@@ -1,21 +1,21 @@
 package terrails.statskeeper.helper;
 
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 import terrails.statskeeper.StatsKeeper;
 
 public class HealthHelper {
 
-    public static IAttributeInstance getAttribute(PlayerEntity player) {
-        return player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+    public static ModifiableAttributeInstance getAttribute(PlayerEntity player) {
+        return player.getAttribute(Attributes.field_233818_a_);
     }
     public static void addModifier(PlayerEntity player, int amount) {
-        IAttributeInstance attribute = HealthHelper.getAttribute(player);
+        ModifiableAttributeInstance attribute = HealthHelper.getAttribute(player);
         attribute.removeModifier(StatsKeeper.HEALTH_UUID);
-        attribute.applyModifier(new AttributeModifier(StatsKeeper.HEALTH_UUID, StatsKeeper.MOD_ID, amount - attribute.getBaseValue(), AttributeModifier.Operation.ADDITION));
+        attribute.func_233769_c_(new AttributeModifier(StatsKeeper.HEALTH_UUID, StatsKeeper.MOD_ID, amount - attribute.getBaseValue(), AttributeModifier.Operation.ADDITION));
     }
     public static boolean hasModifier(PlayerEntity player) {
         return getAttribute(player).getModifier(StatsKeeper.HEALTH_UUID) != null;
