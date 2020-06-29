@@ -15,6 +15,13 @@ public abstract class Feature {
     public abstract void setupConfig(final ForgeConfigSpec.Builder builder);
 
     /**
+     * @return if {@link #configLoad()} should be executed on config load
+     */
+    public boolean canLoadConfig() {
+        return true;
+    }
+
+    /**
      * @return if a certain mod is loaded or something
      */
     public boolean canLoad() {
@@ -22,9 +29,7 @@ public abstract class Feature {
     }
 
     public void registerEventBus() {
-        if (canLoad()) {
-            MinecraftForge.EVENT_BUS.register(this);
-        }
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public void configLoad() {

@@ -61,7 +61,7 @@ public class StatsKeeper {
 
     static {
         final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        Arrays.stream(FEATURES).filter(Feature::canLoad).forEach(feature -> {
+        Arrays.stream(FEATURES).filter(Feature::canLoadConfig).forEach(feature -> {
             builder.push(feature.name());
             feature.setupConfig(builder);
             builder.pop();
