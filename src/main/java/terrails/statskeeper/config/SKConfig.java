@@ -13,7 +13,7 @@ public class SKConfig {
     public static boolean drop_experience;
 
     public static void initialize() {
-        File configFile = new File(FabricLoader.getInstance().getConfigDirectory(), "statskeeper.json");
+        File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "statskeeper.json");
 
         SKConfigDummy instance = new SKConfigDummy();
         if (configFile.exists()) {

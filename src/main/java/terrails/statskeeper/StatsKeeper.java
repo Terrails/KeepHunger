@@ -1,6 +1,7 @@
 package terrails.statskeeper;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.event.server.ServerStartCallback;
@@ -36,6 +37,6 @@ public class StatsKeeper implements ModInitializer {
         PlayerRespawnCallback.EVENT.register(BaseStatHandler.PLAYER_RESPAWN);
         UseBlockCallback.EVENT.register(BaseStatHandler.BLOCK_INTERACT);
         UseItemCallback.EVENT.register(BaseStatHandler.ITEM_INTERACT);
-        ServerStartCallback.EVENT.register((MinecraftServer server) -> SKConfig.initialize());
+        ServerLifecycleEvents.SERVER_STARTED.register((MinecraftServer server) -> SKConfig.initialize());
     }
 }
