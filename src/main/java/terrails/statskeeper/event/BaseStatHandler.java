@@ -27,7 +27,10 @@ public class BaseStatHandler {
 
             boolean checkGameRule = player.getEntityWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
             if (SKConfig.keep_experience && !checkGameRule) {
-                player.addExperience(oldPlayer.experienceLevel);
+                player.experienceLevel = oldPlayer.experienceLevel;
+                player.totalExperience = oldPlayer.totalExperience;
+                player.experienceProgress = oldPlayer.experienceProgress;
+                player.setScore(oldPlayer.getScore());
             }
 
             if (SKHungerConfig.keep_hunger) {
