@@ -1,5 +1,6 @@
 modLoader="javafml"
 loaderVersion="[30,)"
+license="MIT License"
 issueTrackerURL="https://github.com/Terrails/StatsKeeper/issues"
 
 [[mods]]
