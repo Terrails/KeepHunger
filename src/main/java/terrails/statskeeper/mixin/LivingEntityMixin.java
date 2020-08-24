@@ -21,14 +21,13 @@ import java.util.Map;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin implements IEffectCure {
 
-    @ModifyVariable(method = "updatePostDeath()V", ordinal = 0, at = @At(value = "STORE", ordinal = 0), require = 1)
-    private int dropExperience(int amount) {
+    @Inject(method = "dropXp", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getCurrentExperience(Lnet/minecraft/entity/player/PlayerEntity;)I"), cancellable = true)
+    private void dropExperience(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         //noinspection ConstantConditions
-        if (!SKConfig.drop_experience && entity instanceof PlayerEntity) {
-            return 0;
+        if (entity instanceof PlayerEntity && !SKConfig.drop_experience) {
+            info.cancel();
         }
-        return amount;
     }
 
     @Shadow protected ItemStack activeItemStack;
