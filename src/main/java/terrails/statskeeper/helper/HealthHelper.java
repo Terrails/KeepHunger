@@ -10,12 +10,12 @@ import terrails.statskeeper.StatsKeeper;
 public class HealthHelper {
 
     public static ModifiableAttributeInstance getAttribute(PlayerEntity player) {
-        return player.getAttribute(Attributes.field_233818_a_);
+        return player.getAttribute(Attributes.MAX_HEALTH);
     }
     public static void addModifier(PlayerEntity player, int amount) {
         ModifiableAttributeInstance attribute = HealthHelper.getAttribute(player);
         attribute.removeModifier(StatsKeeper.HEALTH_UUID);
-        attribute.func_233769_c_(new AttributeModifier(StatsKeeper.HEALTH_UUID, StatsKeeper.MOD_ID, amount - attribute.getBaseValue(), AttributeModifier.Operation.ADDITION));
+        attribute.applyPersistentModifier(new AttributeModifier(StatsKeeper.HEALTH_UUID, StatsKeeper.MOD_ID, amount - attribute.getBaseValue(), AttributeModifier.Operation.ADDITION));
     }
     public static boolean hasModifier(PlayerEntity player) {
         return getAttribute(player).getModifier(StatsKeeper.HEALTH_UUID) != null;
