@@ -417,8 +417,8 @@ public class HealthFeature extends Feature {
 
         ForgeConfigSpec.ConfigValue<List<? extends Integer>> thresholdsValue = builder
                 .comment("Values which, when achieved, move the lowest health of the player to the achieved value.\n" +
-                        "The first threshold can also be non-removable, meaning that the health won't be removed until the player is over that threshold.\n" +
-                        "This can only be used on the first threshold. To use it make the number negative. Make sure the values are in ascending order!")
+                        "The first threshold can also be non-removable, meaning that the health won't be removed till the player is over that threshold.\n" +
+                        "This can only be used on the first threshold. To use it make the number negative. Make sure that the values are in ascending order!")
                 .worldRestart()
                 .defineList("healthThresholds", Lists.newArrayList(-8, 16), o -> o != null && Integer.class.isAssignableFrom(o.getClass()));
 
@@ -426,7 +426,7 @@ public class HealthFeature extends Feature {
 
 
         ForgeConfigSpec.ConfigValue<List<? extends String>> itemsValue = builder
-                .comment("Items that increase/decrease health when used. Use a equal sign to define how much health is gained or lost.\n" +
+                .comment("Items that increase/decrease health when used. Use an equal sign to define how much health is gained or lost.\n" +
                         "e.g. 'minecraft:apple = 1', the health gets increased by 0.5 hearts.\n" +
                         "Appending a ':' after the number will make the item that decreases health also bypass healthThresholds")
                 .worldRestart()
