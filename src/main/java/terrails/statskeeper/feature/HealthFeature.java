@@ -417,7 +417,7 @@ public class HealthFeature extends Feature {
 
         ForgeConfigSpec.ConfigValue<List<? extends Integer>> thresholdsValue = builder
                 .comment("Values which, when achieved, move the lowest health of the player to the achieved value.\n" +
-                        "The first threshold can also be non-removable, meaning that the health won't be removed till the player is over that threshold.\n" +
+                        "The first threshold can also be non-removable, meaning that the health won't be removed until the player is over that threshold.\n" +
                         "This can only be used on the first threshold. To use it make the number negative. Make sure the values are in ascending order!")
                 .worldRestart()
                 .defineList("healthThresholds", Lists.newArrayList(-8, 16), o -> o != null && Integer.class.isAssignableFrom(o.getClass()));
