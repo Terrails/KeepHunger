@@ -2,12 +2,14 @@ package terrails.statskeeper.feature;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.GameType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -24,6 +26,7 @@ public class HealthFeature extends Feature {
 
     private static ForgeConfigSpec.BooleanValue enabled;
     private static ForgeConfigSpec.BooleanValue message;
+    private static ForgeConfigSpec.BooleanValue hardcore;
     private static ForgeConfigSpec.ConfigValue<List<? extends String>> on_change_reset;
 
     private static ForgeConfigSpec.IntValue max_health;
@@ -71,7 +74,7 @@ public class HealthFeature extends Feature {
             Integer integer = thresholds.floor(this.amount);
             this.threshold = integer != null ? Math.abs(integer) <= this.amount ? Math.abs(integer) : integer : 0;
 
-            if (this.start == this.max && this.min <= 0) {
+            if (this.start == this.max && this.min <= 0 && !hardcore.get()) {
                 this.amount = this.max;
             } else {
                 int min = Math.max(this.min, this.threshold);
@@ -162,7 +165,7 @@ public class HealthFeature extends Feature {
         @Override
         public boolean isHealthRemovable() {
             int min = Math.max(this.min, Math.abs(this.threshold));
-            return this.min > 0 && this.amount > min;
+            return (this.min > 0 && this.amount > min) || hardcore.get();
         }
 
         @Override
@@ -249,19 +252,34 @@ public class HealthFeature extends Feature {
                 manager.setHealth(player, manager.getHealth());
             });
 
-            if (starting_health == max_health.get() && min_health.get() <= 0) {
+            if (starting_health == max_health.get() && min_health.get() <= 0 && !hardcore.get()) {
                 manager.update(player);
                 return;
             }
 
             int decrease = health_decrease.get();
-            if (event.isWasDeath() && !event.getOriginal().isCreative() && decrease > 0 && manager.isHealthRemovable()) {
+            if (event.isWasDeath() && !event.getOriginal().isSpectator() && !event.getOriginal().isCreative() && decrease > 0 && manager.isHealthRemovable()) {
                 int prevHealth = manager.getHealth();
                 manager.addHealth(player, -decrease);
                 double removedAmount = manager.getHealth() - prevHealth;
                 if (message.get() && removedAmount > 0) {
                     HealthHelper.playerMessage(event.getPlayer(), "health.statskeeper.death_remove", removedAmount);
                 }
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public void respawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (!enabled.get()) {
+            return;
+        }
+
+        HealthManager.getInstance((ServerPlayerEntity) event.getPlayer(), (manager, player) -> {
+
+            if (hardcore.get() && manager.getHealth() <= 0) {
+                player.setGameType(GameType.SPECTATOR);
+                manager.reset(player);
             }
         });
     }
@@ -390,6 +408,12 @@ public class HealthFeature extends Feature {
         message = builder
                 .comment("Show a message when a threshold is reached and when health is gained or lost")
                 .define("healthChangeMessage", true);
+
+        hardcore = builder
+                .comment("Enables 'hardcore' mode which makes the player a spectator when 0 max health is reached.\n" +
+                        "Setting minHealthAmount to 0 and removing all healthThresholds is required or unexpected behaviour might happen.")
+                .worldRestart()
+                .define("hardcoreMode", false);
 
         ForgeConfigSpec.ConfigValue<List<? extends Integer>> thresholdsValue = builder
                 .comment("Values which, when achieved, move the lowest health of the player to the achieved value.\n" +
