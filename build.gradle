@@ -10,8 +10,8 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-def minecraft_version = "1.16.2"
-def forge_version = "33.0.20"
+def minecraft_version = "1.16.3"
+def forge_version = "34.1.0"
 
 version = "5.2.9"
 group = "terrails.statskeeper"
@@ -25,7 +25,6 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
-         //   property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -37,7 +36,6 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-         //   property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -54,9 +52,6 @@ repositories {
     maven {
         url 'https://www.dogforce-games.com/maven'
     }
-//    flatDir {
-//        dirs "includedMods/"
-//    }
 }
 
 
