@@ -265,21 +265,11 @@ public class HealthFeature extends Feature {
                 if (message.get() && removedAmount > 0) {
                     HealthHelper.playerMessage(event.getPlayer(), "health.statskeeper.death_remove", removedAmount);
                 }
-            }
-        });
-    }
 
-    @SubscribeEvent
-    public void respawn(PlayerEvent.PlayerRespawnEvent event) {
-        if (!enabled.get()) {
-            return;
-        }
-
-        HealthManager.getInstance((ServerPlayerEntity) event.getPlayer(), (manager, player) -> {
-
-            if (hardcore.get() && manager.getHealth() <= 0) {
-                player.setGameType(GameType.SPECTATOR);
-                manager.reset(player);
+                if (hardcore.get() && manager.getHealth() <= 0) {
+                    event.getOriginal().setGameType(GameType.SPECTATOR);
+                    manager.reset(player);
+                }
             }
         });
     }
