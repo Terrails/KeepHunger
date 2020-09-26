@@ -428,7 +428,7 @@ public class HealthFeature extends Feature {
         ForgeConfigSpec.ConfigValue<List<? extends String>> itemsValue = builder
                 .comment("Items that increase/decrease health when used. Use a equal sign to define how much health is gained or lost.\n" +
                         "e.g. 'minecraft:apple = 1', the health gets increased by 0.5 hearts.\n" +
-                        "Appending a ':' after the number will make the item which decreases health bypass thresholds")
+                        "Appending a ':' after the number will make the item that decreases health also bypass healthThresholds")
                 .worldRestart()
                 .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), o -> o != null && String.class.isAssignableFrom(o.getClass()));
 
