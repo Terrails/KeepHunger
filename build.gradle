@@ -5,13 +5,16 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-def minecraft_version = "1.16.1"
-def yarn_version = "1.16.1+build.21"
-def loader_version = "0.9.2+build.206"
-def fabric_version = "0.17.0+build.386-1.16.1"
+def minecraft_version = "1.16.3"
+def yarn_version = "1.16.3+build.17"
+def loader_version = "0.10.0+build.208"
+def fabric_version = "0.22.1+build.409-1.16"
+
+def fiber_version = "0.23.0-2"
+def modmenu_version = "1.14.6+build.31"
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
-version = "2.1.5"
+version = "3.2.5"
 group = "terrails.statskeeper"
 
 minecraft {
@@ -23,6 +26,11 @@ dependencies {
     modCompile "net.fabricmc:fabric-loader:${loader_version}"
 
     modCompile "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    modRuntime ("io.github.prospector:modmenu:${modmenu_version}") { transitive = false }
+
+    implementation "me.zeroeightsix:fiber:${fiber_version}"
+    include "me.zeroeightsix:fiber:${fiber_version}"
 }
 
 processResources {
@@ -43,11 +51,11 @@ tasks.withType(JavaCompile) {
 }
 
 task apiJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set("api")
     from(sourceSets.main.allJava) {
         include "terrails/statskeeper/api/**"
     }
     from "LICENSE"
-    classifier = "api"
 }
 
 artifacts {

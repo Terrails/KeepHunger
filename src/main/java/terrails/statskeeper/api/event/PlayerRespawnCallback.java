@@ -3,6 +3,7 @@ package terrails.statskeeper.api.event;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface PlayerRespawnCallback {
 
@@ -14,5 +15,5 @@ public interface PlayerRespawnCallback {
             }
     );
 
-    void onPlayerRespawn(PlayerEntity player, boolean isEnd);
+    void onPlayerRespawn(ServerPlayerEntity player, boolean isEnd);
 }

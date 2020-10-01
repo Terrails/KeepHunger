@@ -4,7 +4,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntityAttributesS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -15,8 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import terrails.statskeeper.api.data.HealthManager;
 import terrails.statskeeper.api.event.PlayerCopyCallback;
-import terrails.statskeeper.config.SKHealthConfig;
-import terrails.statskeeper.health.PlayerHealthManager;
+import terrails.statskeeper.feature.HealthFeature;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -28,13 +26,12 @@ public class ServerPlayerEntityMixin implements HealthManager.Accessor {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void constructor(CallbackInfo info) {
-        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        this.healthManager = new PlayerHealthManager(player);
+        this.healthManager = new HealthFeature.Handler((ServerPlayerEntity) (Object) this);
     }
 
     @Override
-    public Optional<HealthManager> getHealthManager() {
-        return Optional.ofNullable(SKHealthConfig.enabled ? this.healthManager : null);
+    public HealthManager getHealthManager() {
+        return this.healthManager;
     }
 
     @Inject(method = "readCustomDataFromTag", at = @At("RETURN"))
@@ -53,7 +50,7 @@ public class ServerPlayerEntityMixin implements HealthManager.Accessor {
         PlayerCopyCallback.EVENT.invoker().onPlayerCopy(player, oldPlayer, isEnd);
     }
 
-    @Inject(method = "changeDimension", at = @At("RETURN"))
+    @Inject(method = "moveToWorld", at = @At("RETURN"))
     private void changeDimension(ServerWorld destination, CallbackInfoReturnable<Entity> info) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         EntityAttributeInstance attribute = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);

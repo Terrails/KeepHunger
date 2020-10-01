@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import terrails.statskeeper.config.SKConfig;
-import terrails.statskeeper.effect.IEffectCure;
+import terrails.statskeeper.api.event.PlayerDropExperienceCallback;
+import terrails.statskeeper.api.effect.IEffectCure;
 import terrails.statskeeper.api.effect.SKEffects;
 import terrails.statskeeper.api.event.PlayerUseFinishedCallback;
 
@@ -21,18 +21,18 @@ import java.util.Map;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin implements IEffectCure {
 
+    @Shadow protected ItemStack activeItemStack;
+    @Shadow private @Final Map<StatusEffect, StatusEffectInstance> activeStatusEffects;
+    @Shadow protected void onStatusEffectRemoved(StatusEffectInstance statusEffectInstance_1) {}
+
     @Inject(method = "dropXp", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;getCurrentExperience(Lnet/minecraft/entity/player/PlayerEntity;)I"), cancellable = true)
     private void dropExperience(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         //noinspection ConstantConditions
-        if (entity instanceof PlayerEntity && !SKConfig.drop_experience) {
+        if (entity instanceof PlayerEntity && !PlayerDropExperienceCallback.EVENT.invoker().dropExperience((PlayerEntity) entity)) {
             info.cancel();
         }
     }
-
-    @Shadow protected ItemStack activeItemStack;
-    @Shadow private @Final Map<StatusEffect, StatusEffectInstance> activeStatusEffects;
-    @Shadow protected void onStatusEffectRemoved(StatusEffectInstance statusEffectInstance_1) {}
 
     @Override
     public void clearPlayerStatusEffects(ItemStack stack) {

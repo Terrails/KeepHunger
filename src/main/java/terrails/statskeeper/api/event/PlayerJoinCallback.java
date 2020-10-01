@@ -3,6 +3,7 @@ package terrails.statskeeper.api.event;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface PlayerJoinCallback {
 
@@ -14,5 +15,5 @@ public interface PlayerJoinCallback {
             }
     );
 
-    void onPlayerJoin(PlayerEntity player);
+    void onPlayerJoin(ServerPlayerEntity player);
 }

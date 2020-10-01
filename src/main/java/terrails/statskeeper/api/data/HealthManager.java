@@ -1,18 +1,22 @@
 package terrails.statskeeper.api.data;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.Optional;
+import java.util.function.Consumer;
 
 public interface HealthManager {
 
-    static Optional<HealthManager> getInstance(PlayerEntity player) {
+    static HealthManager getInstance(ServerPlayerEntity player) {
         return ((Accessor) player).getHealthManager();
     }
 
+    static void apply(ServerPlayerEntity player, Consumer<? super HealthManager> consumer) {
+        consumer.accept(getInstance(player));
+    }
+
     interface Accessor {
-        Optional<HealthManager> getHealthManager();
+        HealthManager getHealthManager();
     }
 
     /**

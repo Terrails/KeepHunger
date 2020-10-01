@@ -3,15 +3,13 @@
   "package": "terrails.statskeeper.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "HungerManagerAccessor",
-    "ServerPlayerEntityMixin",
-    "LivingEntityMixin",
     "BucketMilkItemMixin",
+    "HungerManagerAccessor",
+    "LivingEntityMixin",
     "PlayerManagerMixin",
+    "ServerPlayerEntityMixin",
+    "ServerPlayerInteractionManagerMixin",
     "ServerPlayNetworkHandlerMixin"
-  ],
-  "client": [
-    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

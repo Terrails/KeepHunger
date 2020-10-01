@@ -9,10 +9,12 @@
     "Terrails"
   ],
   "contact": {
-    "sources": "https://github.com/Terrails/StatsKeeper/"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/stats-keeper-fabric",
+    "issues": "https://github.com/Terrails/StatsKeeper/issues"
   },
 
-  "license": "Apache-2.0",
+  "license": "MIT",
+  "icon": "assets/statskeeper/icon.png",
 
   "environment": "*",
   "entrypoints": {
@@ -20,14 +22,16 @@
       "terrails.statskeeper.StatsKeeper"
     ]
   },
+
   "mixins": [
     "statskeeper.mixins.json"
   ],
 
   "depends": {
-    "fabricloader": ">=0.4.0",
+    "fabricloader": ">=0.10.0",
     "fabric": "*"
   },
+
   "suggests": {
     "healthoverlay": "*"
   }

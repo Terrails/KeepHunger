@@ -3,6 +3,7 @@ package terrails.statskeeper.api.event;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public interface PlayerCopyCallback {
 
@@ -14,5 +15,5 @@ public interface PlayerCopyCallback {
             }
     );
 
-    void onPlayerCopy(PlayerEntity player, PlayerEntity oldPlayer, boolean isEnd);
+    void onPlayerCopy(ServerPlayerEntity player, ServerPlayerEntity oldPlayer, boolean isEnd);
 }
