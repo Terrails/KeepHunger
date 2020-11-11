@@ -5,13 +5,13 @@ plugins {
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-def minecraft_version = "1.16.3"
-def yarn_version = "1.16.3+build.17"
-def loader_version = "0.10.0+build.208"
-def fabric_version = "0.22.1+build.409-1.16"
+def minecraft_version = "1.16.4"
+def yarn_version = "1.16.4+build.6"
+def loader_version = "0.10.6+build.214"
+def fabric_version = "0.25.1+build.416-1.16"
 
 def fiber_version = "0.23.0-2"
-def modmenu_version = "1.14.6+build.31"
+def modmenu_version = "1.14.7+build.11"
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
 version = "3.2.5"
