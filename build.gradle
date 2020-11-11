@@ -14,7 +14,7 @@ def fiber_version = "0.23.0-2"
 def modmenu_version = "1.14.7+build.11"
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
-version = "3.2.5"
+version = "3.2.6"
 group = "terrails.statskeeper"
 
 minecraft {

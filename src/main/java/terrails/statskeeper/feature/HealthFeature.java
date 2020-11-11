@@ -153,8 +153,8 @@ public class HealthFeature extends Feature {
             this.start = startingHealth.getValue();
             this.max = maxHealth.getValue();
             this.min = minHealth.getValue();
-            this.amount = this.start;
             this.setHealth(this.start);
+            this.amount = this.start;
         }
 
         @Override
@@ -280,6 +280,7 @@ public class HealthFeature extends Feature {
         }
 
         HealthManager.apply(player, manager -> {
+            player.setHealth(player.getMaxHealth());
 
             if (hardcore.getValue() && healthDecrease.getValue() > 0 && manager.getHealth() <= 0) {
                 player.setGameMode(GameMode.SPECTATOR);
