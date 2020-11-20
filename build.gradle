@@ -1,20 +1,20 @@
 plugins { 
-    id 'fabric-loom' version '0.4-SNAPSHOT'
+    id 'fabric-loom' version '0.5-SNAPSHOT'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 def minecraft_version = "1.16.4"
-def yarn_version = "1.16.4+build.6"
-def loader_version = "0.10.6+build.214"
-def fabric_version = "0.25.1+build.416-1.16"
+def yarn_version = "1.16.4+build.7"
+def loader_version = "0.10.8"
+def fabric_version = "0.26.0+1.16"
 
 def fiber_version = "0.23.0-2"
-def modmenu_version = "1.14.7+build.11"
+def modmenu_version = "1.14.10+build.15"
 
 archivesBaseName = "StatsKeeper-${minecraft_version}"
-version = "3.2.6"
+version = "3.2.7"
 group = "terrails.statskeeper"
 
 minecraft {
