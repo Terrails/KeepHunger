@@ -10,8 +10,9 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle'
 
-def minecraft_version = "1.16.3"
-def forge_version = "34.1.0"
+def minecraft_version = "1.16.4"
+def forge_version = "35.0.18"
+def mappings_version = ["snapshot", "20201028-1.16.3"]
 
 version = "5.3.10"
 group = "terrails.statskeeper"
@@ -20,7 +21,7 @@ archivesBaseName = "StatsKeeper-${minecraft_version}"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: "snapshot", version: "20200820-1.16.1"
+    mappings channel: mappings_version[0], version: mappings_version[1]
 
     runs {
         client {
