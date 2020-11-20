@@ -2,7 +2,6 @@ package terrails.statskeeper.feature;
 
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
-import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
@@ -21,21 +20,22 @@ import terrails.statskeeper.api.capabilities.HealthManager;
 import terrails.statskeeper.helper.HealthHelper;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class HealthFeature extends Feature {
 
     private static ForgeConfigSpec.BooleanValue enabled;
     private static ForgeConfigSpec.BooleanValue message;
     private static ForgeConfigSpec.BooleanValue hardcore;
-    private static ForgeConfigSpec.ConfigValue<List<? extends String>> on_change_reset;
+    private static ForgeConfigSpec.ConfigValue<List<? extends String>> onChangeReset;
 
-    private static ForgeConfigSpec.IntValue max_health;
-    private static ForgeConfigSpec.IntValue min_health;
-    private static ForgeConfigSpec.IntValue health_decrease;
-    private static int starting_health;
+    private static ForgeConfigSpec.IntValue maxHealth;
+    private static ForgeConfigSpec.IntValue minHealth;
+    private static ForgeConfigSpec.IntValue healthDecrease;
+    private static int startingHealth;
 
     /** Map<RegistryName, Tuple<Health Amount, Bypasses Threshold>> */
-    private static Map<ResourceLocation, Tuple<Integer, Boolean>> items;
+    private static Map<ResourceLocation, Tuple<Integer, Boolean>> regenerativeItems;
     private static NavigableSet<Integer> thresholds;
 
     public static class Handler implements HealthManager {
@@ -55,7 +55,7 @@ public class HealthFeature extends Feature {
 
         @Override
         public void update(ServerPlayerEntity playerEntity) {
-            if (!playerEntity.isAlive() /* || playerEntity.isCreative() */ || !enabled.get()) {
+            if (!playerEntity.isAlive() || !enabled.get()) {
                 return;
             }
 
@@ -92,7 +92,7 @@ public class HealthFeature extends Feature {
 
         @Override
         public boolean setHealth(ServerPlayerEntity playerEntity, int amount) {
-            if (!playerEntity.isAlive() /* || playerEntity.isCreative() */ || !enabled.get()) {
+            if (!playerEntity.isAlive() || !enabled.get()) {
                 return false;
             }
 
@@ -111,6 +111,10 @@ public class HealthFeature extends Feature {
 
         @Override
         public boolean addHealth(ServerPlayerEntity playerEntity, int amount, boolean threshold) {
+            if (!playerEntity.isAlive() || !enabled.get()) {
+                return false;
+            }
+
             int prevThreshold = this.threshold;
             int prevHealth = this.amount;
             amount = MathHelper.clamp(this.amount + amount, this.min, this.max);
@@ -139,9 +143,9 @@ public class HealthFeature extends Feature {
         @Override
         public void reset(ServerPlayerEntity playerEntity) {
             this.threshold = 0;
-            this.start = starting_health;
-            this.max = max_health.get();
-            this.min = min_health.get();
+            this.start = startingHealth;
+            this.max = maxHealth.get();
+            this.min = minHealth.get();
             this.amount = this.start;
             this.setHealth(playerEntity, this.start);
         }
@@ -200,18 +204,18 @@ public class HealthFeature extends Feature {
         }
 
         private boolean hasConfigChanged() {
-            for (String string : on_change_reset.get()) {
+            for (String string : onChangeReset.get()) {
                 string = string.toUpperCase();
 
-                if (string.equals("MIN_HEALTH") && min_health.get() != this.min) {
+                if (string.equals("MIN_HEALTH") && minHealth.get() != this.min) {
                     return true;
                 }
 
-                if (string.equals("MAX_HEALTH") && max_health.get() != this.max) {
+                if (string.equals("MAX_HEALTH") && maxHealth.get() != this.max) {
                     return true;
                 }
 
-                if (string.equals("STARTING_HEALTH") && starting_health != this.start) {
+                if (string.equals("STARTING_HEALTH") && startingHealth != this.start) {
                     return true;
                 }
             }
@@ -252,12 +256,12 @@ public class HealthFeature extends Feature {
                 manager.setHealth(player, manager.getHealth());
             });
 
-            if (starting_health == max_health.get() && min_health.get() <= 0 && !hardcore.get()) {
+            if (startingHealth == maxHealth.get() && minHealth.get() <= 0 && !hardcore.get()) {
                 manager.update(player);
                 return;
             }
 
-            int decrease = health_decrease.get();
+            int decrease = healthDecrease.get();
             if (event.isWasDeath() && !event.getOriginal().isSpectator() && !event.getOriginal().isCreative() && decrease > 0 && manager.isHealthRemovable()) {
                 int prevHealth = manager.getHealth();
                 manager.addHealth(player, -decrease);
@@ -292,7 +296,7 @@ public class HealthFeature extends Feature {
                 return;
             }
 
-            for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : items.entrySet()) {
+            for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : regenerativeItems.entrySet()) {
 
                 Item item = stack.getItem();
                 if (item.getRegistryName() == null || !item.getRegistryName().equals(entry.getKey())) {
@@ -315,7 +319,7 @@ public class HealthFeature extends Feature {
             return;
         }
 
-        for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : items.entrySet()) {
+        for (Map.Entry<ResourceLocation, Tuple<Integer, Boolean>> entry : regenerativeItems.entrySet()) {
 
             Item item = event.getItem().getItem();
             if (item.getRegistryName() == null || !item.getRegistryName().equals(entry.getKey())) {
@@ -338,50 +342,51 @@ public class HealthFeature extends Feature {
 
         builder.push("values");
 
-        max_health = builder
+        maxHealth = builder
                 .comment("The highest amount of health a player can have")
                 .worldRestart()
                 .defineInRange("maxHealthAmount", 20, 1, 1024);
 
-        min_health = builder
+        minHealth = builder
                 .comment("The lowest amount of health a player can have. Can be set to 0 in case only maxHealthAmount is wanted")
                 .worldRestart()
                 .defineInRange("minHealthAmount", 6, 0, 1024);
 
-        health_decrease = builder
+        healthDecrease = builder
                 .comment("The amount of health lost on each death. It will only work if minHealthAmount is higher than 0")
                 .worldRestart()
                 .defineInRange("deathDecreasedHealthAmount", 1, 0, 1024);
 
-        ForgeConfigSpec.ConfigValue<String> startingValue = builder
-                .comment("The starting health for the player. Possible values are MIN, MAX or just a number")
-                .worldRestart()
-                .define("startingHealthAmount", "MIN");
-
-        runnables.add(() -> {
-            String string = startingValue.get().toUpperCase();
+        customConfigValue(builder.comment("The starting health for the player. Possible values are MIN, MAX or just a number").worldRestart()
+                .define("startingHealthAmount", "MIN", obj -> {
+                    if (obj instanceof String) {
+                        String str = ((String) obj).toUpperCase();
+                        return str.equals("MIN") || str.equals("MAX") || Pattern.matches("^[0-9]*$", str);
+                    } else return false;
+                }), (value) -> {
+            String string = value.get().toUpperCase();
             if (string.equals("MIN")) {
-                if (min_health.get() == 0) {
+                if (minHealth.get() == 0) {
                     StatsKeeper.LOGGER.error("'startingHealthAmount' cannot be set to '{}' while 'minHealthAmount' is set to 0.", string);
                     StatsKeeper.LOGGER.error("Using 'maxHealthAmount' as an alternative! Things will not behave as expected.");
-                    starting_health = max_health.get();
-                } else starting_health = min_health.get();
+                    startingHealth = maxHealth.get();
+                } else startingHealth = minHealth.get();
             } else if (string.equals("MAX")) {
-                starting_health = max_health.get();
+                startingHealth = maxHealth.get();
             } else {
                 int i = Integer.parseInt(string.replaceAll("[^0-9]", ""));
-                if (i > max_health.get() || i < min_health.get()) {
+                if (i > maxHealth.get() || i < minHealth.get()) {
                     StatsKeeper.LOGGER.error("'startingHealthAmount' '{}' is out of bounds!", i);
-                    if (min_health.get() == 0) {
+                    if (minHealth.get() == 0) {
                         StatsKeeper.LOGGER.error("Using 'maxHealthAmount' as an alternative! Things will not behave as expected.");
-                        starting_health = max_health.get();
+                        startingHealth = maxHealth.get();
                     } else {
                         StatsKeeper.LOGGER.error("Using 'minHealthAmount' as an alternative! Things will not behave as expected.");
-                        starting_health = min_health.get();
+                        startingHealth = minHealth.get();
                     }
                     return;
                 }
-                starting_health = i;
+                startingHealth = i;
             }
         });
 
@@ -390,10 +395,14 @@ public class HealthFeature extends Feature {
         builder.push("additional");
 
         List<String> defaults = Arrays.asList("MIN_HEALTH", "MAX_HEALTH", "STARTING_HEALTH");
-        on_change_reset = builder
+        onChangeReset = builder
                 .comment("Config options which should be considered for the reset of health. All available are used by default")
                 .worldRestart()
-                .defineList("configChangeReset", defaults, o -> o != null && String.class.isAssignableFrom(o.getClass()) && defaults.contains(o.toString().toUpperCase()));
+                .defineList("configChangeReset", defaults, obj -> {
+                    if (obj instanceof String) {
+                        return defaults.contains(((String) obj).toUpperCase());
+                    } else return false;
+                });
 
         message = builder
                 .comment("Show a message when a threshold is reached and when health is gained or lost")
@@ -405,15 +414,13 @@ public class HealthFeature extends Feature {
                 .worldRestart()
                 .define("hardcoreMode", false);
 
-        ForgeConfigSpec.ConfigValue<List<? extends Integer>> thresholdsValue = builder
-                .comment("Values which, when achieved, move the lowest health of the player to the achieved value.\n" +
-                        "The first threshold can also be non-removable, meaning that the health won't be removed till the player is over that threshold.\n" +
-                        "This can only be used on the first threshold. To use it make the number negative. Make sure that the values are in ascending order!")
-                .worldRestart()
-                .defineList("healthThresholds", Lists.newArrayList(-8, 16), o -> o != null && Integer.class.isAssignableFrom(o.getClass()));
-
-        runnables.add(() -> thresholds = ImmutableSortedSet.copyOf(thresholdsValue.get()));
-
+        customConfigValue(builder
+                        .comment("Values which, when achieved, move the lowest health of the player to the achieved value.\n" +
+                                "The first threshold can also be non-removable, meaning that the health won't be removed till the player is over that threshold.\n" +
+                                "This can only be used on the first threshold. To use it make the number negative. Make sure that the values are in ascending order!")
+                        .worldRestart()
+                        .defineList("healthThresholds", Lists.newArrayList(-8, 16), o -> o != null && Integer.class.isAssignableFrom(o.getClass())),
+                (value) -> thresholds = ImmutableSortedSet.copyOf(value.get()));
 
         ForgeConfigSpec.ConfigValue<List<? extends String>> itemsValue = builder
                 .comment("Items that increase/decrease health when used. Use an equal sign to define how much health is gained or lost.\n" +
@@ -422,35 +429,41 @@ public class HealthFeature extends Feature {
                 .worldRestart()
                 .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), o -> o != null && String.class.isAssignableFrom(o.getClass()));
 
-        runnables.add(() -> {
-            items = new HashMap<>();
-            for (String string : itemsValue.get()) {
-                string = string.replaceAll("[\\s+]", "");
+        customConfigValue(builder
+                        .comment("Items that increase/decrease health when used. Use an equal sign to define how much health is gained or lost.\n" +
+                                "e.g. 'minecraft:apple = 1', the health gets increased by 0.5 hearts.\n" +
+                                "Appending a ':' after the number will make the item that decreases health also bypass healthThresholds")
+                        .worldRestart()
+                        .defineList("regenerativeItems", Lists.newArrayList("minecraft:nether_star = 1"), o -> o != null && String.class.isAssignableFrom(o.getClass())),
+                (value) -> {
+                    regenerativeItems = new HashMap<>();
+                    for (String string : itemsValue.get()) {
+                        string = string.replaceAll("[\\s+]", "");
 
-                String name = string.substring(0, string.indexOf("="));
+                        String name = string.substring(0, string.indexOf("="));
 
-                if (!ForgeRegistries.ITEMS.containsKey(new ResourceLocation(name))) {
-                    StatsKeeper.LOGGER.error("Regenerative Item '{}' could not be found in the item registry. Skipping...", name);
-                    continue;
-                }
+                        if (!ForgeRegistries.ITEMS.containsKey(new ResourceLocation(name))) {
+                            StatsKeeper.LOGGER.error("Regenerative Item '{}' could not be found in the item registry. Skipping...", name);
+                            continue;
+                        }
 
-                int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1, (string.endsWith(":") ? string.lastIndexOf(":") : string.length())).trim());
+                        int amount = Integer.parseInt(string.substring(string.indexOf("=") + 1, (string.endsWith(":") ? string.lastIndexOf(":") : string.length())).trim());
 
-                if (amount == 0) {
-                    StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot have health set to 0. Skipping...", name);
-                    continue;
-                }
+                        if (amount == 0) {
+                            StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot have health set to 0. Skipping...", name);
+                            continue;
+                        }
 
-                boolean bypass = string.endsWith(":");
+                        boolean bypass = string.endsWith(":");
 
-                if (bypass && amount > 0) {
-                    StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot bypass thresholds when it gains health. Skipping...", name);
-                    continue;
-                }
+                        if (bypass && amount > 0) {
+                            StatsKeeper.LOGGER.error("Regenerative Item '{}' cannot bypass thresholds when it gains health. Skipping...", name);
+                            continue;
+                        }
 
-                items.put(new ResourceLocation(name), new Tuple<>(amount, bypass));
-            }
-        });
+                        regenerativeItems.put(new ResourceLocation(name), new Tuple<>(amount, bypass));
+                    }
+                });
 
         builder.pop();
     }

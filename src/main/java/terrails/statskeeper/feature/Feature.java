@@ -5,6 +5,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class Feature {
 
@@ -34,5 +35,9 @@ public abstract class Feature {
 
     public void configLoad() {
         runnables.forEach(Runnable::run);
+    }
+
+    protected <T> void customConfigValue(ForgeConfigSpec.ConfigValue<T> value, Consumer<ForgeConfigSpec.ConfigValue<T>> consumer) {
+        runnables.add(() -> consumer.accept(value));
     }
 }
