@@ -11,7 +11,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 
 def minecraft_version = "1.16.4"
-def forge_version = "35.0.18"
+def forge_version = "35.1.28"
 def mappings_version = ["snapshot", "20201028-1.16.3"]
 
 version = "5.3.11"
@@ -47,14 +47,6 @@ minecraft {
         }
     }
 }
-
-
-repositories {
-    maven {
-        url 'https://www.dogforce-games.com/maven'
-    }
-}
-
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
