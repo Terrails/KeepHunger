@@ -3,5 +3,5 @@
 potion.stats_keeper.appetite=Нет аппетита
 health.statskeeper.death_remove=Ой, вы потеряли %s сердце(ца)!
 health.statskeeper.item_add=Вы получили %s сердце(ца)!
-health.statskeeper.item_lose=You lost %s heart(s)!" # NEEDS TRANSLATION #
-health.statskeeper.threshold=Your lowest health has been set to %s heart(s)! # NEEDS TRANSLATION #
+health.statskeeper.item_lose=Вы потеряли %s сердце(ца)!"
+health.statskeeper.threshold=Ваше самое низкое здоровье установлено на %s сердце(ца)!
